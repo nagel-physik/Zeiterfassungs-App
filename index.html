@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v15.4</title>
+    <title>Arbeitszeit-Assistent Pro v15.5</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -16,36 +16,28 @@
         .app-header { width: 100%; text-align: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); position: relative; }
         .app-header h1 { font-size: 1.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); margin: 0; }
         .help-trigger { position: absolute; right: 0; top: 0; background: var(--primary); color: var(--bg); width: 24px; height: 24px; border-radius: 50%; font-weight: bold; font-size: 0.9rem; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; }
-        
         .card { background: var(--card); padding: 20px; border-radius: 20px; margin-bottom: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.4); text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .next-info { background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 18px; padding: 15px; text-align: left; margin-bottom: 12px; border-left: 5px solid var(--primary); }
         .timer-display { font-size: 2.6rem; font-weight: 800; margin: 5px 0; color: var(--text); font-variant-numeric: tabular-nums; }
-        
         .btn { border: none; padding: 14px; border-radius: 12px; font-weight: bold; width: 100%; margin-bottom: 8px; cursor: pointer; color: white; transition: 0.2s; font-size: 1rem; }
         .btn-start { background: var(--success); }
         .btn-stop { background: var(--danger) !important; }
         .btn-setup { background: #475569; }
         .btn-refresh { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-extra { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid var(--primary); }
-
         .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
         .progress-bar { height: 10px; background: #020617; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
         .progress-fill { height: 100%; width: 0%; transition: width 1s ease-in-out; }
-        
         #log-container { max-height: 100px; overflow-y: auto; margin-top: 10px; scrollbar-width: none; width: 100%; }
         .log-entry { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
-        
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; padding: 0; }
         .modal-content { background: var(--card); min-height: 100vh; padding: 70px 20px 40px 20px; box-sizing: border-box; }
         .modal-nav { position: fixed; top: 0; left: 0; right: 0; background: var(--card); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--primary); z-index: 1001; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .nav-btn { background: none; border: none; font-size: 0.9rem; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-        
         .help-text { text-align: left; font-size: 0.85rem; line-height: 1.4; color: #cbd5e1; }
         .help-text h3 { color: var(--primary); margin-top: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 8px; }
-        .help-text p { margin: 8px 0; }
-        .help-text b { color: var(--accent); }
-
         input, select { background: #0f172a; border: 1px solid var(--primary); color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 15px 0; box-sizing: border-box; font-size: 1rem; }
+        input::placeholder { color: rgba(255, 255, 255, 0.3); }
         label { font-size: 0.75rem; font-weight: bold; color: var(--primary); text-transform: uppercase; }
         .manual-box { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: left; }
     </style>
@@ -76,10 +68,8 @@
             <button id="week-btn" style="border:none; padding:8px 18px; border-radius:10px; color:white; font-weight:bold; cursor:pointer;" onclick="toggleWeekManual()">Woche <span id="week-label">A</span></button>
             <div style="font-size: 0.8rem; font-weight: bold; color: #94a3b8;">Ziel: <span id="soll-info" style="color:white;">26</span> Std/Wo</div>
         </div>
-        
         <div id="main-timer" class="timer-display">00:00:00</div>
         <button id="btn-main" class="btn btn-start" onclick="toggleMain()">Dienst starten</button>
-
         <div class="progress-container" style="margin-top: 15px;">
             <div class="progress-label"><span>Tag Unterricht (Soll)</span><span id="day-percent">0%</span></div>
             <div class="progress-bar"><div id="day-progress" class="progress-fill" style="background: var(--accent);"></div></div>
@@ -176,16 +166,16 @@
             <div class="help-text" style="padding: 20px;">
                 <p>Willkommen beim Arbeitszeit-Assistenten. Diese App dient der lückenlosen Dokumentation Ihrer Dienstzeit.</p>
                 <h3>1. Installation auf dem Handy</h3>
-                <p>Öffnen Sie diese Seite im Browser (Safari bei iPhone). Tippen Sie auf das <b>Teilen-Icon</b> (Quadrat mit Pfeil) und wählen Sie <b>"Zum Home-Bildschirm"</b>. Die App erscheint nun mit eigenem Icon auf Ihrem Startbildschirm.</p>
+                <p>Öffnen Sie diese Seite im Browser (Safari bei iPhone). Tippen Sie auf das <b>Teilen-Icon</b> und wählen Sie <b>"Zum Home-Bildschirm"</b>.</p>
                 <h3>2. Erstmalige Einrichtung (Setup)</h3>
                 <p>Tippen Sie unten auf das <b>Zahnrad (⚙️ Einstellungen)</b>. Tragen Sie Ihren Namen und Ihr <b>Wochen-Soll</b> ein. Füllen Sie Ihren Stundenplan für die A- und B-Woche aus.</p>
-                <p><b>Hinweis:</b> Ein Block (B1-B4) entspricht immer <b>90 Minuten</b> (2 Schulstunden à 45 Min.).</p>
+                <p><b>Hinweis:</b> Ein Block (B1-B4) entspricht immer <b>90 Minuten</b>.</p>
                 <h3>3. Dienstantritt & Feierabend</h3>
-                <p>Drücken Sie bei Ankunft in der Schule auf <b>"Dienst starten"</b>. Bei Verlassen drücken Sie <b>"Dienst beenden"</b>. Jeder beendete Dienst wird automatisch in die Monatsliste gespeichert.</p>
+                <p>Drücken Sie bei Ankunft in der Schule auf <b>"Dienst starten"</b>. Bei Verlassen drücken Sie <b>"Dienst beenden"</b>. Jeder beendete Dienst wird automatisch gespeichert.</p>
                 <h3>4. Der Live-Assistent</h3>
                 <p>Das blaue Feld oben zeigt Ihnen immer an, wo Sie gerade sein müssen und was Sie sich als Notiz für diesen Block notiert haben.</p>
                 <h3>5. Korrektur & Nachtrag</h3>
-                <p>Haben Sie vergessen den Timer zu drücken? Gehen Sie in die <b>Einstellungen</b>. Dort können Sie die Ankunft oder den Feierabend jederzeit mit dem Uhrzeit-Rad nachpflegen.</p>
+                <p>Haben Sie vergessen den Timer zu drücken? Gehen Sie in die <b>Einstellungen</b>. Dort können Sie die Ankunft oder den Feierabend jederzeit nachpflegen.</p>
                 <h3>6. Tages-Reset</h3>
                 <p>Die <b>Historie (Logs)</b> unten zeigt Ihre heutigen Aktionen. Diese Liste löscht sich jede Nacht automatisch von selbst.</p>
             </div>`;
@@ -210,7 +200,7 @@
             <div class="manual-box" style="border-color:var(--success);">
                 <label style="color:var(--success);">📊 Monatsexport (${db.length} Einträge)</label>
                 <button class="btn btn-start" style="background:var(--success); font-size:0.8rem;" onclick="exportToExcel()">📥 EXPORT FÜR EXCEL/NUMBERS</button>
-                <button class="btn btn-refresh" style="font-size:0.7rem; border-color:var(--danger); color:var(--danger);" onclick="if(confirm('Monatsdaten wirklich löschen?')) {db=[]; localStorage.setItem('lehrerDB_Export', JSON.stringify(db)); location.reload();}">🗑️ Monat zurücksetzen</button>
+                <button class="btn btn-refresh" style="font-size:0.7rem; border-color:var(--danger); color:var(--danger);" onclick="if(confirm('Monat löschen?')) {db=[]; localStorage.setItem('lehrerDB_Export', JSON.stringify(db)); location.reload();}">🗑️ Monat zurücksetzen</button>
             </div>
             <label>Name</label><input type="text" id="user-input" value="${userName}">
             <label>Wochen-Soll</label>
@@ -223,7 +213,7 @@
                 blocks.forEach(b => {
                     const entry = plan[k]?.[b.id] || { text: "", note: "" };
                     html += `<div style="margin-top:5px;"><label>${b.label}</label>
-                    <input type="text" list="suggestions" placeholder="Fach | Klasse | Raum" onchange="saveData('${k}','${b.id}','text',this.value)" value="${entry.text}">
+                    <input type="text" list="suggestions" placeholder="${b.type==='lesson' ? 'Fach | Klasse | Raum' : 'Ort der Aufsicht...'}" onchange="saveData('${k}','${b.id}','text',this.value)" value="${entry.text}">
                     ${b.type==='lesson' ? `<input type="text" placeholder="Notiz..." onchange="saveData('${k}','${b.id}','note',this.value)" value="${entry.note||''}">` : ''}</div>`;
                 }); html += `</div>`;
             });
@@ -308,7 +298,7 @@
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `Zeiterfassung_${userName}.csv`;
+        link.download = `Export_${userName}.csv`;
         link.click();
     }
 
