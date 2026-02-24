@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v16.5 Final</title>
+    <title>Arbeitszeit-Assistent Pro v16.7</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -28,6 +28,8 @@
         .btn-refresh { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-extra { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid var(--primary); }
         .btn-vz { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-confirm { background: var(--accent) !important; color: var(--bg) !important; animation: pulse-confirm 0.5s infinite; }
+        @keyframes pulse-confirm { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
         .btn-vz.active { background: var(--danger); color: white; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
         .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
@@ -46,6 +48,7 @@
         input, select { background: #0f172a; border: 1px solid var(--primary); color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 15px 0; box-sizing: border-box; font-size: 1rem; }
         label { font-size: 0.75rem; font-weight: bold; color: var(--primary); text-transform: uppercase; }
         .manual-box { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: left; }
+        .footer-info { margin-top: 25px; font-size: 0.65rem; color: #475569; text-align: center; width: 100%; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -79,8 +82,8 @@
         </div>
         <div id="main-timer" class="timer-display">00:00:00</div>
         <button id="btn-main" class="btn btn-start" onclick="toggleMain()">Dienst starten</button>
-        <button id="btn-vz" class="btn btn-vz" onclick="toggleVZ()">+ Vertretung (90m)</button>
-        <button id="btn-extra" class="btn btn-extra" onclick="toggleExtra()">Konferenz / Termin</button>
+        <button id="btn-vz" class="btn btn-vz" onclick="handleVZClick()">+ Vertretung (90m)</button>
+        <button id="btn-extra" class="btn btn-extra" onclick="handleExtraClick()">Konferenz / Termin</button>
         <div class="progress-container" style="margin-top: 20px;">
             <div class="progress-label"><span>Tag Unterricht (Soll)</span><span id="day-percent">0%</span></div>
             <div class="progress-bar"><div id="day-progress" class="progress-fill" style="background: var(--accent);"></div></div>
@@ -97,6 +100,10 @@
         <button class="btn btn-setup" onclick="openSetup()">⚙️ Einstellungen</button>
         <button class="btn btn-refresh" onclick="location.reload()">🔄 Refresh</button>
     </div>
+
+    <footer class="footer-info">
+        &copy; 2026 Michael Nagel &bull; v16.7
+    </footer>
 </div>
 
 <div id="modal"><div class="modal-content" id="modal-body"></div></div>
@@ -113,7 +120,8 @@
     let weeklySollHours = localStorage.getItem('weeklySollV13') || 26;
     let userName = localStorage.getItem('userNameV13') || 'Lehrkraft';
     let vocabulary = JSON.parse(localStorage.getItem('lehrerVocabV13')) || [];
-    let mainInterval;
+    let mainInterval, vzWatcherInterval;
+    let confirmVZ = false, confirmExtra = false;
 
     const blocks = [
         { id: 'b1', start: '07:30', end: '09:00', label: '1. Block', type: 'lesson' },
@@ -126,7 +134,6 @@
         { id: 'a4', start: '15:15', end: '15:30', label: '4. Aufsicht', type: 'duty' }
     ];
 
-    // FIX: TÄGLICHER RESET DER LOGS UM 0:00 UHR
     const todayStr = new Date().toDateString();
     const storedLogDate = localStorage.getItem('logDateV13');
     if(storedLogDate !== todayStr) { 
@@ -149,6 +156,10 @@
             addLog("Ankunft"); updateUI();
         } else {
             if(confirm("Dienst beenden?")) {
+                const elapsed = (Date.now() - session.start) / 1000;
+                if(elapsed < 30) {
+                    if(confirm("Eintrag ist kürzer als 30 Sek. NICHT speichern?")) { session.active = false; localStorage.removeItem('activeSessionV13'); location.reload(); return; }
+                }
                 saveToDB('Hauptdienst', session.start, Date.now());
                 addLog("Feierabend");
                 session.active = false; localStorage.removeItem('activeSessionV13'); location.reload();
@@ -156,20 +167,67 @@
         }
     }
 
-    function toggleVZ() {
-        if (!vzSession.active) {
-            if(confirm("90 Minuten Vertretung (VZ) starten?")) {
-                vzSession = { active: true, start: Date.now() };
-                localStorage.setItem('vzSessionV13', JSON.stringify(vzSession));
-                addLog("VZ Start"); updateUI();
+    function handleVZClick() {
+        if(vzSession.active) {
+            if(confirm("Vertretung vorzeitig beenden?")) {
+                const elapsed = (Date.now() - vzSession.start) / 1000;
+                if(elapsed < 30) { if(confirm("Kurze Zeit. Eintrag ignorieren?")) { vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload(); return; } }
+                stopVZManually();
             }
-        } else {
-            if(confirm("Vertretung vorzeitig stoppen? (Zeit wird gespeichert)")) {
-                saveToDB('Vertretung (VZ)', vzSession.start, Date.now());
-                addLog("VZ Ende");
-                vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload();
-            }
+            return;
         }
+        if(!confirmVZ) {
+            confirmVZ = true; const btn = document.getElementById('btn-vz');
+            btn.innerText = "Sicher? (Hier tippen)"; btn.classList.add('btn-confirm');
+            setTimeout(() => { confirmVZ = false; if(!vzSession.active) { btn.innerText = "+ Vertretung (90m)"; btn.classList.remove('btn-confirm'); } }, 3000);
+        } else { toggleVZ(); }
+    }
+
+    function toggleVZ() {
+        vzSession = { active: true, start: Date.now() };
+        localStorage.setItem('vzSessionV13', JSON.stringify(vzSession));
+        addLog("VZ Start"); startVZWatcher(); updateUI();
+    }
+
+    function startVZWatcher() {
+        if(vzWatcherInterval) clearInterval(vzWatcherInterval);
+        vzWatcherInterval = setInterval(() => {
+            if (vzSession.active) {
+                const elapsed = Date.now() - vzSession.start;
+                if (elapsed >= 90 * 60000) {
+                    saveToDB('Vertretung (VZ)', vzSession.start, vzSession.start + 90 * 60000);
+                    addLog("VZ Ende (Auto)"); vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload();
+                }
+            }
+        }, 5000);
+    }
+
+    function stopVZManually() {
+        saveToDB('Vertretung (VZ)', vzSession.start, Date.now());
+        addLog("VZ Ende"); vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload();
+    }
+
+    function handleExtraClick() {
+        if(extraSession.active) {
+            if(confirm("Konferenz/Termin beenden?")) {
+                const elapsed = (Date.now() - extraSession.start) / 1000;
+                if(elapsed < 30) { if(confirm("Kurze Zeit. Eintrag ignorieren?")) { extraSession.active = false; localStorage.removeItem('extraSessionV13'); location.reload(); return; } }
+                saveToDB('Konferenz', extraSession.start, Date.now());
+                addLog("Konf. Ende"); extraSession.active = false; localStorage.removeItem('extraSessionV13'); location.reload();
+            }
+            return;
+        }
+        if(!confirmExtra) {
+            confirmExtra = true; const btn = document.getElementById('btn-extra');
+            btn.innerText = "Sicher? (Hier tippen)"; btn.classList.add('btn-confirm');
+            setTimeout(() => { confirmExtra = false; if(!extraSession.active) { btn.innerText = "Konferenz / Termin"; btn.classList.remove('btn-confirm'); } }, 3000);
+        } else { toggleExtra(); }
+    }
+
+    function toggleExtra() {
+        extraSession = { active: true, start: Date.now() };
+        localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
+        addLog("Konf. Start"); location.reload();
     }
 
     function saveToDB(typ, start, end) {
@@ -193,9 +251,7 @@
             localStorage.removeItem('activeSessionV13');
             localStorage.removeItem('vzSessionV13');
             localStorage.removeItem('extraSessionV13');
-            logs = [];
-            localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
-            location.reload();
+            logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); location.reload();
         }
     }
 
@@ -207,38 +263,36 @@
                 <div></div>
             </div>
             <div class="help-text" style="padding: 10px 20px 40px 20px;">
-                <p>Willkommen bei deiner persönlichen Arbeitszeiterfassung. Hier erfährst du alles, was du für einen reibungslosen Start wissen musst.</p>
+                <p>Willkommen bei deiner persönlichen Arbeitszeiterfassung. Hier erfährst du alles Wichtige:</p>
                 
                 <h2>1. Installation & Start</h2>
-                <h3>App-Gefühl auf dem iPhone/Android</h3>
-                <p>Öffnen Sie die Seite in Safari. Tippe auf das <b>Teilen-Symbol</b> (Quadrat mit Pfeil) und wähle <b>"Zum Home-Bildschirm"</b>. Die App erscheint nun mit eigenem Icon auf deinem Startbildschirm und lässt sich wie eine echte App bedienen.</p>
+                <h3>App-Gefühl auf dem Smartphone</h3>
+                <p>Öffne die Seite in Safari (iPhone) oder Chrome (Android). Tippe auf das <b>Teilen-Symbol</b> (Quadrat mit Pfeil) und wähle <b>"Zum Home-Bildschirm hinzufügen"</b>. So startest du die App ohne Browser-Leiste.</p>
                 
                 <h2>2. Die erste Einrichtung (Setup)</h2>
                 <h3>Stundenplan hinterlegen</h3>
-                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib deinen Namen und dein Wochen-Soll (z.B. 26 Std.) ein. Trage dann deinen Plan für Woche A und B ein. Ein "Block" entspricht dabei immer <b>90 Minuten</b> (2 Schulstunden).</p>
-                <h3>Wochenwechsel</h3>
-                <p>Auf der Startseite kannst du jederzeit zwischen Woche A und B umschalten. Die App merkt sich deine Wahl.</p>
+                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib deinen Namen und dein Wochen-Soll (z.B. 26 Std.) ein. Trage dann deinen Plan für Woche A und B ein. Ein "Block" entspricht dabei immer <b>90 Minuten</b>.</p>
                 
-                <h2>3. Der Dienst-Alltag</h2>
+                <h2>3. Der Dienst-Alltag & Sicherheit</h2>
                 <h3>Dienst starten/beenden</h3>
-                <p>Tippe bei Ankunft auf <b>"Dienst starten"</b>. Der Timer läuft im Hintergrund weiter. Bei Verlassen tippst du auf <b>"Dienst beenden"</b>. Dein Feierabend wird nun in der Monatsliste gespeichert.</p>
-                <h3>Vertretung (+ Vertretung Button)</h3>
-                <p>Musst du eine Vertretungsstunde machen? Tippe auf den roten Button. Er läuft automatisch <b>90 Minuten</b>. Danach speichert er die VZ selbstständig ab. Der <b>rote Balken</b> zeigt dir, wie viele Vertretungen du diesen Monat bereits geleistet hast.</p>
-                <h3>Konferenz / Termin</h3>
-                <p>Für Elternabende oder Sitzungen. Dieser Timer läuft so lange, bis du ihn manuell wieder stoppst.</p>
+                <p>Tippe bei Ankunft auf <b>"Dienst starten"</b>. Der Timer läuft im Hintergrund weiter.</p>
+                <h3>Scharfschalten (VZ & Konferenz)</h3>
+                <p>Um versehentliche Klicks zu vermeiden, müssen diese Buttons <b>zweimal</b> innerhalb von 3 Sekunden getippt werden. Beim ersten Tippen färbt sich der Button gelb ("Sicher?").</p>
+                <h3>Automatischer Log-out (VZ)</h3>
+                <p>Eine Vertretung wird automatisch nach <b>90 Minuten</b> beendet und gespeichert, falls du vergisst, sie manuell zu stoppen.</p>
+                <h3>Fehlklick-Schutz</h3>
+                <p>Einträge, die kürzer als 30 Sekunden laufen, werden beim Stoppen abgefragt. So kannst du versehentliche Timer sofort löschen, damit dein Excel sauber bleibt.</p>
                 
                 <h2>4. Auswertung & Export</h2>
                 <h3>Daten für Excel/Numbers</h3>
-                <p>Gehe am Monatsende in die <b>⚙️ Einstellungen</b> und tippe auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird in deinem Datei-Ordner (Downloads) gespeichert. Du kannst sie direkt mit <b>Numbers</b> oder Excel öffnen und hast einen perfekten Nachweis deiner Stunden.</p>
+                <p>Gehe in die <b>⚙️ Einstellungen</b> und tippe auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert und kann direkt mit Excel oder Numbers geöffnet werden.</p>
                 
                 <h2>5. Fehler korrigieren</h2>
                 <h3>Nachtrag</h3>
-                <p>Hast du vergessen zu "stempeln"? In den Einstellungen kannst du unter <b>"NACHTRAG"</b> die Uhrzeit für Ankunft, Vertretung oder Konferenzen ganz einfach manuell nachpflegen.</p>
-                <h3>Tages-Reset (Testmodus)</h3>
-                <p>Wenn du die App nur ausprobieren wolltest und die Balken auf Null setzen willst: In den Einstellungen gibt es einen Button <b>"HEUTIGEN TAG AUF NULL SETZEN"</b>. Er löscht alle heutigen Timer und Excel-Einträge, lässt deinen Stundenplan aber unberührt.</p>
+                <p>In den Einstellungen kannst du unter <b>"NACHTRAG"</b> Uhrzeiten manuell nachpflegen, falls du das Stempeln vergessen hast.</p>
                 
                 <h2>6. Automatischer Reset</h2>
-                <p>Die kleine Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst, damit du morgens wieder mit einer sauberen Übersicht startest.</p>
+                <p>Die Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst.</p>
             </div>`;
         document.getElementById('modal').style.display = 'block';
     }
@@ -292,8 +346,7 @@
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `Zeiten_${userName}.csv`;
-        link.click();
+        link.download = `Zeiten_${userName}.csv`; link.click();
     }
 
     function updateUI() {
@@ -310,11 +363,13 @@
             if (mainInterval) { clearInterval(mainInterval); mainInterval = null; }
         }
         const vzBtn = document.getElementById('btn-vz');
-        if (vzSession.active) {
-            vzBtn.innerText = "Vertretung läuft... (Stoppen?)"; vzBtn.classList.add('active');
-        } else {
-            vzBtn.innerText = "+ Vertretung (90m)"; vzBtn.classList.remove('active');
-        }
+        if (vzSession.active) { vzBtn.innerText = "Vertretung läuft... (Stoppen?)"; vzBtn.classList.add('active'); vzBtn.classList.remove('btn-confirm'); }
+        else { vzBtn.innerText = "+ Vertretung (90m)"; vzBtn.classList.remove('active'); vzBtn.classList.remove('btn-confirm'); }
+        
+        const extraBtn = document.getElementById('btn-extra');
+        if (extraSession.active) { extraBtn.innerText = "Konferenz läuft... (Stoppen?)"; extraBtn.style.background = "var(--danger)"; extraBtn.classList.remove('btn-confirm'); }
+        else { extraBtn.innerText = "Konferenz / Termin"; extraBtn.style.background = ""; extraBtn.classList.remove('btn-confirm'); }
+
         const currentMonth = new Date().getMonth();
         const vzCount = db.filter(e => {
             const dParts = e.datum.split('.');
@@ -329,109 +384,16 @@
         renderLogs();
     }
 
-    function processNachtrag() {
-        const timeVal = document.getElementById('nachtrag-time').value;
-        const [h, m, s] = timeVal.split(':');
-        const target = new Date(); target.setHours(h, m, s || 0);
-        const cat = document.getElementById('nachtrag-cat').value;
-        if(cat === 'main') {
-            if(document.getElementById('nachtrag-type').value === 'start') {
-                session = { active: true, start: target.getTime(), day: new Date().toDateString() };
-                localStorage.setItem('activeSessionV13', JSON.stringify(session));
-                addLog("Nachtrag Start");
-            } else { saveToDB('Hauptdienst', session.start, target.getTime()); addLog("Nachtrag Ende"); session.active = false; localStorage.removeItem('activeSessionV13'); }
-        } else if(cat === 'vz') {
-            if(document.getElementById('nachtrag-type').value === 'start') {
-                vzSession = { active: true, start: target.getTime() };
-                localStorage.setItem('vzSessionV13', JSON.stringify(vzSession));
-                addLog("Nachtrag VZ Start");
-            } else { saveToDB('Vertretung (VZ)', vzSession.start, target.getTime()); addLog("Nachtrag VZ Ende"); vzSession.active = false; localStorage.removeItem('vzSessionV13'); }
-        } else {
-            if(document.getElementById('nachtrag-type').value === 'start') {
-                extraSession = { active: true, start: target.getTime() };
-                localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
-                addLog("Nachtrag Konf. Start");
-            } else { saveToDB('Konferenz', extraSession.start, target.getTime()); addLog("Nachtrag Konf. Ende"); extraSession.active = false; localStorage.removeItem('extraSessionV13'); }
-        }
-        location.reload();
-    }
-
-    function updateProgressBar() {
-        const days = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
-        const todayKey = `${currentWeek}-${days[new Date().getDay()]}`;
-        let dailySollMin = 0;
-        if(plan[todayKey]) { [1,2,3,4].forEach(n => { if(plan[todayKey]['b'+n] && plan[todayKey]['b'+n].text) dailySollMin += 90; }); }
-        const elapsedMin = session.active ? (Date.now() - session.start) / 60000 : 0;
-        const dPerc = dailySollMin > 0 ? Math.min((elapsedMin/dailySollMin)*100, 100) : 0;
-        const wPerc = Math.min((elapsedMin/(weeklySollHours*45))*100, 100);
-        document.getElementById('day-progress').style.width = dPerc + "%";
-        document.getElementById('day-percent').innerText = Math.round(dPerc) + "%";
-        document.getElementById('week-progress').style.width = wPerc + "%";
-        document.getElementById('week-percent').innerText = Math.round(wPerc) + "%";
-    }
-
-    function updateAssistant() {
-        const now = new Date(); const currentTime = now.getHours() * 60 + now.getMinutes();
-        const todayKey = `${currentWeek}-${['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()]}`;
-        let found = false;
-        for (let block of blocks) {
-            const [hE, mE] = block.end.split(':').map(Number);
-            if (currentTime < (hE * 60 + mE)) {
-                const entry = plan[todayKey]?.[block.id];
-                if (entry && entry.text) {
-                    const [hS, mS] = block.start.split(':').map(Number);
-                    const isNow = currentTime >= (hS * 60 + mS);
-                    document.getElementById('task-status').innerText = isNow ? "JETZT AKTIV" : "DEMNÄCHST";
-                    document.getElementById('task-title').innerText = entry.text;
-                    document.getElementById('task-details').innerText = `Zeit: ${block.start} - ${block.end}`;
-                    document.getElementById('task-card').style.borderLeftColor = isNow ? (block.type === 'duty' ? 'var(--accent)' : 'var(--primary)') : 'rgba(255,255,255,0.1)';
-                    if (entry.note) { document.getElementById('task-note').innerText = "💡 " + entry.note; document.getElementById('task-note').style.display = 'block'; }
-                    else { document.getElementById('task-note').style.display = 'none'; }
-                    found = true; break;
-                }
-            }
-        }
-        if (!found) { document.getElementById('task-status').innerText = "Bereit"; document.getElementById('task-title').innerText = "Keine Termine"; document.getElementById('task-details').innerText = "Guten Tag!"; document.getElementById('task-note').style.display = 'none'; }
-    }
-
-    function addLog(msg) { logs.unshift({ time: new Date().toLocaleTimeString().substr(0,5), msg }); if(logs.length > 5) logs.pop(); localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); renderLogs(); }
-    function renderLogs() { document.getElementById('log-container').innerHTML = logs.map(l => `<div class="log-entry"><span>${l.msg}</span><span style="color:var(--primary); font-weight:bold;">${l.time}</span></div>`).join(''); }
     function saveData(k, id, f, v) { if(!plan[k]) plan[k]={}; if(!plan[k][id]) plan[k][id]={}; plan[k][id][f] = v; if(f==='text' && v.length > 2 && !vocabulary.includes(v)) { vocabulary.push(v); localStorage.setItem('lehrerVocabV13', JSON.stringify(vocabulary)); } }
     function saveAll() { userName = document.getElementById('user-input').value; weeklySollHours = document.getElementById('soll-select').value; localStorage.setItem('userNameV13', userName); localStorage.setItem('weeklySollV13', weeklySollHours); localStorage.setItem('lehrerPlanV13', JSON.stringify(plan)); location.reload(); }
     function toggleWeekManual() { currentWeek = currentWeek === 'A' ? 'B' : 'A'; localStorage.setItem('manualWeekV13', currentWeek); location.reload(); }
-    
-    function toggleExtra() { 
-        if(!extraSession.active) { 
-            extraSession = { active:true, start:Date.now() }; 
-            localStorage.setItem('extraSessionV13', JSON.stringify(extraSession)); 
-            addLog("Konf. Start"); location.reload(); 
-        } else { 
-            if(confirm("Konferenz beenden?")) { 
-                saveToDB('Konferenz', extraSession.start, Date.now()); 
-                addLog("Konf. Ende"); extraSession.active = false; localStorage.removeItem('extraSessionV13'); 
-                location.reload(); 
-            } 
-        } 
-    }
 
     window.onload = () => {
         updateUI();
         if(vzSession.active) {
-            setInterval(() => {
-                const elapsed = Date.now() - vzSession.start;
-                if (elapsed >= 90 * 60000) {
-                    saveToDB('Vertretung (VZ)', vzSession.start, vzSession.start + 90 * 60000);
-                    addLog("VZ Ende (90m)"); vzSession.active = false; localStorage.removeItem('vzSessionV13');
-                    location.reload();
-                }
-            }, 1000);
-        }
-        if(extraSession.active) { 
-            setInterval(() => { 
-                const diff = Date.now() - extraSession.start; 
-                if(document.getElementById('extra-timer')) document.getElementById('extra-timer').innerText = new Date(diff).toISOString().substr(11, 8); 
-            }, 1000); 
-            const btn = document.getElementById('btn-extra'); btn.innerText = "Konferenz läuft... (Stoppen?)"; btn.style.background = "var(--danger)"; 
+            const elapsed = Date.now() - vzSession.start;
+            if (elapsed >= 90 * 60000) { saveToDB('Vertretung (VZ)', vzSession.start, vzSession.start + 90 * 60000); vzSession.active = false; localStorage.removeItem('vzSessionV13'); updateUI(); }
+            else { startVZWatcher(); }
         }
         document.getElementById('suggestions').innerHTML = vocabulary.map(v => `<option value="${v}">`).join('');
     };
