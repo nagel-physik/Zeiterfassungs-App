@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v16.4 Final</title>
+    <title>Arbeitszeit-Assistent Pro v16.5 Final</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -109,7 +109,6 @@
     let extraSession = JSON.parse(localStorage.getItem('extraSessionV13')) || { active: false };
     let vzSession = JSON.parse(localStorage.getItem('vzSessionV13')) || { active: false };
     let logs = JSON.parse(localStorage.getItem('dailyLogsV13')) || [];
-    let logDate = localStorage.getItem('logDateV13');
     let currentWeek = localStorage.getItem('manualWeekV13') || 'A';
     let weeklySollHours = localStorage.getItem('weeklySollV13') || 26;
     let userName = localStorage.getItem('userNameV13') || 'Lehrkraft';
@@ -127,8 +126,14 @@
         { id: 'a4', start: '15:15', end: '15:30', label: '4. Aufsicht', type: 'duty' }
     ];
 
+    // FIX: TÄGLICHER RESET DER LOGS UM 0:00 UHR
     const todayStr = new Date().toDateString();
-    if(logDate !== todayStr) { logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); localStorage.setItem('logDateV13', todayStr); }
+    const storedLogDate = localStorage.getItem('logDateV13');
+    if(storedLogDate !== todayStr) { 
+        logs = []; 
+        localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); 
+        localStorage.setItem('logDateV13', todayStr); 
+    }
 
     setInterval(() => {
         const now = new Date();
@@ -188,7 +193,8 @@
             localStorage.removeItem('activeSessionV13');
             localStorage.removeItem('vzSessionV13');
             localStorage.removeItem('extraSessionV13');
-            localStorage.setItem('dailyLogsV13', JSON.stringify([]));
+            logs = [];
+            localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
             location.reload();
         }
     }
