@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v16.7</title>
+    <title>Arbeitszeit-Assistent Pro v17.3</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -28,10 +28,15 @@
         .btn-refresh { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-extra { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid var(--primary); }
         .btn-vz { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+        
+        /* Aktive Zustände mit neuen Farben */
         .btn-confirm { background: var(--accent) !important; color: var(--bg) !important; animation: pulse-confirm 0.5s infinite; }
+        .btn-vz.active { background: #f59e0b !important; color: white; animation: pulse 2s infinite; border-color: #f59e0b; }
+        .btn-extra.active { background: #6366f1 !important; color: white; animation: pulse 2s infinite; border-color: #6366f1; }
+        
         @keyframes pulse-confirm { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
-        .btn-vz.active { background: var(--danger); color: white; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        
         .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
         .progress-bar { height: 10px; background: #020617; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
         .progress-fill { height: 100%; width: 0%; transition: width 1s ease-in-out; }
@@ -44,10 +49,9 @@
         .help-text { text-align: left; font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
         .help-text h2 { color: var(--primary); border-bottom: 1px solid var(--primary); padding-bottom: 5px; margin-top: 25px; }
         .help-text h3 { color: var(--accent); margin-top: 20px; margin-bottom: 5px; font-size: 1rem; }
-        .help-text b { color: #ffffff; }
+        .manual-box { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: left; }
         input, select { background: #0f172a; border: 1px solid var(--primary); color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 15px 0; box-sizing: border-box; font-size: 1rem; }
         label { font-size: 0.75rem; font-weight: bold; color: var(--primary); text-transform: uppercase; }
-        .manual-box { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: left; }
         .footer-info { margin-top: 25px; font-size: 0.65rem; color: #475569; text-align: center; width: 100%; letter-spacing: 1px; }
     </style>
 </head>
@@ -102,12 +106,11 @@
     </div>
 
     <footer class="footer-info">
-        &copy; 2026 Michael Nagel &bull; v16.7
+        &copy; 2026 Michael Nagel &bull; v17.3
     </footer>
 </div>
 
 <div id="modal"><div class="modal-content" id="modal-body"></div></div>
-<datalist id="suggestions"></datalist>
 
 <script>
     let db = JSON.parse(localStorage.getItem('lehrerDB_Export')) || [];
@@ -119,7 +122,6 @@
     let currentWeek = localStorage.getItem('manualWeekV13') || 'A';
     let weeklySollHours = localStorage.getItem('weeklySollV13') || 26;
     let userName = localStorage.getItem('userNameV13') || 'Lehrkraft';
-    let vocabulary = JSON.parse(localStorage.getItem('lehrerVocabV13')) || [];
     let mainInterval, vzWatcherInterval;
     let confirmVZ = false, confirmExtra = false;
 
@@ -134,20 +136,26 @@
         { id: 'a4', start: '15:15', end: '15:30', label: '4. Aufsicht', type: 'duty' }
     ];
 
-    const todayStr = new Date().toDateString();
-    const storedLogDate = localStorage.getItem('logDateV13');
-    if(storedLogDate !== todayStr) { 
-        logs = []; 
-        localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); 
-        localStorage.setItem('logDateV13', todayStr); 
-    }
-
     setInterval(() => {
         const now = new Date();
         document.getElementById('live-clock').innerText = now.toLocaleTimeString();
         document.getElementById('live-date').innerText = now.toLocaleDateString();
+        
+        const todayStr = now.toDateString();
+        if(localStorage.getItem('logDateV13') !== todayStr) {
+            logs = [];
+            localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
+            localStorage.setItem('logDateV13', todayStr);
+            renderLogs();
+        }
+
         if (session.active) updateAssistant();
+        updateUI(); 
     }, 1000);
+
+    function formatTime(ms) {
+        return new Date(ms).toISOString().substr(11, 8);
+    }
 
     function toggleMain() {
         if (!session.active) {
@@ -158,7 +166,7 @@
             if(confirm("Dienst beenden?")) {
                 const elapsed = (Date.now() - session.start) / 1000;
                 if(elapsed < 30) {
-                    if(confirm("Eintrag ist kürzer als 30 Sek. NICHT speichern?")) { session.active = false; localStorage.removeItem('activeSessionV13'); location.reload(); return; }
+                    if(confirm("Kurze Zeit. NICHT speichern?")) { session.active = false; localStorage.removeItem('activeSessionV13'); location.reload(); return; }
                 }
                 saveToDB('Hauptdienst', session.start, Date.now());
                 addLog("Feierabend");
@@ -174,19 +182,44 @@
                 if(elapsed < 30) { if(confirm("Kurze Zeit. Eintrag ignorieren?")) { vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload(); return; } }
                 stopVZManually();
             }
-            return;
+        } else {
+            if(!confirmVZ) {
+                confirmVZ = true; 
+                const btn = document.getElementById('btn-vz');
+                btn.innerText = "Sicher? (Hier tippen)"; btn.classList.add('btn-confirm');
+                setTimeout(() => { confirmVZ = false; updateUI(); }, 3000);
+            } else { toggleVZ(); }
         }
-        if(!confirmVZ) {
-            confirmVZ = true; const btn = document.getElementById('btn-vz');
-            btn.innerText = "Sicher? (Hier tippen)"; btn.classList.add('btn-confirm');
-            setTimeout(() => { confirmVZ = false; if(!vzSession.active) { btn.innerText = "+ Vertretung (90m)"; btn.classList.remove('btn-confirm'); } }, 3000);
-        } else { toggleVZ(); }
     }
 
     function toggleVZ() {
         vzSession = { active: true, start: Date.now() };
         localStorage.setItem('vzSessionV13', JSON.stringify(vzSession));
         addLog("VZ Start"); startVZWatcher(); updateUI();
+    }
+
+    function handleExtraClick() {
+        if(extraSession.active) {
+            if(confirm("Konferenz beenden?")) {
+                const elapsed = (Date.now() - extraSession.start) / 1000;
+                if(elapsed < 30) { if(confirm("Kurze Zeit. Eintrag ignorieren?")) { extraSession.active = false; localStorage.removeItem('extraSessionV13'); location.reload(); return; } }
+                saveToDB('Konferenz', extraSession.start, Date.now());
+                addLog("Konf. Ende"); extraSession.active = false; localStorage.removeItem('extraSessionV13'); location.reload();
+            }
+        } else {
+            if(!confirmExtra) {
+                confirmExtra = true; 
+                const btn = document.getElementById('btn-extra');
+                btn.innerText = "Sicher? (Hier tippen)"; btn.classList.add('btn-confirm');
+                setTimeout(() => { confirmExtra = false; updateUI(); }, 3000);
+            } else { toggleExtra(); }
+        }
+    }
+
+    function toggleExtra() {
+        extraSession = { active: true, start: Date.now() };
+        localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
+        addLog("Konf. Start"); updateUI();
     }
 
     function startVZWatcher() {
@@ -207,29 +240,6 @@
         addLog("VZ Ende"); vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload();
     }
 
-    function handleExtraClick() {
-        if(extraSession.active) {
-            if(confirm("Konferenz/Termin beenden?")) {
-                const elapsed = (Date.now() - extraSession.start) / 1000;
-                if(elapsed < 30) { if(confirm("Kurze Zeit. Eintrag ignorieren?")) { extraSession.active = false; localStorage.removeItem('extraSessionV13'); location.reload(); return; } }
-                saveToDB('Konferenz', extraSession.start, Date.now());
-                addLog("Konf. Ende"); extraSession.active = false; localStorage.removeItem('extraSessionV13'); location.reload();
-            }
-            return;
-        }
-        if(!confirmExtra) {
-            confirmExtra = true; const btn = document.getElementById('btn-extra');
-            btn.innerText = "Sicher? (Hier tippen)"; btn.classList.add('btn-confirm');
-            setTimeout(() => { confirmExtra = false; if(!extraSession.active) { btn.innerText = "Konferenz / Termin"; btn.classList.remove('btn-confirm'); } }, 3000);
-        } else { toggleExtra(); }
-    }
-
-    function toggleExtra() {
-        extraSession = { active: true, start: Date.now() };
-        localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
-        addLog("Konf. Start"); location.reload();
-    }
-
     function saveToDB(typ, start, end) {
         const diff = end - start;
         db.push({
@@ -243,16 +253,49 @@
         localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
     }
 
-    function resetToday() {
-        if(confirm("ACHTUNG: Alle heutigen Timer und heutigen Excel-Einträge werden gelöscht. Fortfahren?")) {
-            const today = new Date().toLocaleDateString('de-DE');
-            db = db.filter(e => e.datum !== today);
-            localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
-            localStorage.removeItem('activeSessionV13');
-            localStorage.removeItem('vzSessionV13');
-            localStorage.removeItem('extraSessionV13');
-            logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); location.reload();
+    function updateUI() {
+        const mainDisp = document.getElementById('main-timer');
+        if(session.active) {
+            mainDisp.innerText = formatTime(Date.now() - session.start);
+            document.getElementById('btn-main').innerText = "Dienst beenden";
+            document.getElementById('btn-main').className = "btn btn-stop";
+        } else {
+            mainDisp.innerText = "00:00:00";
+            document.getElementById('btn-main').innerText = "Dienst starten";
+            document.getElementById('btn-main').className = "btn btn-start";
         }
+
+        const vzBtn = document.getElementById('btn-vz');
+        if (vzSession.active) {
+            vzBtn.innerText = `VZ läuft... (${formatTime(Date.now() - vzSession.start)})`;
+            vzBtn.classList.add('active'); vzBtn.classList.remove('btn-confirm');
+        } else if (!confirmVZ) {
+            vzBtn.innerText = "+ Vertretung (90m)";
+            vzBtn.classList.remove('active', 'btn-confirm');
+        }
+
+        const exBtn = document.getElementById('btn-extra');
+        if (extraSession.active) {
+            exBtn.innerText = `Konf läuft... (${formatTime(Date.now() - extraSession.start)})`;
+            exBtn.classList.add('active'); exBtn.classList.remove('btn-confirm');
+        } else if (!confirmExtra) {
+            exBtn.innerText = "Konferenz / Termin";
+            exBtn.classList.remove('active', 'btn-confirm');
+        }
+
+        const currentMonth = new Date().getMonth();
+        const vzCount = db.filter(e => {
+            const dParts = e.datum.split('.');
+            return new Date(dParts[2], dParts[1]-1, dParts[0]).getMonth() === currentMonth && e.isVZ === 'JA';
+        }).length;
+        document.getElementById('vz-val').innerText = vzCount;
+        document.getElementById('vz-progress').style.width = Math.min((vzCount / 3) * 100, 100) + "%";
+        document.getElementById('week-label').innerText = currentWeek;
+        document.getElementById('week-btn').style.background = currentWeek === 'A' ? 'var(--weekA)' : 'var(--weekB)';
+        document.getElementById('display-name').innerText = "USER: " + userName.toUpperCase();
+        document.getElementById('soll-info').innerText = weeklySollHours;
+        renderLogs();
+        updateProgressBar();
     }
 
     function openHelp() {
@@ -264,33 +307,23 @@
             </div>
             <div class="help-text" style="padding: 10px 20px 40px 20px;">
                 <p>Willkommen bei deiner persönlichen Arbeitszeiterfassung. Hier erfährst du alles Wichtige:</p>
-                
                 <h2>1. Installation & Start</h2>
-                <h3>App-Gefühl auf dem Smartphone</h3>
-                <p>Öffne die Seite in Safari (iPhone) oder Chrome (Android). Tippe auf das <b>Teilen-Symbol</b> (Quadrat mit Pfeil) und wähle <b>"Zum Home-Bildschirm hinzufügen"</b>. So startest du die App ohne Browser-Leiste.</p>
-                
+                <p>Öffne die Seite in Safari (iPhone) oder Chrome (Android). Tippe auf das <b>Teilen-Symbol</b> und wähle <b>"Zum Home-Bildschirm hinzufügen"</b>.</p>
                 <h2>2. Die erste Einrichtung (Setup)</h2>
-                <h3>Stundenplan hinterlegen</h3>
-                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib deinen Namen und dein Wochen-Soll (z.B. 26 Std.) ein. Trage dann deinen Plan für Woche A und B ein. Ein "Block" entspricht dabei immer <b>90 Minuten</b>.</p>
-                
+                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib Namen und Wochen-Soll ein. Trage dann deinen Plan für Woche A und B ein. Ein "Block" entspricht immer <b>90 Minuten</b>.</p>
                 <h2>3. Der Dienst-Alltag & Sicherheit</h2>
-                <h3>Dienst starten/beenden</h3>
-                <p>Tippe bei Ankunft auf <b>"Dienst starten"</b>. Der Timer läuft im Hintergrund weiter.</p>
+                <h3>Live-Timer auf Buttons</h3>
+                <p>Sobald eine Vertretung (Orange) oder Konferenz (Blau) läuft, zeigt dir der Button direkt die bereits vergangene Zeit an.</p>
                 <h3>Scharfschalten (VZ & Konferenz)</h3>
-                <p>Um versehentliche Klicks zu vermeiden, müssen diese Buttons <b>zweimal</b> innerhalb von 3 Sekunden getippt werden. Beim ersten Tippen färbt sich der Button gelb ("Sicher?").</p>
+                <p>Um versehentliche Klicks zu vermeiden, müssen diese Buttons <b>zweimal</b> getippt werden. Beim ersten Tippen färbt sich der Button gelb ("Sicher?").</p>
                 <h3>Automatischer Log-out (VZ)</h3>
-                <p>Eine Vertretung wird automatisch nach <b>90 Minuten</b> beendet und gespeichert, falls du vergisst, sie manuell zu stoppen.</p>
+                <p>Eine Vertretung wird automatisch nach <b>90 Minuten</b> beendet und gespeichert.</p>
                 <h3>Fehlklick-Schutz</h3>
-                <p>Einträge, die kürzer als 30 Sekunden laufen, werden beim Stoppen abgefragt. So kannst du versehentliche Timer sofort löschen, damit dein Excel sauber bleibt.</p>
-                
+                <p>Einträge, die kürzer als 30 Sekunden laufen, werden beim Stoppen abgefragt. So bleibt dein Excel sauber.</p>
                 <h2>4. Auswertung & Export</h2>
-                <h3>Daten für Excel/Numbers</h3>
-                <p>Gehe in die <b>⚙️ Einstellungen</b> und tippe auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert und kann direkt mit Excel oder Numbers geöffnet werden.</p>
-                
-                <h2>5. Fehler korrigieren</h2>
-                <h3>Nachtrag</h3>
-                <p>In den Einstellungen kannst du unter <b>"NACHTRAG"</b> Uhrzeiten manuell nachpflegen, falls du das Stempeln vergessen hast.</p>
-                
+                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert.</p>
+                <h2>5. Fehler korrigieren (Nachtrag)</h2>
+                <p>In den Einstellungen kannst du unter <b>"🕒 NACHTRAG"</b> Uhrzeiten manuell nachpflegen, falls du das Stempeln vergessen hast.</p>
                 <h2>6. Automatischer Reset</h2>
                 <p>Die Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst.</p>
             </div>`;
@@ -322,16 +355,16 @@
             </div>
             <label>Name</label><input type="text" id="user-input" value="${userName}">
             <label>Wochen-Soll</label>
-            <select id="soll-select"><option value="25" ${weeklySollHours==25?'selected':''}>25 Std</option><option value="26" ${weeklySollHours==26?'selected':''}>26 Std</option></select>`;
+            <input type="number" id="soll-input" value="${weeklySollHours}">`;
+        
         ['A','B'].forEach(w => {
-            html += `<h3 style="color:var(--primary); margin-top:20px;">WOCHE ${w}</h3>`;
+            html += `<h3 style="color:var(--primary); margin-top:20px;">Woche ${w}</h3>`;
             ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(d => {
                 const k = `${w}-${d}`; html += `<div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:12px; margin-top:8px;"><strong>${d}</strong>`;
                 blocks.forEach(b => {
-                    const entry = plan[k]?.[b.id] || { text: "", note: "" };
+                    const entry = plan[k]?.[b.id] || { text: "" };
                     html += `<div style="margin-top:5px;"><label>${b.label}</label>
-                    <input type="text" list="suggestions" placeholder="${b.type==='lesson' ? 'Fach | Klasse | Raum' : 'Ort der Aufsicht...'}" onchange="saveData('${k}','${b.id}','text',this.value)" value="${entry.text}">
-                    ${b.type==='lesson' ? `<input type="text" placeholder="Notiz..." onchange="saveData('${k}','${b.id}','note',this.value)" value="${entry.note||''}">` : ''}</div>`;
+                    <input type="text" onchange="saveData('${k}','${b.id}',this.value)" value="${entry.text}"></div>`;
                 }); html += `</div>`;
             });
         });
@@ -339,63 +372,107 @@
         document.getElementById('modal').style.display = 'block';
     }
 
+    function processNachtrag() {
+        const timeVal = document.getElementById('nachtrag-time').value;
+        const [h, m, s] = timeVal.split(':');
+        const target = new Date(); target.setHours(h, m, s || 0);
+        const cat = document.getElementById('nachtrag-cat').value;
+        const type = document.getElementById('nachtrag-type').value;
+
+        if(cat === 'main') {
+            if(type === 'start') {
+                session = { active: true, start: target.getTime(), day: new Date().toDateString() };
+                localStorage.setItem('activeSessionV13', JSON.stringify(session));
+            } else { saveToDB('Hauptdienst', session.start, target.getTime()); session.active = false; localStorage.removeItem('activeSessionV13'); }
+        } else if(cat === 'vz') {
+            if(type === 'start') {
+                vzSession = { active: true, start: target.getTime() };
+                localStorage.setItem('vzSessionV13', JSON.stringify(vzSession));
+            } else { saveToDB('Vertretung (VZ)', vzSession.start, target.getTime()); vzSession.active = false; localStorage.removeItem('vzSessionV13'); }
+        } else {
+            if(type === 'start') {
+                extraSession = { active: true, start: target.getTime() };
+                localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
+            } else { saveToDB('Konferenz', extraSession.start, target.getTime()); extraSession.active = false; localStorage.removeItem('extraSessionV13'); }
+        }
+        location.reload();
+    }
+
     function exportToExcel() {
-        if (db.length === 0) return alert("Keine Daten!");
         let csv = "\ufeffDatum;Kategorie;Beginn;Ende;Dauer;VZ\n";
-        db.forEach(e => { csv += `${e.datum};${e.typ};${e.start};${e.ende};${e.dauer};${e.isVZ || 'NEIN'}\n`; });
+        db.forEach(e => { csv += `${e.datum};${e.typ};${e.start};${e.ende};${e.dauer};${e.isVZ}\n`; });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = `Zeiten_${userName}.csv`; link.click();
     }
 
-    function updateUI() {
-        const btn = document.getElementById('btn-main');
-        if (session.active) {
-            btn.innerText = "Dienst beenden"; btn.className = "btn btn-stop";
-            if (!mainInterval) mainInterval = setInterval(() => {
-                const diff = Date.now() - session.start;
-                document.getElementById('main-timer').innerText = new Date(diff).toISOString().substr(11, 8);
-                updateProgressBar();
-            }, 1000);
-        } else {
-            btn.innerText = "Dienst starten"; btn.className = "btn btn-start";
-            if (mainInterval) { clearInterval(mainInterval); mainInterval = null; }
+    function resetToday() {
+        if(confirm("Heutige Daten (inkl. Historie) löschen?")) {
+            const today = new Date().toLocaleDateString('de-DE');
+            db = db.filter(e => e.datum !== today);
+            localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
+            localStorage.removeItem('activeSessionV13');
+            localStorage.removeItem('vzSessionV13');
+            localStorage.removeItem('extraSessionV13');
+            logs = [];
+            localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
+            location.reload();
         }
-        const vzBtn = document.getElementById('btn-vz');
-        if (vzSession.active) { vzBtn.innerText = "Vertretung läuft... (Stoppen?)"; vzBtn.classList.add('active'); vzBtn.classList.remove('btn-confirm'); }
-        else { vzBtn.innerText = "+ Vertretung (90m)"; vzBtn.classList.remove('active'); vzBtn.classList.remove('btn-confirm'); }
-        
-        const extraBtn = document.getElementById('btn-extra');
-        if (extraSession.active) { extraBtn.innerText = "Konferenz läuft... (Stoppen?)"; extraBtn.style.background = "var(--danger)"; extraBtn.classList.remove('btn-confirm'); }
-        else { extraBtn.innerText = "Konferenz / Termin"; extraBtn.style.background = ""; extraBtn.classList.remove('btn-confirm'); }
-
-        const currentMonth = new Date().getMonth();
-        const vzCount = db.filter(e => {
-            const dParts = e.datum.split('.');
-            return new Date(dParts[2], dParts[1]-1, dParts[0]).getMonth() === currentMonth && e.isVZ === 'JA';
-        }).length;
-        document.getElementById('vz-val').innerText = vzCount;
-        document.getElementById('vz-progress').style.width = Math.min((vzCount / 3) * 100, 100) + "%";
-        document.getElementById('week-label').innerText = currentWeek;
-        document.getElementById('week-btn').style.background = currentWeek === 'A' ? 'var(--weekA)' : 'var(--weekB)';
-        document.getElementById('display-name').innerText = "USER: " + userName.toUpperCase();
-        document.getElementById('soll-info').innerText = weeklySollHours;
-        renderLogs();
     }
 
-    function saveData(k, id, f, v) { if(!plan[k]) plan[k]={}; if(!plan[k][id]) plan[k][id]={}; plan[k][id][f] = v; if(f==='text' && v.length > 2 && !vocabulary.includes(v)) { vocabulary.push(v); localStorage.setItem('lehrerVocabV13', JSON.stringify(vocabulary)); } }
-    function saveAll() { userName = document.getElementById('user-input').value; weeklySollHours = document.getElementById('soll-select').value; localStorage.setItem('userNameV13', userName); localStorage.setItem('weeklySollV13', weeklySollHours); localStorage.setItem('lehrerPlanV13', JSON.stringify(plan)); location.reload(); }
+    function updateProgressBar() {
+        const days = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+        const todayKey = `${currentWeek}-${days[new Date().getDay()]}`;
+        let dailySollMin = 0;
+        if(plan[todayKey]) { [1,2,3,4].forEach(n => { if(plan[todayKey]['b'+n] && plan[todayKey]['b'+n].text) dailySollMin += 90; }); }
+        const elapsedMin = session.active ? (Date.now() - session.start) / 60000 : 0;
+        const dPerc = dailySollMin > 0 ? Math.min((elapsedMin/dailySollMin)*100, 100) : 0;
+        const wPerc = Math.min((elapsedMin/(weeklySollHours*60))*100, 100);
+        document.getElementById('day-progress').style.width = dPerc + "%";
+        document.getElementById('day-percent').innerText = Math.round(dPerc) + "%";
+        document.getElementById('week-progress').style.width = wPerc + "%";
+        document.getElementById('week-percent').innerText = Math.round(wPerc) + "%";
+    }
+
+    function updateAssistant() {
+        const now = new Date(); const currentTime = now.getHours() * 60 + now.getMinutes();
+        const todayKey = `${currentWeek}-${['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()]}`;
+        let found = false;
+        for (let block of blocks) {
+            const [hE, mE] = block.end.split(':').map(Number);
+            if (currentTime < (hE * 60 + mE)) {
+                const entry = plan[todayKey]?.[block.id];
+                if (entry && entry.text) {
+                    const [hS, mS] = block.start.split(':').map(Number);
+                    const isNow = currentTime >= (hS * 60 + mS);
+                    document.getElementById('task-status').innerText = isNow ? "JETZT AKTIV" : "DEMNÄCHST";
+                    document.getElementById('task-title').innerText = entry.text;
+                    document.getElementById('task-details').innerText = `Zeit: ${block.start} - ${block.end}`;
+                    found = true; break;
+                }
+            }
+        }
+        if (!found) { document.getElementById('task-status').innerText = "Bereit"; document.getElementById('task-title').innerText = "Keine Termine"; }
+    }
+
+    function addLog(msg) { logs.unshift({ time: new Date().toLocaleTimeString().substr(0,5), msg }); if(logs.length > 5) logs.pop(); localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); renderLogs(); }
+    function renderLogs() { document.getElementById('log-container').innerHTML = logs.map(l => `<div class="log-entry"><span>${l.msg}</span><span>${l.time}</span></div>`).join(''); }
+    function saveData(k, id, v) { if(!plan[k]) plan[k]={}; plan[k][id] = { text: v }; }
+    function saveAll() { 
+        userName = document.getElementById('user-input').value; 
+        weeklySollHours = document.getElementById('soll-input').value; 
+        localStorage.setItem('userNameV13', userName); 
+        localStorage.setItem('weeklySollV13', weeklySollHours); 
+        localStorage.setItem('lehrerPlanV13', JSON.stringify(plan)); 
+        location.reload(); 
+    }
     function toggleWeekManual() { currentWeek = currentWeek === 'A' ? 'B' : 'A'; localStorage.setItem('manualWeekV13', currentWeek); location.reload(); }
 
     window.onload = () => {
         updateUI();
-        if(vzSession.active) {
-            const elapsed = Date.now() - vzSession.start;
-            if (elapsed >= 90 * 60000) { saveToDB('Vertretung (VZ)', vzSession.start, vzSession.start + 90 * 60000); vzSession.active = false; localStorage.removeItem('vzSessionV13'); updateUI(); }
-            else { startVZWatcher(); }
-        }
-        document.getElementById('suggestions').innerHTML = vocabulary.map(v => `<option value="${v}">`).join('');
+        if(vzSession.active) startVZWatcher();
+        renderLogs();
     };
 </script>
 </body>
