@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v17.4</title>
+    <title>Arbeitszeit-Assistent Pro v17.5</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -102,7 +102,7 @@
     </div>
 
     <footer class="footer-info">
-        &copy; 2026 Michael Nagel &bull; v17.4
+        &copy; 2026 Michael Nagel &bull; v17.5
     </footer>
 </div>
 
@@ -239,7 +239,7 @@
 
     function saveToDB(typ, start, end, datumStr) {
         let diff = end - start;
-        if (diff < 0) diff = Math.abs(diff); // Sicherung gegen Rückwärtsrechnen
+        if (diff < 0) diff = Math.abs(diff);
         
         db.push({
             datum: datumStr,
@@ -330,16 +330,12 @@
     }
 
     function openSetup() {
-        const now = new Date();
-        const currentTimeString = now.toTimeString().substr(0, 8);
-        
-        // Letzte 5 Wochentage generieren
         let dateOptions = "";
         let d = new Date();
         let count = 0;
         while(count < 7) {
             let dayNum = d.getDay();
-            if(dayNum !== 0 && dayNum !== 6) { // Kein Sa/So
+            if(dayNum !== 0 && dayNum !== 6) {
                 let ds = d.toLocaleDateString('de-DE');
                 dateOptions += `<option value="${ds}">${count === 0 ? 'Heute' : ds}</option>`;
             }
@@ -366,11 +362,11 @@
                 <label>Datum wählen (Mo-Fr)</label>
                 <select id="nachtrag-date">${dateOptions}</select>
                 <select id="nachtrag-cat"><option value="Hauptdienst">HAUPT-DIENST</option><option value="Konferenz">KONFERENZ</option><option value="Vertretung (VZ)">VERTRETUNG (VZ)</option></select>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div><label>Beginn</label><input type="time" id="nachtrag-start" step="1" value="08:00:00"></div>
-                    <div><label>Ende</label><input type="time" id="nachtrag-ende" step="1" value="13:00:00"></div>
+                <div style="display:flex; gap:10px; width:100%;">
+                    <div style="flex:1;"><label>Beginn</label><input type="time" id="nachtrag-start" step="1" style="width:100%;" value="08:00:00"></div>
+                    <div style="flex:1;"><label>Ende</label><input type="time" id="nachtrag-ende" step="1" style="width:100%;" value="13:00:00"></div>
                 </div>
-                <button class="btn btn-start" style="padding:10px; font-size:0.85rem;" onclick="processNachtragV15()">NACHTRAG SPEICHERN</button>
+                <button class="btn btn-start" style="padding:10px; font-size:0.85rem; margin-top:10px;" onclick="processNachtragV15()">NACHTRAG SPEICHERN</button>
             </div>
             <label>Name</label><input type="text" id="user-input" value="${userName}">
             <label>Wochen-Soll</label>
@@ -396,13 +392,10 @@
         const cat = document.getElementById('nachtrag-cat').value;
         const startVal = document.getElementById('nachtrag-start').value;
         const endeVal = document.getElementById('nachtrag-ende').value;
-        
-        // Erzeuge Dummy-Dates für die Differenzberechnung
         const d1 = new Date("2000-01-01T" + startVal);
         const d2 = new Date("2000-01-01T" + endeVal);
-        
         saveToDB(cat, d1.getTime(), d2.getTime(), datum);
-        alert("Eintrag für " + datum + " wurde gespeichert.");
+        alert("Eintrag gespeichert.");
         location.reload();
     }
 
@@ -416,7 +409,7 @@
     }
 
     function resetToday() {
-        if(confirm("Heutige Daten (inkl. Historie) löschen?")) {
+        if(confirm("Alles heute löschen?")) {
             const today = new Date().toLocaleDateString('de-DE');
             db = db.filter(e => e.datum !== today);
             localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
