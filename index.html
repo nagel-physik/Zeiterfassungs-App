@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v17.3</title>
+    <title>Arbeitszeit-Assistent Pro v17.4</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -28,15 +28,11 @@
         .btn-refresh { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-extra { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid var(--primary); }
         .btn-vz { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
-        
-        /* Aktive Zustände mit neuen Farben */
         .btn-confirm { background: var(--accent) !important; color: var(--bg) !important; animation: pulse-confirm 0.5s infinite; }
         .btn-vz.active { background: #f59e0b !important; color: white; animation: pulse 2s infinite; border-color: #f59e0b; }
         .btn-extra.active { background: #6366f1 !important; color: white; animation: pulse 2s infinite; border-color: #6366f1; }
-        
         @keyframes pulse-confirm { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-        
         .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
         .progress-bar { height: 10px; background: #020617; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
         .progress-fill { height: 100%; width: 0%; transition: width 1s ease-in-out; }
@@ -94,7 +90,7 @@
             <div class="progress-label"><span>Vertretungen (Monat)</span><span id="vz-val">0</span></div>
             <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--danger);"></div></div>
             <div class="progress-label"><span>Wochenziel (Gesamt)</span><span id="week-percent">0%</span></div>
-            <div class="progress-bar"><div id="week-progress" class="progress-fill" style="background: var(--success);"></div></div>
+            <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--success);"></div></div>
         </div>
     </div>
 
@@ -102,11 +98,11 @@
 
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 15px;">
         <button class="btn btn-setup" onclick="openSetup()">⚙️ Einstellungen</button>
-        <button class="btn btn-refresh" onclick="location.reload()">🔄 Refresh</button>
+        <button class="btn btn-refresh" onclick="location.reload()">🔄 Aktualisierung</button>
     </div>
 
     <footer class="footer-info">
-        &copy; 2026 Michael Nagel &bull; v17.3
+        &copy; 2026 Michael Nagel &bull; v17.4
     </footer>
 </div>
 
@@ -154,6 +150,7 @@
     }, 1000);
 
     function formatTime(ms) {
+        if (ms < 0) ms = 0;
         return new Date(ms).toISOString().substr(11, 8);
     }
 
@@ -168,7 +165,7 @@
                 if(elapsed < 30) {
                     if(confirm("Kurze Zeit. NICHT speichern?")) { session.active = false; localStorage.removeItem('activeSessionV13'); location.reload(); return; }
                 }
-                saveToDB('Hauptdienst', session.start, Date.now());
+                saveToDB('Hauptdienst', session.start, Date.now(), new Date().toLocaleDateString('de-DE'));
                 addLog("Feierabend");
                 session.active = false; localStorage.removeItem('activeSessionV13'); location.reload();
             }
@@ -203,7 +200,7 @@
             if(confirm("Konferenz beenden?")) {
                 const elapsed = (Date.now() - extraSession.start) / 1000;
                 if(elapsed < 30) { if(confirm("Kurze Zeit. Eintrag ignorieren?")) { extraSession.active = false; localStorage.removeItem('extraSessionV13'); location.reload(); return; } }
-                saveToDB('Konferenz', extraSession.start, Date.now());
+                saveToDB('Konferenz', extraSession.start, Date.now(), new Date().toLocaleDateString('de-DE'));
                 addLog("Konf. Ende"); extraSession.active = false; localStorage.removeItem('extraSessionV13'); location.reload();
             }
         } else {
@@ -228,7 +225,7 @@
             if (vzSession.active) {
                 const elapsed = Date.now() - vzSession.start;
                 if (elapsed >= 90 * 60000) {
-                    saveToDB('Vertretung (VZ)', vzSession.start, vzSession.start + 90 * 60000);
+                    saveToDB('Vertretung (VZ)', vzSession.start, vzSession.start + 90 * 60000, new Date().toLocaleDateString('de-DE'));
                     addLog("VZ Ende (Auto)"); vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload();
                 }
             }
@@ -236,14 +233,16 @@
     }
 
     function stopVZManually() {
-        saveToDB('Vertretung (VZ)', vzSession.start, Date.now());
+        saveToDB('Vertretung (VZ)', vzSession.start, Date.now(), new Date().toLocaleDateString('de-DE'));
         addLog("VZ Ende"); vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload();
     }
 
-    function saveToDB(typ, start, end) {
-        const diff = end - start;
+    function saveToDB(typ, start, end, datumStr) {
+        let diff = end - start;
+        if (diff < 0) diff = Math.abs(diff); // Sicherung gegen Rückwärtsrechnen
+        
         db.push({
-            datum: new Date(start).toLocaleDateString('de-DE'),
+            datum: datumStr,
             typ: typ,
             start: new Date(start).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
             ende: new Date(end).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
@@ -323,7 +322,7 @@
                 <h2>4. Auswertung & Export</h2>
                 <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert.</p>
                 <h2>5. Fehler korrigieren (Nachtrag)</h2>
-                <p>In den Einstellungen kannst du unter <b>"🕒 NACHTRAG"</b> Uhrzeiten manuell nachpflegen, falls du das Stempeln vergessen hast.</p>
+                <p>In den Einstellungen kannst du unter <b>"🕒 NACHTRAG"</b> Uhrzeiten manuell nachpflegen. Du kannst das Datum für die letzten 5 Wochentage frei wählen.</p>
                 <h2>6. Automatischer Reset</h2>
                 <p>Die Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst.</p>
             </div>`;
@@ -331,7 +330,23 @@
     }
 
     function openSetup() {
-        const currentTimeString = new Date().toTimeString().substr(0, 8);
+        const now = new Date();
+        const currentTimeString = now.toTimeString().substr(0, 8);
+        
+        // Letzte 5 Wochentage generieren
+        let dateOptions = "";
+        let d = new Date();
+        let count = 0;
+        while(count < 7) {
+            let dayNum = d.getDay();
+            if(dayNum !== 0 && dayNum !== 6) { // Kein Sa/So
+                let ds = d.toLocaleDateString('de-DE');
+                dateOptions += `<option value="${ds}">${count === 0 ? 'Heute' : ds}</option>`;
+            }
+            d.setDate(d.getDate() - 1);
+            count++;
+        }
+
         let html = `
             <div class="modal-nav">
                 <button class="nav-btn" onclick="document.getElementById('modal').style.display='none'" style="color:var(--danger);">✕ Abbrechen</button>
@@ -348,10 +363,14 @@
             </div>
             <div class="manual-box">
                 <label style="color:var(--accent); font-weight:800;">🕒 NACHTRAG</label>
-                <select id="nachtrag-cat"><option value="main">HAUPT-DIENST</option><option value="extra">KONFERENZ</option><option value="vz">VERTRETUNG (VZ)</option></select>
-                <select id="nachtrag-type"><option value="start">Beginn setzen</option><option value="end">Ende setzen um:</option></select>
-                <input type="time" id="nachtrag-time" step="1" value="${currentTimeString}">
-                <button class="btn btn-start" style="padding:10px; font-size:0.85rem;" onclick="processNachtrag()">ÜBERNEHMEN</button>
+                <label>Datum wählen (Mo-Fr)</label>
+                <select id="nachtrag-date">${dateOptions}</select>
+                <select id="nachtrag-cat"><option value="Hauptdienst">HAUPT-DIENST</option><option value="Konferenz">KONFERENZ</option><option value="Vertretung (VZ)">VERTRETUNG (VZ)</option></select>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div><label>Beginn</label><input type="time" id="nachtrag-start" step="1" value="08:00:00"></div>
+                    <div><label>Ende</label><input type="time" id="nachtrag-ende" step="1" value="13:00:00"></div>
+                </div>
+                <button class="btn btn-start" style="padding:10px; font-size:0.85rem;" onclick="processNachtragV15()">NACHTRAG SPEICHERN</button>
             </div>
             <label>Name</label><input type="text" id="user-input" value="${userName}">
             <label>Wochen-Soll</label>
@@ -372,29 +391,18 @@
         document.getElementById('modal').style.display = 'block';
     }
 
-    function processNachtrag() {
-        const timeVal = document.getElementById('nachtrag-time').value;
-        const [h, m, s] = timeVal.split(':');
-        const target = new Date(); target.setHours(h, m, s || 0);
+    function processNachtragV15() {
+        const datum = document.getElementById('nachtrag-date').value;
         const cat = document.getElementById('nachtrag-cat').value;
-        const type = document.getElementById('nachtrag-type').value;
-
-        if(cat === 'main') {
-            if(type === 'start') {
-                session = { active: true, start: target.getTime(), day: new Date().toDateString() };
-                localStorage.setItem('activeSessionV13', JSON.stringify(session));
-            } else { saveToDB('Hauptdienst', session.start, target.getTime()); session.active = false; localStorage.removeItem('activeSessionV13'); }
-        } else if(cat === 'vz') {
-            if(type === 'start') {
-                vzSession = { active: true, start: target.getTime() };
-                localStorage.setItem('vzSessionV13', JSON.stringify(vzSession));
-            } else { saveToDB('Vertretung (VZ)', vzSession.start, target.getTime()); vzSession.active = false; localStorage.removeItem('vzSessionV13'); }
-        } else {
-            if(type === 'start') {
-                extraSession = { active: true, start: target.getTime() };
-                localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
-            } else { saveToDB('Konferenz', extraSession.start, target.getTime()); extraSession.active = false; localStorage.removeItem('extraSessionV13'); }
-        }
+        const startVal = document.getElementById('nachtrag-start').value;
+        const endeVal = document.getElementById('nachtrag-ende').value;
+        
+        // Erzeuge Dummy-Dates für die Differenzberechnung
+        const d1 = new Date("2000-01-01T" + startVal);
+        const d2 = new Date("2000-01-01T" + endeVal);
+        
+        saveToDB(cat, d1.getTime(), d2.getTime(), datum);
+        alert("Eintrag für " + datum + " wurde gespeichert.");
         location.reload();
     }
 
@@ -431,7 +439,7 @@
         const wPerc = Math.min((elapsedMin/(weeklySollHours*60))*100, 100);
         document.getElementById('day-progress').style.width = dPerc + "%";
         document.getElementById('day-percent').innerText = Math.round(dPerc) + "%";
-        document.getElementById('week-progress').style.width = wPerc + "%";
+        document.getElementById('vz-progress').style.width = wPerc + "%";
         document.getElementById('week-percent').innerText = Math.round(wPerc) + "%";
     }
 
