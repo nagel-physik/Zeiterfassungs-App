@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v17.5</title>
+    <title>Arbeitszeit-Assistent Pro v17.6</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -28,16 +28,20 @@
         .btn-refresh { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-extra { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid var(--primary); }
         .btn-vz { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+        
         .btn-confirm { background: var(--accent) !important; color: var(--bg) !important; animation: pulse-confirm 0.5s infinite; }
         .btn-vz.active { background: #f59e0b !important; color: white; animation: pulse 2s infinite; border-color: #f59e0b; }
         .btn-extra.active { background: #6366f1 !important; color: white; animation: pulse 2s infinite; border-color: #6366f1; }
+        
         @keyframes pulse-confirm { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        
         .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
         .progress-bar { height: 10px; background: #020617; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
         .progress-fill { height: 100%; width: 0%; transition: width 1s ease-in-out; }
         #log-container { max-height: 100px; overflow-y: auto; margin-top: 10px; scrollbar-width: none; width: 100%; }
         .log-entry { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
+        
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; padding: 0; }
         .modal-content { background: var(--card); min-height: 100vh; padding: 70px 20px 40px 20px; box-sizing: border-box; }
         .modal-nav { position: fixed; top: 0; left: 0; right: 0; background: var(--card); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--primary); z-index: 1001; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -45,10 +49,16 @@
         .help-text { text-align: left; font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
         .help-text h2 { color: var(--primary); border-bottom: 1px solid var(--primary); padding-bottom: 5px; margin-top: 25px; }
         .help-text h3 { color: var(--accent); margin-top: 20px; margin-bottom: 5px; font-size: 1rem; }
-        .manual-box { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: left; }
+        
+        .manual-box { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: left; box-sizing: border-box; }
+        
         input, select { background: #0f172a; border: 1px solid var(--primary); color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 15px 0; box-sizing: border-box; font-size: 1rem; }
         label { font-size: 0.75rem; font-weight: bold; color: var(--primary); text-transform: uppercase; }
         .footer-info { margin-top: 25px; font-size: 0.65rem; color: #475569; text-align: center; width: 100%; letter-spacing: 1px; }
+
+        /* Fix für nebeneinanderliegende Inputs */
+        .flex-row { display: flex; gap: 10px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+        .flex-col { flex: 1; min-width: 0; }
     </style>
 </head>
 <body>
@@ -71,7 +81,6 @@
         <div style="font-size: 0.65rem; color: var(--accent); font-weight: 800; text-transform: uppercase;" id="task-status">Bereit</div>
         <div style="font-size: 1.2rem; font-weight: 700; margin: 2px 0;" id="task-title">Dienst Starten?</div>
         <div style="font-size: 0.85rem; color: #cbd5e1;" id="task-details">Guten Tag!</div>
-        <div id="task-note" style="margin-top: 8px; padding: 6px; background: rgba(16, 185, 129, 0.15); border-radius: 8px; font-size: 0.8rem; color: var(--success); display: none; border: 1px solid var(--success);"></div>
     </div>
 
     <div class="card">
@@ -90,7 +99,7 @@
             <div class="progress-label"><span>Vertretungen (Monat)</span><span id="vz-val">0</span></div>
             <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--danger);"></div></div>
             <div class="progress-label"><span>Wochenziel (Gesamt)</span><span id="week-percent">0%</span></div>
-            <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--success);"></div></div>
+            <div class="progress-bar"><div id="week-progress" class="progress-fill" style="background: var(--success);"></div></div>
         </div>
     </div>
 
@@ -102,7 +111,7 @@
     </div>
 
     <footer class="footer-info">
-        &copy; 2026 Michael Nagel &bull; v17.5
+        &copy; 2026 Michael Nagel &bull; v17.6
     </footer>
 </div>
 
@@ -238,9 +247,7 @@
     }
 
     function saveToDB(typ, start, end, datumStr) {
-        let diff = end - start;
-        if (diff < 0) diff = Math.abs(diff);
-        
+        let diff = Math.abs(end - start);
         db.push({
             datum: datumStr,
             typ: typ,
@@ -309,7 +316,7 @@
                 <h2>1. Installation & Start</h2>
                 <p>Öffne die Seite in Safari (iPhone) oder Chrome (Android). Tippe auf das <b>Teilen-Symbol</b> und wähle <b>"Zum Home-Bildschirm hinzufügen"</b>.</p>
                 <h2>2. Die erste Einrichtung (Setup)</h2>
-                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib Namen und Wochen-Soll ein. Trage dann deinen Plan für Woche A und B ein. Ein "Block" entspricht immer <b>90 Minuten</b>.</p>
+                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib Namen und Wochen-Soll ein. Trage dann deinen Plan für Woche A und B ein.</p>
                 <h2>3. Der Dienst-Alltag & Sicherheit</h2>
                 <h3>Live-Timer auf Buttons</h3>
                 <p>Sobald eine Vertretung (Orange) oder Konferenz (Blau) läuft, zeigt dir der Button direkt die bereits vergangene Zeit an.</p>
@@ -362,11 +369,11 @@
                 <label>Datum wählen (Mo-Fr)</label>
                 <select id="nachtrag-date">${dateOptions}</select>
                 <select id="nachtrag-cat"><option value="Hauptdienst">HAUPT-DIENST</option><option value="Konferenz">KONFERENZ</option><option value="Vertretung (VZ)">VERTRETUNG (VZ)</option></select>
-                <div style="display:flex; gap:10px; width:100%;">
-                    <div style="flex:1;"><label>Beginn</label><input type="time" id="nachtrag-start" step="1" style="width:100%;" value="08:00:00"></div>
-                    <div style="flex:1;"><label>Ende</label><input type="time" id="nachtrag-ende" step="1" style="width:100%;" value="13:00:00"></div>
+                <div class="flex-row">
+                    <div class="flex-col"><label>Beginn</label><input type="time" id="nachtrag-start" step="1" value="08:00:00"></div>
+                    <div class="flex-col"><label>Ende</label><input type="time" id="nachtrag-ende" step="1" value="13:00:00"></div>
                 </div>
-                <button class="btn btn-start" style="padding:10px; font-size:0.85rem; margin-top:10px;" onclick="processNachtragV15()">NACHTRAG SPEICHERN</button>
+                <button class="btn btn-start" style="padding:10px; font-size:0.85rem; margin-top:5px;" onclick="processNachtragV15()">NACHTRAG SPEICHERN</button>
             </div>
             <label>Name</label><input type="text" id="user-input" value="${userName}">
             <label>Wochen-Soll</label>
@@ -432,7 +439,7 @@
         const wPerc = Math.min((elapsedMin/(weeklySollHours*60))*100, 100);
         document.getElementById('day-progress').style.width = dPerc + "%";
         document.getElementById('day-percent').innerText = Math.round(dPerc) + "%";
-        document.getElementById('vz-progress').style.width = wPerc + "%";
+        document.getElementById('week-progress').style.width = wPerc + "%";
         document.getElementById('week-percent').innerText = Math.round(wPerc) + "%";
     }
 
