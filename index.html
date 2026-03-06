@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v17.7</title>
+    <title>Arbeitszeit-Assistent Pro v18.2</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -26,29 +26,25 @@
         .btn-stop { background: var(--danger) !important; }
         .btn-setup { background: #475569; }
         .btn-refresh { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
-        .btn-extra { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid var(--primary); }
         .btn-vz { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-extra { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid var(--primary); }
         .btn-confirm { background: var(--accent) !important; color: var(--bg) !important; animation: pulse-confirm 0.5s infinite; }
-        .btn-vz.active { background: #f59e0b !important; color: white; animation: pulse 2s infinite; border-color: #f59e0b; }
-        .btn-extra.active { background: #6366f1 !important; color: white; animation: pulse 2s infinite; border-color: #6366f1; }
-        @keyframes pulse-confirm { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
         .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
         .progress-bar { height: 10px; background: #020617; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
-        .progress-fill { height: 100%; width: 0%; transition: width 1s ease-in-out; }
-        #log-container { max-height: 100px; overflow-y: auto; margin-top: 10px; scrollbar-width: none; width: 100%; }
-        .log-entry { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; padding: 0; }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.5s; }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; }
         .modal-content { background: var(--card); min-height: 100vh; padding: 70px 20px 40px 20px; box-sizing: border-box; }
-        .modal-nav { position: fixed; top: 0; left: 0; right: 0; background: var(--card); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--primary); z-index: 1001; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .nav-btn { background: none; border: none; font-size: 0.9rem; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .modal-nav { position: fixed; top: 0; left: 0; right: 0; background: var(--card); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--primary); z-index: 1001; }
+        .accordion-btn { background: #334155; color: white; padding: 15px; width: 100%; text-align: left; border: none; border-radius: 12px; margin-top: 10px; font-weight: bold; display: flex; justify-content: space-between; cursor: pointer; }
+        .accordion-content { display: none; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 0 0 12px 12px; margin-bottom: 10px; }
+        .manual-box { background: rgba(56, 189, 248, 0.05); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: left; }
+        input, select { background: #0f172a; border: 1px solid var(--primary); color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 12px 0; box-sizing: border-box; font-size: 1rem; }
+        label { font-size: 0.7rem; color: var(--primary); font-weight: bold; text-transform: uppercase; }
+        .log-entry { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
+        .footer-info { margin-top: 25px; font-size: 0.65rem; color: #475569; text-align: center; width: 100%; letter-spacing: 1px; }
         .help-text { text-align: left; font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
         .help-text h2 { color: var(--primary); border-bottom: 1px solid var(--primary); padding-bottom: 5px; margin-top: 25px; }
         .help-text h3 { color: var(--accent); margin-top: 20px; margin-bottom: 5px; font-size: 1rem; }
-        .manual-box { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: left; box-sizing: border-box; }
-        input, select { background: #0f172a; border: 1px solid var(--primary); color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 15px 0; box-sizing: border-box; font-size: 1rem; -webkit-appearance: none; }
-        label { font-size: 0.75rem; font-weight: bold; color: var(--primary); text-transform: uppercase; }
-        .footer-info { margin-top: 25px; font-size: 0.65rem; color: #475569; text-align: center; width: 100%; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -69,39 +65,40 @@
 
     <div class="next-info" id="task-card">
         <div style="font-size: 0.65rem; color: var(--accent); font-weight: 800; text-transform: uppercase;" id="task-status">Bereit</div>
-        <div style="font-size: 1.2rem; font-weight: 700; margin: 2px 0;" id="task-title">Dienst Starten?</div>
-        <div style="font-size: 0.85rem; color: #cbd5e1;" id="task-details">Guten Tag!</div>
+        <div style="font-size: 1.1rem; font-weight: 700;" id="task-title">Dienst Starten?</div>
+        <div style="font-size: 0.8rem; color: #cbd5e1;" id="task-details">Guten Tag!</div>
     </div>
 
     <div class="card">
-        <div id="display-name" style="font-size: 0.85rem; color: var(--accent); font-weight: bold; margin-bottom: 8px; letter-spacing: 1px;">LEHRKRAFT</div>
+        <div id="display-name" style="font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 8px;">LEHRKRAFT</div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <button id="week-btn" style="border:none; padding:8px 18px; border-radius:10px; color:white; font-weight:bold; cursor:pointer;" onclick="toggleWeekManual()">Woche <span id="week-label">A</span></button>
-            <div style="font-size: 0.8rem; font-weight: bold; color: #94a3b8;">Ziel: <span id="soll-info" style="color:white;">26</span> Std/Wo</div>
+            <div style="font-size: 0.8rem; font-weight: bold; color: #94a3b8;">Ziel: <span id="soll-info" style="color:white;">26</span> Std</div>
         </div>
         <div id="main-timer" class="timer-display">00:00:00</div>
         <button id="btn-main" class="btn btn-start" onclick="toggleMain()">Dienst starten</button>
         <button id="btn-vz" class="btn btn-vz" onclick="handleVZClick()">+ Vertretung (90m)</button>
         <button id="btn-extra" class="btn btn-extra" onclick="handleExtraClick()">Konferenz / Termin</button>
+        
         <div class="progress-container" style="margin-top: 20px;">
-            <div class="progress-label"><span>Tag Unterricht (Soll)</span><span id="day-percent">0%</span></div>
+            <div class="progress-label"><span>Tag Fortschritt</span><span id="day-percent">0%</span></div>
             <div class="progress-bar"><div id="day-progress" class="progress-fill" style="background: var(--accent);"></div></div>
             <div class="progress-label"><span>Vertretungen (Monat)</span><span id="vz-val">0</span></div>
             <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--danger);"></div></div>
-            <div class="progress-label"><span>Wochenziel (Gesamt)</span><span id="week-percent">0%</span></div>
-            <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--success);"></div></div>
+            <div class="progress-label"><span>Woche Gesamt</span><span id="week-percent">0%</span></div>
+            <div class="progress-bar"><div id="week-progress" class="progress-fill" style="background: var(--success);"></div></div>
         </div>
     </div>
 
     <div id="log-container"></div>
-
+    
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 15px;">
         <button class="btn btn-setup" onclick="openSetup()">⚙️ Einstellungen</button>
         <button class="btn btn-refresh" onclick="location.reload()">🔄 Aktualisierung</button>
     </div>
 
     <footer class="footer-info">
-        &copy; 2026 Michael Nagel &bull; v17.7
+        &copy; 2026 Michael Nagel &bull; v18.2
     </footer>
 </div>
 
@@ -111,24 +108,24 @@
     let db = JSON.parse(localStorage.getItem('lehrerDB_Export')) || [];
     let plan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
     let session = JSON.parse(localStorage.getItem('activeSessionV13')) || { active: false };
-    let extraSession = JSON.parse(localStorage.getItem('extraSessionV13')) || { active: false };
     let vzSession = JSON.parse(localStorage.getItem('vzSessionV13')) || { active: false };
+    let extraSession = JSON.parse(localStorage.getItem('extraSessionV13')) || { active: false };
     let logs = JSON.parse(localStorage.getItem('dailyLogsV13')) || [];
     let currentWeek = localStorage.getItem('manualWeekV13') || 'A';
-    let weeklySollHours = localStorage.getItem('weeklySollV13') || 26;
+    let weeklySollHours = parseFloat(localStorage.getItem('weeklySollV13')) || 26;
     let userName = localStorage.getItem('userNameV13') || 'Lehrkraft';
-    let mainInterval, vzWatcherInterval;
     let confirmVZ = false, confirmExtra = false;
 
     const blocks = [
-        { id: 'b1', start: '07:30', end: '09:00', label: '1. Block', type: 'lesson' },
-        { id: 'a1', start: '09:00', end: '09:30', label: '1. Aufsicht', type: 'duty' },
-        { id: 'b2', start: '09:30', end: '11:00', label: '2. Block', type: 'lesson' },
-        { id: 'a2', start: '11:00', end: '11:30', label: '2. Aufsicht', type: 'duty' },
-        { id: 'b3', start: '11:30', end: '13:00', label: '3. Block', type: 'lesson' },
-        { id: 'a3', start: '13:00', end: '13:45', label: '3. Aufsicht', type: 'duty' },
-        { id: 'b4', start: '13:45', end: '15:15', label: '4. Block', type: 'lesson' },
-        { id: 'a4', start: '15:15', end: '15:30', label: '4. Aufsicht', type: 'duty' }
+        { id: 'f1', label: 'Frühaufsicht', start: '07:10', end: '07:30' },
+        { id: 'b1', label: '1. Block', start: '07:30', end: '09:00' },
+        { id: 'a1', label: '1. Aufsicht', start: '09:00', end: '09:30' },
+        { id: 'b2', label: '2. Block', start: '09:30', end: '11:00' },
+        { id: 'a2', label: '2. Aufsicht', start: '11:00', end: '11:30' },
+        { id: 'b3', label: '3. Block', start: '11:30', end: '13:00' },
+        { id: 'a3', label: '3. Aufsicht', start: '13:00', end: '13:45' },
+        { id: 'b4', label: '4. Block', start: '13:45', end: '15:15' },
+        { id: 's1', label: 'Spätaufsicht', start: '15:15', end: '15:30' }
     ];
 
     setInterval(() => {
@@ -148,157 +145,185 @@
         updateUI(); 
     }, 1000);
 
-    function formatTime(ms) {
-        if (ms < 0) ms = 0;
-        return new Date(ms).toISOString().substr(11, 8);
-    }
-
     function toggleMain() {
         if (!session.active) {
-            session = { active: true, start: Date.now(), day: new Date().toDateString() };
+            session = { active: true, start: Date.now() };
             localStorage.setItem('activeSessionV13', JSON.stringify(session));
-            addLog("Ankunft"); updateUI();
+            addLog("Dienststart");
         } else {
             if(confirm("Dienst beenden?")) {
-                const elapsed = (Date.now() - session.start) / 1000;
-                if(elapsed < 30) {
-                    if(confirm("Kurze Zeit. NICHT speichern?")) { session.active = false; localStorage.removeItem('activeSessionV13'); location.reload(); return; }
-                }
-                saveToDB('Hauptdienst', session.start, Date.now(), new Date().toLocaleDateString('de-DE'));
+                saveToDB('Hauptdienst', session.start, Date.now());
+                session.active = false; localStorage.removeItem('activeSessionV13');
                 addLog("Feierabend");
-                session.active = false; localStorage.removeItem('activeSessionV13'); location.reload();
             }
         }
+        updateUI();
     }
 
-    function handleVZClick() {
-        if(vzSession.active) {
-            if(confirm("Vertretung vorzeitig beenden?")) {
-                const elapsed = (Date.now() - vzSession.start) / 1000;
-                if(elapsed < 30) { if(confirm("Kurze Zeit. Eintrag ignorieren?")) { vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload(); return; } }
-                stopVZManually();
-            }
-        } else {
-            if(!confirmVZ) {
-                confirmVZ = true; 
-                const btn = document.getElementById('btn-vz');
-                btn.innerText = "Sicher? (Hier tippen)"; btn.classList.add('btn-confirm');
-                setTimeout(() => { confirmVZ = false; updateUI(); }, 3000);
-            } else { toggleVZ(); }
-        }
-    }
-
-    function toggleVZ() {
-        vzSession = { active: true, start: Date.now() };
-        localStorage.setItem('vzSessionV13', JSON.stringify(vzSession));
-        addLog("VZ Start"); startVZWatcher(); updateUI();
-    }
-
-    function handleExtraClick() {
-        if(extraSession.active) {
-            if(confirm("Konferenz beenden?")) {
-                const elapsed = (Date.now() - extraSession.start) / 1000;
-                if(elapsed < 30) { if(confirm("Kurze Zeit. Eintrag ignorieren?")) { extraSession.active = false; localStorage.removeItem('extraSessionV13'); location.reload(); return; } }
-                saveToDB('Konferenz', extraSession.start, Date.now(), new Date().toLocaleDateString('de-DE'));
-                addLog("Konf. Ende"); extraSession.active = false; localStorage.removeItem('extraSessionV13'); location.reload();
-            }
-        } else {
-            if(!confirmExtra) {
-                confirmExtra = true; 
-                const btn = document.getElementById('btn-extra');
-                btn.innerText = "Sicher? (Hier tippen)"; btn.classList.add('btn-confirm');
-                setTimeout(() => { confirmExtra = false; updateUI(); }, 3000);
-            } else { toggleExtra(); }
-        }
-    }
-
-    function toggleExtra() {
-        extraSession = { active: true, start: Date.now() };
-        localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
-        addLog("Konf. Start"); updateUI();
-    }
-
-    function startVZWatcher() {
-        if(vzWatcherInterval) clearInterval(vzWatcherInterval);
-        vzWatcherInterval = setInterval(() => {
-            if (vzSession.active) {
-                const elapsed = Date.now() - vzSession.start;
-                if (elapsed >= 90 * 60000) {
-                    saveToDB('Vertretung (VZ)', vzSession.start, vzSession.start + 90 * 60000, new Date().toLocaleDateString('de-DE'));
-                    addLog("VZ Ende (Auto)"); vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload();
-                }
-            }
-        }, 5000);
-    }
-
-    function stopVZManually() {
-        saveToDB('Vertretung (VZ)', vzSession.start, Date.now(), new Date().toLocaleDateString('de-DE'));
-        addLog("VZ Ende"); vzSession.active = false; localStorage.removeItem('vzSessionV13'); location.reload();
-    }
-
-    function saveToDB(typ, start, end, datumStr) {
+    function saveToDB(typ, start, end, manualDatum = null) {
+        let datumStr = manualDatum || new Date().toLocaleDateString('de-DE');
         let diff = Math.abs(end - start);
         db.push({
-            datum: datumStr,
-            typ: typ,
+            datum: datumStr, typ: typ,
             start: new Date(start).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
             ende: new Date(end).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
             dauer: new Date(diff).toISOString().substr(11, 8),
-            isVZ: (typ.includes('VZ') ? 'JA' : 'NEIN')
+            ms: diff, isVZ: (typ.includes('VZ') ? 'JA' : 'NEIN')
         });
         localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
     }
 
     function updateUI() {
-        const mainDisp = document.getElementById('main-timer');
         if(session.active) {
-            mainDisp.innerText = formatTime(Date.now() - session.start);
-            document.getElementById('btn-main').innerText = "Dienst beenden";
-            document.getElementById('btn-main').className = "btn btn-stop";
-        } else {
-            mainDisp.innerText = "00:00:00";
-            document.getElementById('btn-main').innerText = "Dienst starten";
-            document.getElementById('btn-main').className = "btn btn-start";
-        }
+            document.getElementById('main-timer').innerText = new Date(Date.now() - session.start).toISOString().substr(11, 8);
+        } else { document.getElementById('main-timer').innerText = "00:00:00"; }
 
-        const vzBtn = document.getElementById('btn-vz');
-        if (vzSession.active) {
-            vzBtn.innerText = `VZ läuft... (${formatTime(Date.now() - vzSession.start)})`;
-            vzBtn.classList.add('active'); vzBtn.classList.remove('btn-confirm');
-        } else if (!confirmVZ) {
-            vzBtn.innerText = "+ Vertretung (90m)";
-            vzBtn.classList.remove('active', 'btn-confirm');
-        }
-
-        const exBtn = document.getElementById('btn-extra');
-        if (extraSession.active) {
-            exBtn.innerText = `Konf läuft... (${formatTime(Date.now() - extraSession.start)})`;
-            exBtn.classList.add('active'); exBtn.classList.remove('btn-confirm');
-        } else if (!confirmExtra) {
-            exBtn.innerText = "Konferenz / Termin";
-            exBtn.classList.remove('active', 'btn-confirm');
-        }
-
-        const currentMonth = new Date().getMonth();
+        const now = new Date();
         const vzCount = db.filter(e => {
-            const dParts = e.datum.split('.');
-            return new Date(dParts[2], dParts[1]-1, dParts[0]).getMonth() === currentMonth && e.isVZ === 'JA';
+            const [d, m, y] = e.datum.split('.');
+            return parseInt(m) === (now.getMonth() + 1) && parseInt(y) === now.getFullYear() && e.isVZ === 'JA';
         }).length;
         document.getElementById('vz-val').innerText = vzCount;
-        document.getElementById('vz-progress').style.width = Math.min((vzCount / 3) * 100, 100) + "%";
+        document.getElementById('vz-progress').style.width = Math.min((vzCount / 4) * 100, 100) + "%";
+
+        let weekMS = db.filter(e => {
+            const [d, m, y] = e.datum.split('.');
+            const entryDate = new Date(y, m-1, d);
+            const diff = (now - entryDate) / (1000 * 60 * 60 * 24);
+            return diff <= 7;
+        }).reduce((acc, curr) => acc + (curr.ms || 0), 0);
+        
+        if(session.active) weekMS += (Date.now() - session.start);
+        const weekHours = weekMS / (1000 * 60 * 60);
+        const weekPerc = Math.min((weekHours / weeklySollHours) * 100, 100);
+        document.getElementById('week-percent').innerText = Math.round(weekPerc) + "%";
+        document.getElementById('week-progress').style.width = weekPerc + "%";
+
         document.getElementById('week-label').innerText = currentWeek;
         document.getElementById('week-btn').style.background = currentWeek === 'A' ? 'var(--weekA)' : 'var(--weekB)';
-        document.getElementById('display-name').innerText = "USER: " + userName.toUpperCase();
-        document.getElementById('soll-info').innerText = weeklySollHours;
+        document.getElementById('display-name').innerText = userName.toUpperCase();
         renderLogs();
-        updateProgressBar();
+    }
+
+    function openSetup() {
+        let dateOptions = "";
+        let d = new Date();
+        for(let i=0; i<7; i++) {
+            if(d.getDay() !== 0 && d.getDay() !== 6) {
+                let ds = d.toLocaleDateString('de-DE');
+                dateOptions += `<option value="${ds}">${i===0?'Heute':ds}</option>`;
+            }
+            d.setDate(d.getDate()-1);
+        }
+
+        let html = `
+            <div class="modal-nav">
+                <button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer;">✕ ABBRUCH</button>
+                <b style="color:var(--primary)">EINSTELLUNGEN</b>
+                <button onclick="saveSetup()" style="background:none; border:none; color:var(--success); font-weight:bold; cursor:pointer;">SPEICHERN ✓</button>
+            </div>
+            
+            <div class="manual-box" style="border-color:var(--danger); background:rgba(239, 68, 68, 0.05); margin-top:20px;">
+                <label style="color:var(--danger)">⚠️ RESET</label>
+                <button class="btn btn-stop" style="font-size:0.8rem; padding:8px;" onclick="resetToday()">HEUTIGEN TAG AUF NULL SETZEN</button>
+            </div>
+
+            <div class="manual-box" style="border-color:var(--success);">
+                <label style="color:var(--success)">📊 EXPORT</label>
+                <button class="btn btn-start" style="font-size:0.8rem; padding:8px; background:var(--success);" onclick="exportData()">📥 EXPORT FÜR EXCEL / NUMBERS</button>
+            </div>
+
+            <div class="manual-box">
+                <label style="color:var(--accent)">🕒 NACHTRAG (Mo-Fr)</label>
+                <select id="nachtrag-date">${dateOptions}</select>
+                <select id="nachtrag-cat"><option value="Hauptdienst">Hauptdienst</option><option value="Konferenz">Konferenz</option><option value="Vertretung (VZ)">Vertretung (VZ)</option></select>
+                <div style="display:flex; gap:10px;">
+                    <input type="time" id="nachtrag-start" value="08:00">
+                    <input type="time" id="nachtrag-end" value="13:00">
+                </div>
+                <button class="btn btn-start" style="padding:10px; font-size:0.85rem;" onclick="processManual()">SPEICHERN</button>
+            </div>
+
+            <label>NAME</label><input type="text" id="setup-name" value="${userName}">
+            <label>WOCHEN-SOLL</label><input type="number" id="setup-soll" value="${weeklySollHours}">
+            
+            <button class="accordion-btn" onclick="toggleAcc('accA')">WOCHE A BEARBEITEN <span>▼</span></button>
+            <div id="accA" class="accordion-content">`;
+        
+        ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
+            html += `<div style="margin-top:15px; border-bottom:1px solid #444; padding-bottom:10px;"><b style="color:var(--accent)">${tag}</b>`;
+            blocks.forEach(b => {
+                const val = plan[`A-${tag}`]?.[b.id] || "";
+                html += `<div style="margin-top:8px;"><label>${b.label} (${b.start}-${b.end})</label><input type="text" id="A-${tag}-${b.id}" value="${val}"></div>`;
+            });
+            html += `</div>`;
+        });
+        html += `</div><button class="accordion-btn" onclick="toggleAcc('accB')">WOCHE B BEARBEITEN <span>▼</span></button>
+            <div id="accB" class="accordion-content">`;
+
+        ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
+            html += `<div style="margin-top:15px; border-bottom:1px solid #444; padding-bottom:10px;"><b style="color:var(--accent)">${tag}</b>`;
+            blocks.forEach(b => {
+                const val = plan[`B-${tag}`]?.[b.id] || "";
+                html += `<div style="margin-top:8px;"><label>${b.label} (${b.start}-${b.end})</label><input type="text" id="B-${tag}-${b.id}" value="${val}"></div>`;
+            });
+            html += `</div>`;
+        });
+        html += `</div>`;
+
+        document.getElementById('modal-body').innerHTML = html;
+        document.getElementById('modal').style.display = 'block';
+    }
+
+    function toggleAcc(id) {
+        const el = document.getElementById(id);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function processManual() {
+        const d = document.getElementById('nachtrag-date').value;
+        const c = document.getElementById('nachtrag-cat').value;
+        const s = document.getElementById('nachtrag-start').value;
+        const e = document.getElementById('nachtrag-end').value;
+        const d1 = new Date("2000-01-01T" + s);
+        const d2 = new Date("2000-01-01T" + e);
+        saveToDB(c, d1.getTime(), d2.getTime(), d);
+        alert("Gespeichert!"); location.reload();
+    }
+
+    function resetToday() {
+        if(confirm("Heute löschen?")) {
+            const today = new Date().toLocaleDateString('de-DE');
+            db = db.filter(e => e.datum !== today);
+            localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
+            localStorage.removeItem('activeSessionV13');
+            logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
+            location.reload();
+        }
+    }
+
+    function saveSetup() {
+        userName = document.getElementById('setup-name').value;
+        weeklySollHours = document.getElementById('setup-soll').value;
+        ['A','B'].forEach(w => {
+            ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
+                if(!plan[`${w}-${tag}`]) plan[`${w}-${tag}`] = {};
+                blocks.forEach(b => {
+                    plan[`${w}-${tag}`][b.id] = document.getElementById(`${w}-${tag}-${b.id}`).value;
+                });
+            });
+        });
+        localStorage.setItem('userNameV13', userName);
+        localStorage.setItem('weeklySollV13', weeklySollHours);
+        localStorage.setItem('lehrerPlanV13', JSON.stringify(plan));
+        location.reload();
     }
 
     function openHelp() {
         document.getElementById('modal-body').innerHTML = `
             <div class="modal-nav">
-                <button class="nav-btn" onclick="document.getElementById('modal').style.display='none'" style="color:var(--primary);">✕ Schließen</button>
-                <div style="font-weight:bold; color:var(--primary);">BEDIENUNGSANLEITUNG</div>
+                <button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">✕ SCHLIESSEN</button>
+                <b style="color:var(--primary)">BEDIENUNGSANLEITUNG</b>
                 <div></div>
             </div>
             <div class="help-text" style="padding: 10px 20px 40px 20px;">
@@ -306,7 +331,7 @@
                 <h2>1. Installation & Start</h2>
                 <p>Öffne die Seite in Safari (iPhone) oder Chrome (Android). Tippe auf das <b>Teilen-Symbol</b> und wähle <b>"Zum Home-Bildschirm hinzufügen"</b>.</p>
                 <h2>2. Die erste Einrichtung (Setup)</h2>
-                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib Namen und Wochen-Soll ein. Trage dann deinen Plan für Woche A und B ein.</p>
+                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib Namen und Wochen-Soll ein. Trage dann deinen Plan für Woche A und B ein. Nutze die <b>einklappbaren Bereiche</b> (Akkordeon) für mehr Übersicht beim Editieren.</p>
                 <h2>3. Der Dienst-Alltag & Sicherheit</h2>
                 <h3>Live-Timer auf Buttons</h3>
                 <p>Sobald eine Vertretung (Orange) oder Konferenz (Blau) läuft, zeigt dir der Button direkt die bereits vergangene Zeit an.</p>
@@ -317,164 +342,78 @@
                 <h3>Fehlklick-Schutz</h3>
                 <p>Einträge, die kürzer als 30 Sekunden laufen, werden beim Stoppen abgefragt. So bleibt dein Excel sauber.</p>
                 <h2>4. Auswertung & Export</h2>
-                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert.</p>
+                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert und kann direkt in Numbers oder Excel geöffnet werden.</p>
                 <h2>5. Fehler korrigieren (Nachtrag)</h2>
                 <p>In den Einstellungen kannst du unter <b>"🕒 NACHTRAG"</b> Uhrzeiten manuell nachpflegen. Du kannst das Datum für die letzten 5 Wochentage frei wählen.</p>
-                <h2>6. Automatischer Reset</h2>
-                <p>Die Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst.</p>
+                <h2>6. Automatischer Reset & Statistik</h2>
+                <p>Die Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst. Der Wochenbalken berechnet sich aus allen Einträgen der letzten 7 Tage.</p>
             </div>`;
         document.getElementById('modal').style.display = 'block';
     }
 
-    function openSetup() {
-        let dateOptions = "";
-        let d = new Date();
-        let count = 0;
-        while(count < 7) {
-            let dayNum = d.getDay();
-            if(dayNum !== 0 && dayNum !== 6) {
-                let ds = d.toLocaleDateString('de-DE');
-                dateOptions += `<option value="${ds}">${count === 0 ? 'Heute' : ds}</option>`;
+    function handleVZClick() {
+        if(!confirmVZ) {
+            confirmVZ = true; document.getElementById('btn-vz').classList.add('btn-confirm');
+            setTimeout(() => { confirmVZ = false; document.getElementById('btn-vz').classList.remove('btn-confirm'); }, 3000);
+        } else {
+            saveToDB('Vertretung (VZ)', Date.now(), Date.now() + (90 * 60000));
+            addLog("+1 VZ gebucht"); confirmVZ = false; updateUI();
+        }
+    }
+
+    function handleExtraClick() {
+        if(!confirmExtra) {
+            confirmExtra = true; document.getElementById('btn-extra').classList.add('btn-confirm');
+            setTimeout(() => { confirmExtra = false; document.getElementById('btn-extra').classList.remove('btn-confirm'); }, 3000);
+        } else {
+            if(!extraSession.active) {
+                extraSession = { active: true, start: Date.now() };
+                addLog("Konferenz Start");
+            } else {
+                saveToDB('Konferenz', extraSession.start, Date.now());
+                extraSession = { active: false };
+                addLog("Konferenz Ende");
             }
-            d.setDate(d.getDate() - 1);
-            count++;
+            localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
+            updateUI();
         }
-
-        let html = `
-            <div class="modal-nav">
-                <button class="nav-btn" onclick="document.getElementById('modal').style.display='none'" style="color:var(--danger);">✕ Abbrechen</button>
-                <div style="font-weight:bold; color:var(--primary);">EINSTELLUNGEN</div>
-                <button class="nav-btn" onclick="saveAll()" style="color:var(--success);">Speichern ✓</button>
-            </div>
-            <div class="manual-box" style="border-color:var(--danger); background: rgba(239, 68, 68, 0.05);">
-                <label style="color:var(--danger); font-weight:800;">⚠️ TAGES-RESET</label>
-                <button class="btn btn-stop" style="font-size:0.85rem; padding:10px;" onclick="resetToday()">HEUTIGEN TAG AUF NULL SETZEN</button>
-            </div>
-            <div class="manual-box" style="border-color:var(--success);">
-                <label style="color:var(--success); font-weight:800;">📊 MONATSEXPORT</label>
-                <button class="btn btn-start" style="background:var(--success); font-size:0.85rem;" onclick="exportToExcel()">📥 EXPORT FÜR EXCEL / NUMBERS</button>
-            </div>
-            <div class="manual-box">
-                <label style="color:var(--accent); font-weight:800;">🕒 NACHTRAG</label>
-                <label>Datum wählen (Mo-Fr)</label>
-                <select id="nachtrag-date">${dateOptions}</select>
-                <select id="nachtrag-cat"><option value="Hauptdienst">HAUPT-DIENST</option><option value="Konferenz">KONFERENZ</option><option value="Vertretung (VZ)">VERTRETUNG (VZ)</option></select>
-                
-                <label>Beginn setzen um:</label>
-                <input type="time" id="nachtrag-start" step="1" value="08:00:00">
-                
-                <label>Ende setzen um:</label>
-                <input type="time" id="nachtrag-ende" step="1" value="13:00:00">
-                
-                <button class="btn btn-start" style="padding:10px; font-size:0.85rem; margin-top:10px;" onclick="processNachtragV15()">NACHTRAG SPEICHERN</button>
-            </div>
-            <label>Name</label><input type="text" id="user-input" value="${userName}">
-            <label>Wochen-Soll</label>
-            <input type="number" id="soll-input" value="${weeklySollHours}">`;
-        
-        ['A','B'].forEach(w => {
-            html += `<h3 style="color:var(--primary); margin-top:20px;">Woche ${w}</h3>`;
-            ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(d => {
-                const k = `${w}-${d}`; html += `<div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:12px; margin-top:8px;"><strong>${d}</strong>`;
-                blocks.forEach(b => {
-                    const entry = plan[k]?.[b.id] || { text: "" };
-                    html += `<div style="margin-top:5px;"><label>${b.label}</label>
-                    <input type="text" onchange="saveData('${k}','${b.id}',this.value)" value="${entry.text}"></div>`;
-                }); html += `</div>`;
-            });
-        });
-        document.getElementById('modal-body').innerHTML = html;
-        document.getElementById('modal').style.display = 'block';
     }
 
-    function processNachtragV15() {
-        const datum = document.getElementById('nachtrag-date').value;
-        const cat = document.getElementById('nachtrag-cat').value;
-        const startVal = document.getElementById('nachtrag-start').value;
-        const endeVal = document.getElementById('nachtrag-ende').value;
-        const d1 = new Date("2000-01-01T" + startVal);
-        const d2 = new Date("2000-01-01T" + endeVal);
-        saveToDB(cat, d1.getTime(), d2.getTime(), datum);
-        alert("Eintrag gespeichert.");
-        location.reload();
-    }
-
-    function exportToExcel() {
-        let csv = "\ufeffDatum;Kategorie;Beginn;Ende;Dauer;VZ\n";
-        db.forEach(e => { csv += `${e.datum};${e.typ};${e.start};${e.ende};${e.dauer};${e.isVZ}\n`; });
+    function addLog(m) { logs.unshift({ t: new Date().toLocaleTimeString().substr(0,5), m }); if(logs.length > 5) logs.pop(); localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); renderLogs(); }
+    function renderLogs() { document.getElementById('log-container').innerHTML = logs.map(l => `<div class="log-entry"><span>${l.m}</span><span>${l.t}</span></div>`).join(''); }
+    function toggleWeekManual() { currentWeek = (currentWeek === 'A' ? 'B' : 'A'); localStorage.setItem('manualWeekV13', currentWeek); updateUI(); }
+    function exportData() {
+        let csv = "\ufeffDatum;Kategorie;Beginn;Ende;Dauer\n";
+        db.forEach(e => { csv += `${e.datum};${e.typ};${e.start};${e.ende};${e.dauer}\n`; });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `Zeiten_${userName}.csv`; link.click();
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
+        link.download = "Arbeitszeiten.csv"; link.click();
     }
-
-    function resetToday() {
-        if(confirm("Alles heute löschen?")) {
-            const today = new Date().toLocaleDateString('de-DE');
-            db = db.filter(e => e.datum !== today);
-            localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
-            localStorage.removeItem('activeSessionV13');
-            localStorage.removeItem('vzSessionV13');
-            localStorage.removeItem('extraSessionV13');
-            logs = [];
-            localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
-            location.reload();
-        }
-    }
-
-    function updateProgressBar() {
-        const days = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
-        const todayKey = `${currentWeek}-${days[new Date().getDay()]}`;
-        let dailySollMin = 0;
-        if(plan[todayKey]) { [1,2,3,4].forEach(n => { if(plan[todayKey]['b'+n] && plan[todayKey]['b'+n].text) dailySollMin += 90; }); }
-        const elapsedMin = session.active ? (Date.now() - session.start) / 60000 : 0;
-        const dPerc = dailySollMin > 0 ? Math.min((elapsedMin/dailySollMin)*100, 100) : 0;
-        const wPerc = Math.min((elapsedMin/(weeklySollHours*60))*100, 100);
-        document.getElementById('day-progress').style.width = dPerc + "%";
-        document.getElementById('day-percent').innerText = Math.round(dPerc) + "%";
-        document.getElementById('week-progress').style.width = wPerc + "%";
-        document.getElementById('week-percent').innerText = Math.round(wPerc) + "%";
-    }
-
     function updateAssistant() {
-        const now = new Date(); const currentTime = now.getHours() * 60 + now.getMinutes();
-        const todayKey = `${currentWeek}-${['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()]}`;
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        const tag = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()];
+        const key = `${currentWeek}-${tag}`;
         let found = false;
-        for (let block of blocks) {
-            const [hE, mE] = block.end.split(':').map(Number);
+        for (let b of blocks) {
+            const [hE, mE] = b.end.split(':').map(Number);
             if (currentTime < (hE * 60 + mE)) {
-                const entry = plan[todayKey]?.[block.id];
-                if (entry && entry.text) {
-                    const [hS, mS] = block.start.split(':').map(Number);
-                    const isNow = currentTime >= (hS * 60 + mS);
-                    document.getElementById('task-status').innerText = isNow ? "JETZT AKTIV" : "DEMNÄCHST";
-                    document.getElementById('task-title').innerText = entry.text;
-                    document.getElementById('task-details').innerText = `Zeit: ${block.start} - ${block.end}`;
+                const text = plan[key]?.[b.id];
+                if (text && text.trim() !== "") {
+                    document.getElementById('task-status').innerText = "AKTUELL / NÄCHSTES";
+                    document.getElementById('task-title').innerText = text;
+                    document.getElementById('task-details').innerText = `${b.label}: ${b.start} - ${b.end}`;
                     found = true; break;
                 }
             }
         }
-        if (!found) { document.getElementById('task-status').innerText = "Bereit"; document.getElementById('task-title').innerText = "Keine Termine"; }
+        if(!found) {
+            document.getElementById('task-status').innerText = "Bereit";
+            document.getElementById('task-title').innerText = "Keine weiteren Termine";
+            document.getElementById('task-details').innerText = "Schönen Feierabend!";
+        }
     }
-
-    function addLog(msg) { logs.unshift({ time: new Date().toLocaleTimeString().substr(0,5), msg }); if(logs.length > 5) logs.pop(); localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); renderLogs(); }
-    function renderLogs() { document.getElementById('log-container').innerHTML = logs.map(l => `<div class="log-entry"><span>${l.msg}</span><span>${l.time}</span></div>`).join(''); }
-    function saveData(k, id, v) { if(!plan[k]) plan[k]={}; plan[k][id] = { text: v }; }
-    function saveAll() { 
-        userName = document.getElementById('user-input').value; 
-        weeklySollHours = document.getElementById('soll-input').value; 
-        localStorage.setItem('userNameV13', userName); 
-        localStorage.setItem('weeklySollV13', weeklySollHours); 
-        localStorage.setItem('lehrerPlanV13', JSON.stringify(plan)); 
-        location.reload(); 
-    }
-    function toggleWeekManual() { currentWeek = currentWeek === 'A' ? 'B' : 'A'; localStorage.setItem('manualWeekV13', currentWeek); location.reload(); }
-
-    window.onload = () => {
-        updateUI();
-        if(vzSession.active) startVZWatcher();
-        renderLogs();
-    };
+    window.onload = updateUI;
 </script>
 </body>
 </html>
