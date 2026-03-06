@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v18.2</title>
+    <title>Arbeitszeit-Assistent Pro v18.3</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -98,7 +98,7 @@
     </div>
 
     <footer class="footer-info">
-        &copy; 2026 Michael Nagel &bull; v18.2
+        &copy; 2026 Michael Nagel &bull; v18.3
     </footer>
 </div>
 
@@ -106,7 +106,22 @@
 
 <script>
     let db = JSON.parse(localStorage.getItem('lehrerDB_Export')) || [];
-    let plan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
+    let rawPlan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
+    let plan = {};
+
+    // REPARATUR-LOGIK: Wandelt [object Object] zurück in Text um
+    Object.keys(rawPlan).forEach(tagKey => {
+        plan[tagKey] = {};
+        Object.keys(rawPlan[tagKey]).forEach(blockId => {
+            let entry = rawPlan[tagKey][blockId];
+            if (typeof entry === 'object' && entry !== null && entry.text !== undefined) {
+                plan[tagKey][blockId] = entry.text;
+            } else {
+                plan[tagKey][blockId] = entry;
+            }
+        });
+    });
+
     let session = JSON.parse(localStorage.getItem('activeSessionV13')) || { active: false };
     let vzSession = JSON.parse(localStorage.getItem('vzSessionV13')) || { active: false };
     let extraSession = JSON.parse(localStorage.getItem('extraSessionV13')) || { active: false };
@@ -337,16 +352,14 @@
                 <p>Sobald eine Vertretung (Orange) oder Konferenz (Blau) läuft, zeigt dir der Button direkt die bereits vergangene Zeit an.</p>
                 <h3>Scharfschalten (VZ & Konferenz)</h3>
                 <p>Um versehentliche Klicks zu vermeiden, müssen diese Buttons <b>zweimal</b> getippt werden. Beim ersten Tippen färbt sich der Button gelb ("Sicher?").</p>
-                <h3>Automatischer Log-out (VZ)</h3>
-                <p>Eine Vertretung wird automatisch nach <b>90 Minuten</b> beendet und gespeichert.</p>
-                <h3>Fehlklick-Schutz</h3>
-                <p>Einträge, die kürzer als 30 Sekunden laufen, werden beim Stoppen abgefragt. So bleibt dein Excel sauber.</p>
+                <h3>VZ Automatik</h3>
+                <p>Vertretungen werden nach 90 Min. automatisch gestoppt.</p>
                 <h2>4. Auswertung & Export</h2>
-                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert und kann direkt in Numbers oder Excel geöffnet werden.</p>
+                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert.</p>
                 <h2>5. Fehler korrigieren (Nachtrag)</h2>
                 <p>In den Einstellungen kannst du unter <b>"🕒 NACHTRAG"</b> Uhrzeiten manuell nachpflegen. Du kannst das Datum für die letzten 5 Wochentage frei wählen.</p>
                 <h2>6. Automatischer Reset & Statistik</h2>
-                <p>Die Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst. Der Wochenbalken berechnet sich aus allen Einträgen der letzten 7 Tage.</p>
+                <p>Die Historie löscht sich jede Nacht um 00:00 Uhr von selbst. Der Wochenbalken scannt alle Einträge der letzten 7 Tage.</p>
             </div>`;
         document.getElementById('modal').style.display = 'block';
     }
@@ -413,7 +426,11 @@
             document.getElementById('task-details').innerText = "Schönen Feierabend!";
         }
     }
-    window.onload = updateUI;
+    window.onload = () => {
+        updateUI();
+        // Einmaliges Speichern nach Konvertierung, um das alte Format loszuwerden
+        localStorage.setItem('lehrerPlanV13', JSON.stringify(plan));
+    };
 </script>
 </body>
 </html>
