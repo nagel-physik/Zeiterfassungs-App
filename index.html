@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v18.3</title>
+    <title>Arbeitszeit-Assistent Pro v18.5</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -22,13 +22,21 @@
         .next-info { background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 18px; padding: 15px; text-align: left; margin-bottom: 12px; border-left: 5px solid var(--primary); }
         .timer-display { font-size: 2.6rem; font-weight: 800; margin: 5px 0; color: var(--text); font-variant-numeric: tabular-nums; }
         .btn { border: none; padding: 14px; border-radius: 12px; font-weight: bold; width: 100%; margin-bottom: 10px; cursor: pointer; color: white; transition: 0.2s; font-size: 1rem; }
-        .btn-start { background: var(--success); }
+        .btn-start { background: var(--success) !important; }
         .btn-stop { background: var(--danger) !important; }
         .btn-setup { background: #475569; }
         .btn-refresh { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-vz { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
         .btn-extra { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid var(--primary); }
+        
+        /* Aktive Timer-Zustände */
         .btn-confirm { background: var(--accent) !important; color: var(--bg) !important; animation: pulse-confirm 0.5s infinite; }
+        .btn-vz.active { background: #f59e0b !important; color: white; animation: pulse 2s infinite; }
+        .btn-extra.active { background: #6366f1 !important; color: white; animation: pulse 2s infinite; }
+
+        @keyframes pulse-confirm { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        
         .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
         .progress-bar { height: 10px; background: #020617; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.5s; }
@@ -77,7 +85,7 @@
         </div>
         <div id="main-timer" class="timer-display">00:00:00</div>
         <button id="btn-main" class="btn btn-start" onclick="toggleMain()">Dienst starten</button>
-        <button id="btn-vz" class="btn btn-vz" onclick="handleVZClick()">+ Vertretung (90m)</button>
+        <button id="btn-vz" class="btn btn-vz" onclick="handleVZClick()">Vertretung</button>
         <button id="btn-extra" class="btn btn-extra" onclick="handleExtraClick()">Konferenz / Termin</button>
         
         <div class="progress-container" style="margin-top: 20px;">
@@ -98,7 +106,7 @@
     </div>
 
     <footer class="footer-info">
-        &copy; 2026 Michael Nagel &bull; v18.3
+        &copy; 2026 Michael Nagel &bull; v18.5
     </footer>
 </div>
 
@@ -106,22 +114,7 @@
 
 <script>
     let db = JSON.parse(localStorage.getItem('lehrerDB_Export')) || [];
-    let rawPlan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
-    let plan = {};
-
-    // REPARATUR-LOGIK: Wandelt [object Object] zurück in Text um
-    Object.keys(rawPlan).forEach(tagKey => {
-        plan[tagKey] = {};
-        Object.keys(rawPlan[tagKey]).forEach(blockId => {
-            let entry = rawPlan[tagKey][blockId];
-            if (typeof entry === 'object' && entry !== null && entry.text !== undefined) {
-                plan[tagKey][blockId] = entry.text;
-            } else {
-                plan[tagKey][blockId] = entry;
-            }
-        });
-    });
-
+    let plan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
     let session = JSON.parse(localStorage.getItem('activeSessionV13')) || { active: false };
     let vzSession = JSON.parse(localStorage.getItem('vzSessionV13')) || { active: false };
     let extraSession = JSON.parse(localStorage.getItem('extraSessionV13')) || { active: false };
@@ -150,15 +143,18 @@
         
         const todayStr = now.toDateString();
         if(localStorage.getItem('logDateV13') !== todayStr) {
-            logs = [];
-            localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
-            localStorage.setItem('logDateV13', todayStr);
+            logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); localStorage.setItem('logDateV13', todayStr);
             renderLogs();
         }
 
         if (session.active) updateAssistant();
         updateUI(); 
     }, 1000);
+
+    function formatTime(ms) {
+        if (ms < 0) ms = 0;
+        return new Date(ms).toISOString().substr(11, 8);
+    }
 
     function toggleMain() {
         if (!session.active) {
@@ -172,7 +168,48 @@
                 addLog("Feierabend");
             }
         }
-        updateUI();
+    }
+
+    function handleVZClick() {
+        if(vzSession.active) {
+            if(confirm("Vertretung beenden?")) {
+                saveToDB('Vertretung (VZ)', vzSession.start, Date.now());
+                vzSession = { active: false }; localStorage.removeItem('vzSessionV13');
+                addLog("VZ Ende");
+            }
+        } else {
+            if(!confirmVZ) {
+                confirmVZ = true;
+                const btn = document.getElementById('btn-vz');
+                btn.innerText = "Sicher? (Tippen)"; btn.classList.add('btn-confirm');
+                setTimeout(() => { confirmVZ = false; updateUI(); }, 3000);
+            } else {
+                vzSession = { active: true, start: Date.now() };
+                localStorage.setItem('vzSessionV13', JSON.stringify(vzSession));
+                addLog("VZ Start"); confirmVZ = false; updateUI();
+            }
+        }
+    }
+
+    function handleExtraClick() {
+        if(extraSession.active) {
+            if(confirm("Konferenz beenden?")) {
+                saveToDB('Konferenz', extraSession.start, Date.now());
+                extraSession = { active: false }; localStorage.removeItem('extraSessionV13');
+                addLog("Konferenz Ende");
+            }
+        } else {
+            if(!confirmExtra) {
+                confirmExtra = true;
+                const btn = document.getElementById('btn-extra');
+                btn.innerText = "Sicher? (Tippen)"; btn.classList.add('btn-confirm');
+                setTimeout(() => { confirmExtra = false; updateUI(); }, 3000);
+            } else {
+                extraSession = { active: true, start: Date.now() };
+                localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
+                addLog("Konf. Start"); confirmExtra = false; updateUI();
+            }
+        }
     }
 
     function saveToDB(typ, start, end, manualDatum = null) {
@@ -189,34 +226,80 @@
     }
 
     function updateUI() {
+        const btnMain = document.getElementById('btn-main');
         if(session.active) {
-            document.getElementById('main-timer').innerText = new Date(Date.now() - session.start).toISOString().substr(11, 8);
-        } else { document.getElementById('main-timer').innerText = "00:00:00"; }
+            document.getElementById('main-timer').innerText = formatTime(Date.now() - session.start);
+            btnMain.innerText = "Dienst beenden"; btnMain.className = "btn btn-stop";
+        } else {
+            document.getElementById('main-timer').innerText = "00:00:00";
+            btnMain.innerText = "Dienst starten"; btnMain.className = "btn btn-start";
+        }
+
+        // Live Timer auf VZ & Extra Buttons
+        const vzBtn = document.getElementById('btn-vz');
+        if(vzSession.active) {
+            vzBtn.innerText = `VZ läuft (${formatTime(Date.now() - vzSession.start)})`;
+            vzBtn.classList.add('active'); vzBtn.classList.remove('btn-confirm');
+        } else if(!confirmVZ) {
+            vzBtn.innerText = "Vertretung"; vzBtn.classList.remove('active', 'btn-confirm');
+        }
+
+        const exBtn = document.getElementById('btn-extra');
+        if(extraSession.active) {
+            exBtn.innerText = `Konf läuft (${formatTime(Date.now() - extraSession.start)})`;
+            exBtn.classList.add('active'); exBtn.classList.remove('btn-confirm');
+        } else if(!confirmExtra) {
+            exBtn.innerText = "Konferenz / Termin"; exBtn.classList.remove('active', 'btn-confirm');
+        }
 
         const now = new Date();
+        // VZ Monat
         const vzCount = db.filter(e => {
-            const [d, m, y] = e.datum.split('.');
-            return parseInt(m) === (now.getMonth() + 1) && parseInt(y) === now.getFullYear() && e.isVZ === 'JA';
+            const parts = e.datum.split('.');
+            return parseInt(parts[1]) === (now.getMonth() + 1) && parseInt(parts[2]) === now.getFullYear() && e.isVZ === 'JA';
         }).length;
         document.getElementById('vz-val').innerText = vzCount;
         document.getElementById('vz-progress').style.width = Math.min((vzCount / 4) * 100, 100) + "%";
 
+        // Woche Gesamt
+        function getMonday(d) {
+            d = new Date(d); var day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6:1);
+            return new Date(d.setDate(diff)).setHours(0,0,0,0);
+        }
+        const monday = getMonday(now);
         let weekMS = db.filter(e => {
-            const [d, m, y] = e.datum.split('.');
-            const entryDate = new Date(y, m-1, d);
-            const diff = (now - entryDate) / (1000 * 60 * 60 * 24);
-            return diff <= 7;
+            const parts = e.datum.split('.');
+            return new Date(parts[2], parts[1]-1, parts[0]).getTime() >= monday;
         }).reduce((acc, curr) => acc + (curr.ms || 0), 0);
-        
         if(session.active) weekMS += (Date.now() - session.start);
-        const weekHours = weekMS / (1000 * 60 * 60);
-        const weekPerc = Math.min((weekHours / weeklySollHours) * 100, 100);
+        const weekPerc = Math.min((weekMS / (weeklySollHours * 3600000)) * 100, 100);
         document.getElementById('week-percent').innerText = Math.round(weekPerc) + "%";
         document.getElementById('week-progress').style.width = weekPerc + "%";
+
+        // Tag Fortschritt
+        const dayKey = `${currentWeek}-${['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()]}`;
+        let firstStart = 1440, lastEnd = 0, hasPlan = false;
+        blocks.forEach(b => {
+           if(plan[dayKey] && plan[dayKey][b.id] && plan[dayKey][b.id].trim() !== "") {
+               hasPlan = true;
+               const [sh, sm] = b.start.split(':').map(Number);
+               const [eh, em] = b.end.split(':').map(Number);
+               firstStart = Math.min(firstStart, sh * 60 + sm);
+               lastEnd = Math.max(lastEnd, eh * 60 + em);
+           }
+        });
+        if(session.active && hasPlan) {
+            const elapsed = Math.max(0, (now.getHours()*60 + now.getMinutes()) - firstStart);
+            const total = lastEnd - firstStart;
+            const dayPerc = Math.min((elapsed / total) * 100, 100);
+            document.getElementById('day-percent').innerText = Math.round(dayPerc) + "%";
+            document.getElementById('day-progress').style.width = dayPerc + "%";
+        }
 
         document.getElementById('week-label').innerText = currentWeek;
         document.getElementById('week-btn').style.background = currentWeek === 'A' ? 'var(--weekA)' : 'var(--weekB)';
         document.getElementById('display-name').innerText = userName.toUpperCase();
+        document.getElementById('soll-info').innerText = weeklySollHours;
         renderLogs();
     }
 
@@ -233,19 +316,14 @@
 
         let html = `
             <div class="modal-nav">
-                <button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer;">✕ ABBRUCH</button>
+                <button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold;">✕ ABBRUCH</button>
                 <b style="color:var(--primary)">EINSTELLUNGEN</b>
-                <button onclick="saveSetup()" style="background:none; border:none; color:var(--success); font-weight:bold; cursor:pointer;">SPEICHERN ✓</button>
+                <button onclick="saveSetup()" style="background:none; border:none; color:var(--success); font-weight:bold;">SPEICHERN ✓</button>
             </div>
             
             <div class="manual-box" style="border-color:var(--danger); background:rgba(239, 68, 68, 0.05); margin-top:20px;">
                 <label style="color:var(--danger)">⚠️ RESET</label>
                 <button class="btn btn-stop" style="font-size:0.8rem; padding:8px;" onclick="resetToday()">HEUTIGEN TAG AUF NULL SETZEN</button>
-            </div>
-
-            <div class="manual-box" style="border-color:var(--success);">
-                <label style="color:var(--success)">📊 EXPORT</label>
-                <button class="btn btn-start" style="font-size:0.8rem; padding:8px; background:var(--success);" onclick="exportData()">📥 EXPORT FÜR EXCEL / NUMBERS</button>
             </div>
 
             <div class="manual-box">
@@ -284,60 +362,47 @@
             });
             html += `</div>`;
         });
-        html += `</div>`;
+        html += `</div><div class="manual-box" style="border-color:var(--success); margin-top:20px;">
+                <label style="color:var(--success)">📊 EXPORT</label>
+                <button class="btn btn-start" style="font-size:0.8rem; padding:8px; background:var(--success);" onclick="exportData()">📥 EXPORT FÜR EXCEL / NUMBERS</button>
+            </div>`;
 
         document.getElementById('modal-body').innerHTML = html;
         document.getElementById('modal').style.display = 'block';
     }
 
-    function toggleAcc(id) {
-        const el = document.getElementById(id);
-        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-    }
-
+    function toggleAcc(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function processManual() {
-        const d = document.getElementById('nachtrag-date').value;
-        const c = document.getElementById('nachtrag-cat').value;
-        const s = document.getElementById('nachtrag-start').value;
-        const e = document.getElementById('nachtrag-end').value;
-        const d1 = new Date("2000-01-01T" + s);
-        const d2 = new Date("2000-01-01T" + e);
-        saveToDB(c, d1.getTime(), d2.getTime(), d);
-        alert("Gespeichert!"); location.reload();
+        const d = document.getElementById('nachtrag-date').value, c = document.getElementById('nachtrag-cat').value;
+        const s = document.getElementById('nachtrag-start').value, e = document.getElementById('nachtrag-end').value;
+        const d1 = new Date("2000-01-01T" + s), d2 = new Date("2000-01-01T" + e);
+        saveToDB(c, d1.getTime(), d2.getTime(), d); alert("Gespeichert!"); location.reload();
     }
-
     function resetToday() {
         if(confirm("Heute löschen?")) {
             const today = new Date().toLocaleDateString('de-DE');
-            db = db.filter(e => e.datum !== today);
-            localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
-            localStorage.removeItem('activeSessionV13');
-            logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
+            db = db.filter(e => e.datum !== today); localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
+            localStorage.removeItem('activeSessionV13'); logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
             location.reload();
         }
     }
-
     function saveSetup() {
         userName = document.getElementById('setup-name').value;
         weeklySollHours = document.getElementById('setup-soll').value;
         ['A','B'].forEach(w => {
             ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
                 if(!plan[`${w}-${tag}`]) plan[`${w}-${tag}`] = {};
-                blocks.forEach(b => {
-                    plan[`${w}-${tag}`][b.id] = document.getElementById(`${w}-${tag}-${b.id}`).value;
-                });
+                blocks.forEach(b => { plan[`${w}-${tag}`][b.id] = document.getElementById(`${w}-${tag}-${b.id}`).value; });
             });
         });
-        localStorage.setItem('userNameV13', userName);
-        localStorage.setItem('weeklySollV13', weeklySollHours);
-        localStorage.setItem('lehrerPlanV13', JSON.stringify(plan));
-        location.reload();
+        localStorage.setItem('userNameV13', userName); localStorage.setItem('weeklySollV13', weeklySollHours);
+        localStorage.setItem('lehrerPlanV13', JSON.stringify(plan)); location.reload();
     }
 
     function openHelp() {
         document.getElementById('modal-body').innerHTML = `
             <div class="modal-nav">
-                <button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">✕ SCHLIESSEN</button>
+                <button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--primary); font-weight:bold;">✕ SCHLIESSEN</button>
                 <b style="color:var(--primary)">BEDIENUNGSANLEITUNG</b>
                 <div></div>
             </div>
@@ -352,44 +417,18 @@
                 <p>Sobald eine Vertretung (Orange) oder Konferenz (Blau) läuft, zeigt dir der Button direkt die bereits vergangene Zeit an.</p>
                 <h3>Scharfschalten (VZ & Konferenz)</h3>
                 <p>Um versehentliche Klicks zu vermeiden, müssen diese Buttons <b>zweimal</b> getippt werden. Beim ersten Tippen färbt sich der Button gelb ("Sicher?").</p>
-                <h3>VZ Automatik</h3>
-                <p>Vertretungen werden nach 90 Min. automatisch gestoppt.</p>
+                <h3>Automatischer Log-out (VZ)</h3>
+                <p>Eine Vertretung wird automatisch nach <b>90 Minuten</b> beendet und gespeichert.</p>
+                <h3>Fehlklick-Schutz</h3>
+                <p>Einträge, die kürzer als 30 Sekunden laufen, werden beim Stoppen abgefragt. So bleibt dein Excel sauber.</p>
                 <h2>4. Auswertung & Export</h2>
-                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert.</p>
+                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert und kann direkt in Numbers oder Excel geöffnet werden.</p>
                 <h2>5. Fehler korrigieren (Nachtrag)</h2>
                 <p>In den Einstellungen kannst du unter <b>"🕒 NACHTRAG"</b> Uhrzeiten manuell nachpflegen. Du kannst das Datum für die letzten 5 Wochentage frei wählen.</p>
                 <h2>6. Automatischer Reset & Statistik</h2>
-                <p>Die Historie löscht sich jede Nacht um 00:00 Uhr von selbst. Der Wochenbalken scannt alle Einträge der letzten 7 Tage.</p>
+                <p>Die Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst. Der Wochenbalken berechnet sich aus allen Einträgen der aktuellen Woche (ab Montag).</p>
             </div>`;
         document.getElementById('modal').style.display = 'block';
-    }
-
-    function handleVZClick() {
-        if(!confirmVZ) {
-            confirmVZ = true; document.getElementById('btn-vz').classList.add('btn-confirm');
-            setTimeout(() => { confirmVZ = false; document.getElementById('btn-vz').classList.remove('btn-confirm'); }, 3000);
-        } else {
-            saveToDB('Vertretung (VZ)', Date.now(), Date.now() + (90 * 60000));
-            addLog("+1 VZ gebucht"); confirmVZ = false; updateUI();
-        }
-    }
-
-    function handleExtraClick() {
-        if(!confirmExtra) {
-            confirmExtra = true; document.getElementById('btn-extra').classList.add('btn-confirm');
-            setTimeout(() => { confirmExtra = false; document.getElementById('btn-extra').classList.remove('btn-confirm'); }, 3000);
-        } else {
-            if(!extraSession.active) {
-                extraSession = { active: true, start: Date.now() };
-                addLog("Konferenz Start");
-            } else {
-                saveToDB('Konferenz', extraSession.start, Date.now());
-                extraSession = { active: false };
-                addLog("Konferenz Ende");
-            }
-            localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
-            updateUI();
-        }
     }
 
     function addLog(m) { logs.unshift({ t: new Date().toLocaleTimeString().substr(0,5), m }); if(logs.length > 5) logs.pop(); localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); renderLogs(); }
@@ -403,8 +442,7 @@
         link.download = "Arbeitszeiten.csv"; link.click();
     }
     function updateAssistant() {
-        const now = new Date();
-        const currentTime = now.getHours() * 60 + now.getMinutes();
+        const now = new Date(), currentTime = now.getHours() * 60 + now.getMinutes();
         const tag = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()];
         const key = `${currentWeek}-${tag}`;
         let found = false;
@@ -420,17 +458,9 @@
                 }
             }
         }
-        if(!found) {
-            document.getElementById('task-status').innerText = "Bereit";
-            document.getElementById('task-title').innerText = "Keine weiteren Termine";
-            document.getElementById('task-details').innerText = "Schönen Feierabend!";
-        }
+        if(!found) { document.getElementById('task-status').innerText = "Bereit"; document.getElementById('task-title').innerText = "Keine weiteren Termine"; }
     }
-    window.onload = () => {
-        updateUI();
-        // Einmaliges Speichern nach Konvertierung, um das alte Format loszuwerden
-        localStorage.setItem('lehrerPlanV13', JSON.stringify(plan));
-    };
+    window.onload = updateUI;
 </script>
 </body>
 </html>
