@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v18.9</title>
+    <title>Arbeitszeit-Assistent Pro v19.0</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -11,31 +11,69 @@
             --danger: #ef4444; --text: #ffffff; --success: #10b981; 
             --overtime: #f59e0b; --weekA: #2563eb; --weekB: #9333ea; 
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 15px; display: flex; flex-direction: column; align-items: center; margin: 0; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--bg);
+            /* Dezent durchsetzter Hintergrund */
+            background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
+            background-attachment: fixed;
+            color: var(--text); padding: 15px; display: flex; flex-direction: column; align-items: center; margin: 0; 
+        }
         .container { width: 100%; max-width: 420px; box-sizing: border-box; }
         
         .time-header { text-align: center; margin-bottom: 20px; width: 100%; position: relative; }
-        #live-clock { font-size: 3rem; font-weight: 800; color: var(--primary); display: block; line-height: 1; }
-        #live-date { font-size: 1rem; font-weight: 600; color: #94a3b8; letter-spacing: 1px; }
+        #live-clock { font-size: 3.2rem; font-weight: 900; color: var(--primary); display: block; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #live-date { font-size: 0.9rem; font-weight: 600; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; display: block; }
 
-        .card { background: var(--card); padding: 20px; border-radius: 24px; margin-bottom: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; border: 1px solid rgba(255,255,255,0.08); }
+        /* Karten mit 3D Optik und blauem Seitenstreifen */
+        .card { 
+            background: var(--card); 
+            padding: 20px; 
+            border-radius: 20px; 
+            margin-bottom: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1); 
+            text-align: center; 
+            border-left: 5px solid var(--primary); /* Der angedeutete Button-Rand */
+            position: relative;
+            overflow: hidden;
+        }
         
-        /* Assistent Zentriert & Nebeneinander */
-        .next-info { background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 20px; padding: 12px; margin-bottom: 15px; border: 1px solid rgba(56, 189, 248, 0.2); display: flex; gap: 10px; }
-        .task-box { flex: 1; padding: 5px; text-align: center; }
+        /* Kompakter Assistent Nebeneinander */
+        .next-info { 
+            background: rgba(30, 41, 59, 0.8); 
+            backdrop-filter: blur(10px);
+            border-radius: 20px; 
+            padding: 10px; 
+            margin-bottom: 15px; 
+            border: 1px solid rgba(56, 189, 248, 0.3); 
+            border-left: 5px solid var(--primary);
+            display: flex; gap: 5px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .task-box { flex: 1; padding: 2px; text-align: center; }
         .task-box:first-child { border-right: 1px solid rgba(255,255,255,0.1); }
-        .task-label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 3px; }
-        .task-val { font-size: 0.95rem; font-weight: 700; line-height: 1.2; min-height: 2.4em; display: flex; align-items: center; justify-content: center; text-align: center; }
-        .task-sub { font-size: 0.7rem; color: #94a3b8; margin-top: 2px; }
+        .task-label { font-size: 0.55rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 2px; }
+        .task-val { 
+            font-size: 1.1rem; /* Größere Schrift */
+            font-weight: 800; 
+            line-height: 1.1; 
+            min-height: 2.2em; 
+            display: flex; align-items: center; justify-content: center; 
+            color: #fff;
+        }
+        .task-sub { font-size: 0.65rem; color: #94a3b8; font-weight: 600; }
 
-        .timer-display { font-size: 2.8rem; font-weight: 800; margin: 10px 0; color: var(--text); font-variant-numeric: tabular-nums; }
+        .timer-display { font-size: 2.8rem; font-weight: 800; margin: 5px 0; color: var(--text); font-variant-numeric: tabular-nums; }
         
-        .btn { border: none; padding: 15px; border-radius: 14px; font-weight: bold; width: 100%; margin-bottom: 10px; cursor: pointer; color: white; transition: 0.3s; font-size: 1rem; box-sizing: border-box; }
-        .btn-start { background: var(--success); }
-        .btn-stop { background: var(--danger) !important; }
+        .btn { border: none; padding: 16px; border-radius: 16px; font-weight: 800; width: 100%; margin-bottom: 10px; cursor: pointer; color: white; transition: 0.2s; font-size: 1rem; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+        .btn:active { transform: translateY(2px); box-shadow: none; }
         
-        .btn-vz { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); }
-        .btn-extra { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); color: var(--primary); }
+        .btn-start { background: linear-gradient(145deg, #10b981, #059669); }
+        .btn-stop { background: linear-gradient(145deg, #ef4444, #dc2626) !important; }
+        
+        .btn-vz { background: rgba(239, 68, 68, 0.1); border: 1.5px solid var(--danger); color: var(--danger); }
+        .btn-extra { background: rgba(56, 189, 248, 0.1); border: 1.5px solid var(--primary); color: var(--primary); }
         
         .btn-confirm { background: var(--accent) !important; color: var(--bg) !important; animation: pulse-confirm 0.5s infinite; border: none; }
         .btn-vz.active { background: var(--overtime) !important; color: white; border: none; }
@@ -43,29 +81,28 @@
         
         @keyframes pulse-confirm { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
 
-        .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
-        .progress-bar { height: 12px; background: #020617; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
-        .progress-fill { height: 100%; width: 0%; transition: width 0.8s ease-in-out; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 700; }
+        .progress-bar { height: 14px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
         
         .switch-container { display: flex; flex-direction: column; align-items: center; }
-        .switch-hint { font-size: 0.6rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
+        .switch-hint { font-size: 0.55rem; font-weight: 900; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1.5px; }
 
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 1000; overflow-y: auto; }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 1000; overflow-y: auto; }
         .modal-content { padding: 80px 20px 40px 20px; }
         .modal-nav { position: fixed; top: 0; left: 0; right: 0; background: var(--card); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--primary); z-index: 1001; }
         
-        .accordion-btn { background: #334155; color: white; padding: 15px; width: 100%; text-align: left; border: none; border-radius: 12px; margin-top: 10px; font-weight: bold; display: flex; justify-content: space-between; }
-        .accordion-content { display: none; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 0 0 12px 12px; }
+        .manual-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: left; border-left: 4px solid var(--primary); }
+        input, select { background: #0f172a; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 12px 0; box-sizing: border-box; font-size: 1rem; }
         
-        .help-container { position: absolute; right: 0; top: 0; cursor: pointer; padding: 5px; }
-        .help-trigger { background: var(--primary); color: var(--bg); width: 24px; height: 24px; border-radius: 50%; font-weight: bold; border: none; font-size: 0.9rem; }
-        .log-entry { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
-        .footer-info { margin-top: 25px; font-size: 0.65rem; color: #475569; text-align: center; }
+        .accordion-btn { background: #334155; color: white; padding: 15px; width: 100%; text-align: left; border: none; border-radius: 12px; margin-top: 10px; font-weight: bold; display: flex; justify-content: space-between; }
+        .accordion-content { display: none; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 0 0 12px 12px; }
+        
+        .help-trigger { background: var(--primary); color: var(--bg); width: 28px; height: 28px; border-radius: 50%; font-weight: 900; border: none; box-shadow: 0 4px 10px rgba(56, 189, 248, 0.4); }
+        .log-entry { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
+        .footer-info { margin-top: 25px; font-size: 0.65rem; color: #475569; text-align: center; font-weight: bold; }
         .help-text { text-align: left; font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
         .help-text h2 { color: var(--primary); border-bottom: 1px solid var(--primary); padding-bottom: 5px; margin-top: 20px; font-size: 1.1rem; }
-        .manual-box { background: rgba(56, 189, 248, 0.05); border: 1px solid var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: left; }
-        input, select { background: #0f172a; border: 1px solid var(--primary); color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 12px 0; box-sizing: border-box; font-size: 1rem; }
-        label { font-size: 0.7rem; color: var(--primary); font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -74,7 +111,7 @@
     <div class="time-header">
         <span id="live-clock">--:--:--</span>
         <span id="live-date">--.--.----</span>
-        <div class="help-container" onclick="openHelp()">
+        <div class="help-container" onclick="openHelp()" style="position: absolute; right: 0; top: 5px; cursor: pointer;">
             <button class="help-trigger">?</button>
         </div>
     </div>
@@ -93,14 +130,14 @@
     </div>
 
     <div class="card">
-        <div id="display-name" style="font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 12px; letter-spacing: 1px;">LEHRKRAFT</div>
+        <div id="display-name" style="font-size: 0.75rem; color: var(--accent); font-weight: 900; margin-bottom: 12px; letter-spacing: 2px;">LEHRKRAFT COCKPIT</div>
         
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:15px;">
             <div class="switch-container">
                 <span class="switch-hint">Wechseln</span>
-                <button id="week-btn" style="border:none; padding:10px 22px; border-radius:12px; color:white; font-weight:bold; cursor:pointer;" onclick="toggleWeekManual()">Woche <span id="week-label">A</span></button>
+                <button id="week-btn" style="border:none; padding:10px 24px; border-radius:12px; color:white; font-weight:bold; cursor:pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);" onclick="toggleWeekManual()">Woche <span id="week-label">A</span></button>
             </div>
-            <div style="font-size: 0.8rem; font-weight: bold; color: #94a3b8; padding-bottom: 5px;">Soll: <span id="soll-info" style="color:white;">26</span> Std</div>
+            <div style="font-size: 0.8rem; font-weight: 800; color: #94a3b8; padding-bottom: 5px;">Ziel: <span id="soll-info" style="color:white;">26</span> Std</div>
         </div>
 
         <div id="main-timer" class="timer-display">00:00:00</div>
@@ -121,10 +158,10 @@
 
     <div id="log-container"></div>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 15px;">
-        <button class="btn btn-setup" style="background: #475569;" onclick="openSetup()">⚙️ Einstellungen</button>
-        <button class="btn btn-refresh" style="border: 1px solid #475569; color: #94a3b8; background: transparent;" onclick="location.reload()">🔄 Aktualisieren</button>
+        <button class="btn btn-setup" style="background: #475569; padding: 12px;" onclick="openSetup()">⚙️ Einstellungen</button>
+        <button class="btn btn-refresh" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="location.reload()">🔄 Aktualisierung</button>
     </div>
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v18.9</footer>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v19.0</footer>
 </div>
 
 <div id="modal"><div class="modal-content" id="modal-body"></div></div>
@@ -156,7 +193,7 @@
     setInterval(() => {
         const now = new Date();
         document.getElementById('live-clock').innerText = now.toLocaleTimeString('de-DE');
-        document.getElementById('live-date').innerText = now.toLocaleDateString('de-DE', {weekday: 'short', day: '2-digit', month: '2-digit'});
+        document.getElementById('live-date').innerText = now.toLocaleDateString('de-DE', {weekday: 'long', day: '2-digit', month: '2-digit'});
         if (session.active) updateAssistant();
         updateUI(); 
     }, 1000);
@@ -337,7 +374,7 @@
         if (nextTask) {
             document.getElementById('task-next').innerText = nextTask.text;
             document.getElementById('task-next-sub').innerText = `${nextTask.label}`;
-        } else { document.getElementById('task-next').innerText = "FEIERABEND!"; document.getElementById('task-next-sub').innerText = "-"; }
+        } else { document.getElementById('task-next').innerText = "FEIERABEND!"; document.getElementById('task-next-sub').innerText = "Alles erledigt."; }
     }
 
     function openSetup() {
@@ -352,19 +389,14 @@
         }
         let html = `
             <div class="modal-nav">
-                <button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold;">✕ ABBRUCH</button>
+                <button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer;">✕ ABBRUCH</button>
                 <b style="color:var(--primary)">EINSTELLUNGEN</b>
                 <button onclick="saveSetup()" style="background:none; border:none; color:var(--success); font-weight:bold;">OK ✓</button>
             </div>
             
             <div class="manual-box" style="border-color:var(--danger); background:rgba(239, 68, 68, 0.05); margin-top:20px;">
                 <label style="color:var(--danger)">⚠️ RESET</label>
-                <button class="btn btn-stop" style="font-size:0.8rem; padding:8px;" onclick="resetToday()">HEUTIGEN TAG AUF NULL SETZEN</button>
-            </div>
-
-            <div class="manual-box" style="border-color:var(--success);">
-                <label style="color:var(--success)">📊 EXPORT</label>
-                <button class="btn btn-start" style="font-size:0.8rem; padding:8px; background:var(--success);" onclick="exportData()">📥 EXPORT FÜR EXCEL / NUMBERS</button>
+                <button class="btn btn-stop" style="font-size:0.8rem; padding:8px;" onclick="resetToday()">HEUTE LÖSCHEN</button>
             </div>
 
             <div class="manual-box">
@@ -400,8 +432,7 @@
             });
             html += `</div>`;
         });
-        html += `</div>`;
-
+        html += `</div><div class="manual-box" style="border-color:var(--success); margin-top:20px;"><label style="color:var(--success)">📊 EXPORT</label><button class="btn btn-start" style="font-size:0.8rem; padding:8px; background:var(--success);" onclick="exportData()">📥 EXPORT (CSV)</button></div>`;
         document.getElementById('modal-body').innerHTML = html;
         document.getElementById('modal').style.display = 'block';
     }
