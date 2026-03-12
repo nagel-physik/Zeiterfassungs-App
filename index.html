@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v19.5</title>
+    <title>Arbeitszeit-Assistent Pro v20.0</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -91,11 +91,11 @@
 <body>
 
 <div id="update-toast">
-    <div class="toast-header"><span>Update Info v19.5</span></div>
+    <div class="toast-header"><span>Update Info v20.0</span></div>
     <div class="toast-body">
-        XXL-Anleitung wiederhergestellt. Historie-Layout & Einstellungen optimiert.
+        Lückenloser Dienst-Export: Die App speichert nun jeden belegten Block (Fach/Raum) chronologisch ab. 
     </div>
-    <button class="toast-btn" onclick="closeToast()">OK, verstanden!</button>
+    <button class="toast-btn" onclick="closeToast()">OK, super!</button>
 </div>
 
 <div class="container">
@@ -140,13 +140,13 @@
         <button class="btn btn-setup" style="background: #475569; padding: 12px;" onclick="openSetup()">⚙️ Einstellungen</button>
         <button class="btn btn-refresh" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
     </div>
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v19.5</footer>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v20.0</footer>
 </div>
 
 <div id="modal"><div class="modal-content" id="modal-body"></div></div>
 
 <script>
-    const APP_VERSION = "19.5";
+    const APP_VERSION = "20.0";
     let db = JSON.parse(localStorage.getItem('lehrerDB_Export')) || [];
     let plan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
     let session = JSON.parse(localStorage.getItem('activeSessionV13')) || { active: false };
@@ -201,10 +201,38 @@
             localStorage.setItem('activeSessionV13', JSON.stringify(session)); addLog("Ankunft");
         } else {
             if(confirm("Dienst beenden?")) {
-                saveToDB('Hauptdienst', session.start, Date.now());
+                const start = session.start; const end = Date.now();
+                processSmartExport(start, end);
+                const gesamtH = ((end - start) / 3600000).toFixed(2);
+                alert(`Feierabend! \nHeute gearbeitet: ${gesamtH} Stunden.`);
                 session.active = false; localStorage.removeItem('activeSessionV13'); addLog("Feierabend");
             }
         }
+    }
+
+    function processSmartExport(sessionStart, sessionEnd) {
+        const now = new Date();
+        const tag = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()];
+        const key = `${currentWeek}-${tag}`;
+        const dayPlan = plan[key] || {};
+        
+        // Jede belegte Schablone aus dem Plan prüfen
+        blocks.forEach(b => {
+            const entryText = dayPlan[b.id];
+            if(entryText && entryText.trim() !== "") {
+                const [sh, sm] = b.start.split(':').map(Number);
+                const [eh, em] = b.end.split(':').map(Number);
+                const bStart = new Date(now).setHours(sh, sm, 0, 0);
+                const bEnd = new Date(now).setHours(eh, em, 0, 0);
+                
+                // Nur speichern, wenn dieser Block innerhalb der Anwesenheit lag
+                if(bStart < sessionEnd && bEnd > sessionStart) {
+                    const realStart = Math.max(sessionStart, bStart);
+                    const realEnd = Math.min(sessionEnd, bEnd);
+                    saveToDB(`${entryText} (${b.label})`, realStart, realEnd);
+                }
+            }
+        });
     }
 
     function handleVZClick() {
@@ -244,6 +272,7 @@
     function saveToDB(typ, start, end, manualDatum = null) {
         let datumStr = manualDatum || new Date().toLocaleDateString('de-DE');
         let diff = Math.abs(end - start);
+        if(diff < 10000 && !manualDatum) return; // Kürzest-Klicks ignorieren
         db.push({
             datum: datumStr, typ: typ, start: new Date(start).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
             ende: new Date(end).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
@@ -359,7 +388,7 @@
             <div class="modal-nav"><button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer;">✕ ABBRUCH</button><b style="color:var(--primary)">EINSTELLUNGEN</b><button onclick="saveSetup()" style="background:none; border:none; color:var(--success); font-weight:bold;">OK ✓</button></div>
             <div class="manual-box" style="border-color:var(--danger); background:rgba(239, 68, 68, 0.05); margin-top:20px;"><label style="color:var(--danger)">⚠️ RESET</label><button class="btn btn-stop" style="font-size:0.8rem; padding:8px;" onclick="resetToday()">HEUTE LÖSCHEN</button></div>
             <div class="manual-box" style="border-color:var(--success);"><label style="color:var(--success)">📊 EXPORT</label><button class="btn btn-start" style="font-size:0.8rem; padding:8px; background:var(--success);" onclick="exportData()">📥 EXPORT (CSV)</button></div>
-            <div class="manual-box"><label style="color:var(--accent)">🕒 NACHTRAG</label><select id="nachtrag-date">${dateOptions}</select><select id="nachtrag-cat"><option value="Hauptdienst">Hauptdienst</option><option value="Konferenz">Konferenz</option><option value="Vertretung (VZ)">Vertretung (VZ)</option></select><div style="display:flex; gap:10px;"><input type="time" id="nachtrag-start" value="08:00"><input type="time" id="nachtrag-end" value="13:00"></div><button class="btn btn-start" style="padding:10px; font-size:0.85rem;" onclick="processManual()">SPEICHERN</button></div>
+            <div class="manual-box"><label style="color:var(--accent)">🕒 NACHTRAG</label><select id="nachtrag-date">${dateOptions}</select><select id="nachtrag-cat"><option value="Korrektur">Korrektur</option><option value="Konferenz">Konferenz</option><option value="Vertretung (VZ)">Vertretung (VZ)</option></select><div style="display:flex; gap:10px;"><input type="time" id="nachtrag-start" value="08:00"><input type="time" id="nachtrag-end" value="13:00"></div><button class="btn btn-start" style="padding:10px; font-size:0.85rem;" onclick="processManual()">SPEICHERN</button></div>
             <label>NAME</label><input type="text" id="setup-name" value="${userName}"><label>WOCHEN-SOLL</label><input type="number" id="setup-soll" value="${weeklySollHours}">
             <button class="accordion-btn" onclick="toggleAcc('accA')">WOCHE A BEARBEITEN <span>▼</span></button><div id="accA" class="accordion-content">`;
         ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
@@ -411,16 +440,14 @@
                 <h2>2. Die erste Einrichtung (Setup)</h2>
                 <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib Namen und Wochen-Soll ein. Trage dann deinen Plan für Woche A und B ein. Nutze die <b>einklappbaren Bereiche</b> (Akkordeon) für mehr Übersicht beim Editieren.</p>
                 <h2>3. Der Dienst-Alltag & Sicherheit</h2>
-                <h3>Live-Timer auf Buttons</h3>
-                <p>Sobald eine Vertretung (Orange) oder Konferenz (Blau) läuft, zeigt dir der Button direkt die bereits vergangene Zeit an.</p>
+                <h3>Automatischer Dienst-Export (NEU v20)</h3>
+                <p>Beim Klick auf "Dienst beenden" erkennt die App automatisch alle belegten Stunden aus deinem Plan (Fach/Raum) und speichert diese einzeln chronologisch ab. Am Ende erhältst du eine Zusammenfassung deines Tages.</p>
                 <h3>Scharfschalten (VZ & Konferenz)</h3>
                 <p>Um versehentliche Klicks zu vermeiden, müssen diese Buttons <b>zweimal</b> getippt werden. Beim ersten Tippen färbt sich der Button gelb ("Sicher?").</p>
                 <h3>Automatischer Log-out (VZ)</h3>
                 <p>Eine Vertretung wird automatisch nach <b>90 Minuten</b> beendet und gespeichert.</p>
-                <h3>Fehlklick-Schutz</h3>
-                <p>Einträge, die kürzer als 30 Sekunden laufen, werden beim Stoppen abgefragt. So bleibt dein Excel sauber.</p>
                 <h2>4. Auswertung & Export</h2>
-                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei wird im CSV-Format gespeichert und kann direkt in Numbers oder Excel geöffnet werden.</p>
+                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei im CSV-Format enthält nun detailliert alle Fächer, Räume und Aufsichten untereinander.</p>
                 <h2>5. Fehler korrigieren (Nachtrag)</h2>
                 <p>In den Einstellungen kannst du unter <b>"🕒 NACHTRAG"</b> Uhrzeiten manuell nachpflegen. Du kannst das Datum für die letzten 5 Wochentage frei wählen.</p>
                 <h2>6. Automatischer Reset & Update-Info</h2>
@@ -433,10 +460,10 @@
     function renderLogs() { document.getElementById('log-container').innerHTML = logs.map(l => `<div class="log-entry"><span>${l.m}</span><span>${l.t}</span></div>`).join(''); }
     function toggleWeekManual() { currentWeek = (currentWeek === 'A' ? 'B' : 'A'); localStorage.setItem('manualWeekV13', currentWeek); updateUI(); }
     function exportData() {
-        let csv = "\ufeffDatum;Kategorie;Beginn;Ende;Dauer\n";
+        let csv = "\ufeffDatum;Kategorie/Fach;Beginn;Ende;Dauer\n";
         db.forEach(e => { csv += `${e.datum};${e.typ};${e.start};${e.ende};${e.dauer}\n`; });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Arbeitszeiten.csv"; link.click();
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Arbeitszeiten_Dienstprotokoll.csv"; link.click();
     }
 </script>
 </body>
