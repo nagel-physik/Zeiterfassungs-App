@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v20.0</title>
+    <title>Arbeitszeit-Assistent Pro v20.1</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -91,11 +91,11 @@
 <body>
 
 <div id="update-toast">
-    <div class="toast-header"><span>Update Info v20.0</span></div>
+    <div class="toast-header"><span>Update Info v20.1</span></div>
     <div class="toast-body">
-        Lückenloser Dienst-Export: Die App speichert nun jeden belegten Block (Fach/Raum) chronologisch ab. 
+        Excel-Upgrade: Intelligente Sortierung nach Wochen & Monaten mit automatischer Überstunden-Berechnung.
     </div>
-    <button class="toast-btn" onclick="closeToast()">OK, super!</button>
+    <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
 
 <div class="container">
@@ -140,13 +140,13 @@
         <button class="btn btn-setup" style="background: #475569; padding: 12px;" onclick="openSetup()">⚙️ Einstellungen</button>
         <button class="btn btn-refresh" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
     </div>
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v20.0</footer>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v20.1</footer>
 </div>
 
 <div id="modal"><div class="modal-content" id="modal-body"></div></div>
 
 <script>
-    const APP_VERSION = "20.0";
+    const APP_VERSION = "20.1";
     let db = JSON.parse(localStorage.getItem('lehrerDB_Export')) || [];
     let plan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
     let session = JSON.parse(localStorage.getItem('activeSessionV13')) || { active: false };
@@ -211,21 +211,19 @@
     }
 
     function processSmartExport(sessionStart, sessionEnd) {
-        const now = new Date();
+        const now = new Date(sessionStart);
         const tag = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()];
         const key = `${currentWeek}-${tag}`;
         const dayPlan = plan[key] || {};
         
-        // Jede belegte Schablone aus dem Plan prüfen
         blocks.forEach(b => {
             const entryText = dayPlan[b.id];
             if(entryText && entryText.trim() !== "") {
                 const [sh, sm] = b.start.split(':').map(Number);
                 const [eh, em] = b.end.split(':').map(Number);
-                const bStart = new Date(now).setHours(sh, sm, 0, 0);
-                const bEnd = new Date(now).setHours(eh, em, 0, 0);
+                const bStart = new Date(sessionStart).setHours(sh, sm, 0, 0);
+                const bEnd = new Date(sessionStart).setHours(eh, em, 0, 0);
                 
-                // Nur speichern, wenn dieser Block innerhalb der Anwesenheit lag
                 if(bStart < sessionEnd && bEnd > sessionStart) {
                     const realStart = Math.max(sessionStart, bStart);
                     const realEnd = Math.min(sessionEnd, bEnd);
@@ -270,9 +268,9 @@
     }
 
     function saveToDB(typ, start, end, manualDatum = null) {
-        let datumStr = manualDatum || new Date().toLocaleDateString('de-DE');
+        let datumStr = manualDatum || new Date(start).toLocaleDateString('de-DE');
         let diff = Math.abs(end - start);
-        if(diff < 10000 && !manualDatum) return; // Kürzest-Klicks ignorieren
+        if(diff < 5000 && !manualDatum) return; 
         db.push({
             datum: datumStr, typ: typ, start: new Date(start).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
             ende: new Date(end).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
@@ -434,24 +432,11 @@
         document.getElementById('modal-body').innerHTML = `
             <div class="modal-nav"><button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">✕ SCHLIESSEN</button><b style="color:var(--primary)">BEDIENUNGSANLEITUNG</b><div></div></div>
             <div class="help-text" style="padding: 10px 20px 40px 20px;">
-                <p>Willkommen bei deiner persönlichen Arbeitszeiterfassung. Hier erfährst du alles Wichtige:</p>
-                <h2>1. Installation & Start</h2>
-                <p>Öffne die Seite in Safari (iPhone) oder Chrome (Android). Tippe auf das <b>Teilen-Symbol</b> und wähle <b>"Zum Home-Bildschirm hinzufügen"</b>.</p>
-                <h2>2. Die erste Einrichtung (Setup)</h2>
-                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib Namen und Wochen-Soll ein. Trage dann deinen Plan für Woche A und B ein. Nutze die <b>einklappbaren Bereiche</b> (Akkordeon) für mehr Übersicht beim Editieren.</p>
-                <h2>3. Der Dienst-Alltag & Sicherheit</h2>
-                <h3>Automatischer Dienst-Export (NEU v20)</h3>
-                <p>Beim Klick auf "Dienst beenden" erkennt die App automatisch alle belegten Stunden aus deinem Plan (Fach/Raum) und speichert diese einzeln chronologisch ab. Am Ende erhältst du eine Zusammenfassung deines Tages.</p>
-                <h3>Scharfschalten (VZ & Konferenz)</h3>
-                <p>Um versehentliche Klicks zu vermeiden, müssen diese Buttons <b>zweimal</b> getippt werden. Beim ersten Tippen färbt sich der Button gelb ("Sicher?").</p>
-                <h3>Automatischer Log-out (VZ)</h3>
-                <p>Eine Vertretung wird automatisch nach <b>90 Minuten</b> beendet und gespeichert.</p>
-                <h2>4. Auswertung & Export</h2>
-                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei im CSV-Format enthält nun detailliert alle Fächer, Räume und Aufsichten untereinander.</p>
-                <h2>5. Fehler korrigieren (Nachtrag)</h2>
-                <p>In den Einstellungen kannst du unter <b>"🕒 NACHTRAG"</b> Uhrzeiten manuell nachpflegen. Du kannst das Datum für die letzten 5 Wochentage frei wählen.</p>
-                <h2>6. Automatischer Reset & Update-Info</h2>
-                <p>Die Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst. Bei neuen App-Versionen erscheint einmalig eine dezente Info-Blase am unteren Rand.</p>
+                <p>Willkommen bei deiner persönlichen Arbeitszeiterfassung.</p>
+                <h2>1. Installation</h2><p>Nutze "Zum Home-Bildschirm hinzufügen" in Safari/Chrome.</p>
+                <h2>2. Setup</h2><p>Trage Namen, Soll und Plan ein. Die Wochenpläne sind einklappbar.</p>
+                <h2>3. Abrechnung (v20.1)</h2>
+                <p>Der CSV-Export erstellt nun automatisch Wochen- und Monatsübersichten. Wochensummen über 26 Stunden werden als Plus-Stunden ausgewiesen.</p>
             </div>`;
         document.getElementById('modal').style.display = 'block';
     }
@@ -459,11 +444,74 @@
     function addLog(m) { logs.unshift({ t: new Date().toLocaleTimeString('de-DE').substr(0,5), m }); if(logs.length > 5) logs.pop(); localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); renderLogs(); }
     function renderLogs() { document.getElementById('log-container').innerHTML = logs.map(l => `<div class="log-entry"><span>${l.m}</span><span>${l.t}</span></div>`).join(''); }
     function toggleWeekManual() { currentWeek = (currentWeek === 'A' ? 'B' : 'A'); localStorage.setItem('manualWeekV13', currentWeek); updateUI(); }
+
     function exportData() {
-        let csv = "\ufeffDatum;Kategorie/Fach;Beginn;Ende;Dauer\n";
-        db.forEach(e => { csv += `${e.datum};${e.typ};${e.start};${e.ende};${e.dauer}\n`; });
+        // Daten nach Datum/Zeit sortieren
+        let sorted = [...db].sort((a,b) => {
+            const dateA = new Date(a.datum.split('.').reverse().join('-') + 'T' + a.start);
+            const dateB = new Date(b.datum.split('.').reverse().join('-') + 'T' + b.start);
+            return dateA - dateB;
+        });
+
+        let csv = "\ufeffWochentag;Datum;Fach/Ereignis;Beginn;Ende;Dauer (Std);Summe Woche;Überstunden (Wo)\n";
+        
+        let currentWoSum = 0;
+        let lastWeekKey = null;
+        let lastMonthKey = null;
+        let monSum = 0;
+
+        sorted.forEach((e, index) => {
+            const parts = e.datum.split('.');
+            const d = new Date(parts[2], parts[1]-1, parts[0]);
+            const dayName = ['So','Mo','Di','Mi','Do','Fr','Sa'][d.getDay()];
+            
+            // Wochen-Check (Montag ist Start)
+            const weekKey = getWeekNumber(d);
+            const monthKey = parts[1] + "." + parts[2];
+
+            // Wenn Woche wechselt, Bilanz ziehen
+            if (lastWeekKey !== null && lastWeekKey !== weekKey) {
+                const woStd = (currentWoSum / 3600000).toFixed(2);
+                const plus = (woStd - weeklySollHours).toFixed(2);
+                csv += `==========;SUMME WOCHE;KW ${lastWeekKey};---;---;${woStd};;${plus > 0 ? '+' + plus : plus}\n\n`;
+                currentWoSum = 0;
+            }
+
+            // Wenn Monat wechselt, Monatsbilanz ziehen
+            if (lastMonthKey !== null && lastMonthKey !== monthKey) {
+                csv += `##########;BILANZ MONAT;${lastMonthKey};---;---;${(monSum / 3600000).toFixed(2)};;---\n\n`;
+                monSum = 0;
+            }
+
+            const dauerH = (e.ms / 3600000).toFixed(2);
+            csv += `${dayName};${e.datum};${e.typ};${e.start};${e.ende};${dauerH};;\n`;
+            
+            currentWoSum += e.ms;
+            monSum += e.ms;
+            lastWeekKey = weekKey;
+            lastMonthKey = monthKey;
+
+            // Letzter Eintrag Check
+            if (index === sorted.length - 1) {
+                const woStd = (currentWoSum / 3600000).toFixed(2);
+                const plus = (woStd - weeklySollHours).toFixed(2);
+                csv += `==========;SUMME WOCHE;KW ${weekKey};---;---;${woStd};;${plus > 0 ? '+' + plus : plus}\n`;
+                csv += `##########;BILANZ MONAT;${monthKey};---;---;${(monSum / 3600000).toFixed(2)};;---\n`;
+            }
+        });
+
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Arbeitszeiten_Dienstprotokoll.csv"; link.click();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Dienstbericht_${userName}_${new Date().toLocaleDateString('de-DE')}.csv`;
+        link.click();
+    }
+
+    function getWeekNumber(d) {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+        var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
     }
 </script>
 </body>
