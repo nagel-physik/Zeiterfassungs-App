@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Arbeitszeit-Assistent Pro v20.1</title>
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
+    <style>
+        :root { 
+            --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --accent: #fbbf24; 
+            --danger: #ef4444; --text: #ffffff; --success: #10b981; 
+            --overtime: #f59e0b; --weekA: #2563eb; --weekB: #9333ea; 
+        }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--bg);
+            background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
+            background-attachment: fixed;
+            color: var(--text); padding: 15px; display: flex; flex-direction: column; align-items: center; margin: 0; 
+        }
+        .container { width: 100%; max-width: 420px; box-sizing: border-box; padding-bottom: 80px; }
+        
+        .time-header { text-align: center; margin-bottom: 20px; width: 100%; position: relative; }
+        #live-clock { font-size: 3.2rem; font-weight: 900; color: var(--primary); display: block; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #live-date { font-size: 0.9rem; font-weight: 600; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; display: block; }
+
+        .card { 
+            background: var(--card); padding: 20px; border-radius: 20px; margin-bottom: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1); 
+            text-align: center; border-left: 5px solid var(--primary); position: relative; overflow: hidden;
+        }
+        
+        .next-info { 
+            background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 10px; margin-bottom: 15px; 
+            border: 1px solid rgba(56, 189, 248, 0.3); border-left: 5px solid var(--primary);
+            display: flex; gap: 5px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .task-box { flex: 1; padding: 2px; text-align: center; }
+        .task-box:first-child { border-right: 1px solid rgba(255,255,255,0.1); }
+        .task-label { font-size: 0.55rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 2px; }
+        .task-val { font-size: 1.1rem; font-weight: 800; line-height: 1.1; min-height: 2.2em; display: flex; align-items: center; justify-content: center; color: #fff; }
+        .task-sub { font-size: 0.65rem; color: #94a3b8; font-weight: 600; }
+
+        .timer-display { font-size: 2.8rem; font-weight: 800; margin: 5px 0; color: var(--text); font-variant-numeric: tabular-nums; }
+        
+        .btn { border: none; padding: 16px; border-radius: 16px; font-weight: 800; width: 100%; margin-bottom: 10px; cursor: pointer; color: white; transition: 0.2s; font-size: 1rem; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+        .btn:active { transform: translateY(2px); box-shadow: none; }
+        .btn-start { background: linear-gradient(145deg, #10b981, #059669); }
+        .btn-stop { background: linear-gradient(145deg, #ef4444, #dc2626) !important; }
+        .btn-vz { background: rgba(239, 68, 68, 0.1); border: 1.5px solid var(--danger); color: var(--danger); }
+        .btn-extra { background: rgba(56, 189, 248, 0.1); border: 1.5px solid var(--primary); color: var(--primary); }
+        .btn-confirm { background: var(--accent) !important; color: var(--bg) !important; animation: pulse-confirm 0.5s infinite; border: none; }
+        .btn-vz.active { background: var(--overtime) !important; color: white; border: none; }
+        .btn-extra.active { background: #6366f1 !important; color: white; border: none; }
+        
+        @keyframes pulse-confirm { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+
+        .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 700; }
+        .progress-bar { height: 14px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        #update-toast { 
+            display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 380px; background: #fffcf0; color: #1e293b; 
+            padding: 15px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            z-index: 3000; border: 1px solid #e2e8f0; animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { bottom: -100px; } to { bottom: 20px; } }
+        .toast-header { font-weight: 900; font-size: 0.7rem; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .toast-body { font-size: 0.85rem; line-height: 1.4; font-weight: 500; }
+        .toast-btn { background: var(--card); color: white; border: none; padding: 5px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 2000; overflow-y: auto; }
+        .modal-content { padding: 80px 20px 40px 20px; }
+        .modal-nav { position: fixed; top: 0; left: 0; right: 0; background: var(--card); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--primary); z-index: 2001; }
+        
+        .help-trigger { background: var(--primary); color: var(--bg); width: 28px; height: 28px; border-radius: 50%; font-weight: 900; border: none; }
+        .log-entry { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
+        .footer-info { margin-top: 25px; font-size: 0.65rem; color: #475569; text-align: center; font-weight: bold; }
+        .help-text { text-align: left; font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
+        .help-text h2 { color: var(--primary); border-bottom: 1px solid var(--primary); padding-bottom: 5px; margin-top: 25px; }
+        .help-text h3 { color: var(--accent); margin-top: 20px; margin-bottom: 5px; font-size: 1rem; }
+        .manual-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid var(--primary); }
+        input, select { background: #0f172a; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 12px 0; font-size: 1rem; }
+        .accordion-btn { background: #334155; color: white; padding: 15px; width: 100%; text-align: left; border: none; border-radius: 12px; margin-top: 10px; font-weight: bold; display: flex; justify-content: space-between; }
+        .accordion-content { display: none; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 0 0 12px 12px; }
+    </style>
+</head>
+<body>
+
+<div id="update-toast">
+    <div class="toast-header"><span>Update Info v20.1</span></div>
+    <div class="toast-body">
+        Excel-Upgrade: Intelligente Sortierung nach Wochen & Monaten mit automatischer Überstunden-Berechnung.
+    </div>
+    <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
+</div>
+
+<div class="container">
+    <div class="time-header">
+        <span id="live-clock">--:--:--</span>
+        <span id="live-date">--.--.----</span>
+        <div class="help-container" onclick="openHelp()" style="position: absolute; right: 0; top: 5px; cursor: pointer;">
+            <button class="help-trigger">?</button>
+        </div>
+    </div>
+
+    <div class="next-info" id="task-card">
+        <div class="task-box"><div class="task-label">Aktuell</div><div class="task-val" id="task-now">Bereit</div><div class="task-sub" id="task-now-sub">-</div></div>
+        <div class="task-box"><div class="task-label">Nächstes</div><div class="task-val" id="task-next">Keine Termine</div><div class="task-sub" id="task-next-sub">-</div></div>
+    </div>
+
+    <div class="card">
+        <div id="display-name" style="font-size: 0.75rem; color: var(--accent); font-weight: 900; margin-bottom: 12px; letter-spacing: 2px;">LEHRKRAFT COCKPIT</div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:15px;">
+            <div style="text-align:center">
+                <span style="font-size: 0.55rem; font-weight: 900; color: var(--primary); text-transform: uppercase; display:block; margin-bottom:4px;">Wechseln</span>
+                <button id="week-btn" style="border:none; padding:10px 24px; border-radius:12px; color:white; font-weight:bold; cursor:pointer;" onclick="toggleWeekManual()">Woche <span id="week-label">A</span></button>
+            </div>
+            <div style="font-size: 0.8rem; font-weight: 800; color: #94a3b8; padding-bottom: 5px;">Ziel: <span id="soll-info" style="color:white;">26</span> Std</div>
+        </div>
+        <div id="main-timer" class="timer-display">00:00:00</div>
+        <button id="btn-main" class="btn btn-start" onclick="toggleMain()">Dienst starten</button>
+        <button id="btn-vz" class="btn btn-vz" onclick="handleVZClick()">Vertretung</button>
+        <button id="btn-extra" class="btn btn-extra" onclick="handleExtraClick()">Konferenz / Termin</button>
+        <div class="progress-container" style="margin-top: 25px;">
+            <div class="progress-label"><span>Tag Fortschritt</span><span id="day-percent">0%</span></div>
+            <div class="progress-bar"><div id="day-progress" class="progress-fill" style="background: var(--primary);"></div></div>
+            <div class="progress-label"><span>Vertretungen (Monat)</span><span id="vz-val">0</span></div>
+            <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--danger);"></div></div>
+            <div class="progress-label"><span>Woche Gesamt</span><span id="week-percent">0%</span></div>
+            <div class="progress-bar"><div id="week-progress" class="progress-fill" style="background: var(--success);"></div></div>
+        </div>
+    </div>
+
+    <div id="log-container"></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 15px;">
+        <button class="btn btn-setup" style="background: #475569; padding: 12px;" onclick="openSetup()">⚙️ Einstellungen</button>
+        <button class="btn btn-refresh" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
+    </div>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v20.1</footer>
+</div>
+
+<div id="modal"><div class="modal-content" id="modal-body"></div></div>
+
+<script>
+    const APP_VERSION = "20.1";
+    let db = JSON.parse(localStorage.getItem('lehrerDB_Export')) || [];
+    let plan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
+    let session = JSON.parse(localStorage.getItem('activeSessionV13')) || { active: false };
+    let vzSession = JSON.parse(localStorage.getItem('vzSessionV13')) || { active: false };
+    let extraSession = JSON.parse(localStorage.getItem('extraSessionV13')) || { active: false };
+    let logs = JSON.parse(localStorage.getItem('dailyLogsV13')) || [];
+    let currentWeek = localStorage.getItem('manualWeekV13') || 'A';
+    let weeklySollHours = parseFloat(localStorage.getItem('weeklySollV13')) || 26;
+    let userName = localStorage.getItem('userNameV13') || 'Lehrkraft';
+    let confirmVZ = false, confirmExtra = false;
+
+    const blocks = [
+        { id: 'f1', label: 'Frühaufsicht', start: '07:10', end: '07:30' },
+        { id: 'b1', label: '1. Block', start: '07:30', end: '09:00' },
+        { id: 'a1', label: '1. Aufsicht', start: '09:00', end: '09:30' },
+        { id: 'b2', label: '2. Block', start: '09:30', end: '11:00' },
+        { id: 'a2', label: '2. Aufsicht', start: '11:00', end: '11:30' },
+        { id: 'b3', label: '3. Block', start: '11:30', end: '13:00' },
+        { id: 'a3', label: '3. Aufsicht', start: '13:00', end: '13:45' },
+        { id: 'b4', label: '4. Block', start: '13:45', end: '15:15' },
+        { id: 's1', label: 'Spätaufsicht', start: '15:15', end: '15:30' }
+    ];
+
+    window.onload = function() {
+        if (localStorage.getItem('lastSeenV') !== APP_VERSION) {
+            document.getElementById('update-toast').style.display = 'block';
+        }
+        updateUI();
+    };
+
+    function closeToast() { localStorage.setItem('lastSeenV', APP_VERSION); document.getElementById('update-toast').style.display = 'none'; }
+    function forceUpdate() { if(confirm("Updates suchen?")) { window.location.href = window.location.pathname + "?u=" + Date.now(); } }
+
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('live-clock').innerText = now.toLocaleTimeString('de-DE');
+        document.getElementById('live-date').innerText = now.toLocaleDateString('de-DE', {weekday: 'long', day: '2-digit', month: '2-digit'});
+        const todayStr = now.toDateString();
+        if(localStorage.getItem('logDateV13') !== todayStr) {
+            logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
+            localStorage.setItem('logDateV13', todayStr); renderLogs();
+        }
+        if (session.active) updateAssistant();
+        updateUI(); 
+    }, 1000);
+
+    function formatTime(ms) { if (ms < 0) ms = 0; return new Date(ms).toISOString().substr(11, 8); }
+
+    function toggleMain() {
+        if (!session.active) {
+            session = { active: true, start: Date.now() };
+            localStorage.setItem('activeSessionV13', JSON.stringify(session)); addLog("Ankunft");
+        } else {
+            if(confirm("Dienst beenden?")) {
+                const start = session.start; const end = Date.now();
+                processSmartExport(start, end);
+                const gesamtH = ((end - start) / 3600000).toFixed(2);
+                alert(`Feierabend! \nHeute gearbeitet: ${gesamtH} Stunden.`);
+                session.active = false; localStorage.removeItem('activeSessionV13'); addLog("Feierabend");
+            }
+        }
+    }
+
+    function processSmartExport(sessionStart, sessionEnd) {
+        const now = new Date(sessionStart);
+        const tag = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()];
+        const key = `${currentWeek}-${tag}`;
+        const dayPlan = plan[key] || {};
+        
+        blocks.forEach(b => {
+            const entryText = dayPlan[b.id];
+            if(entryText && entryText.trim() !== "") {
+                const [sh, sm] = b.start.split(':').map(Number);
+                const [eh, em] = b.end.split(':').map(Number);
+                const bStart = new Date(sessionStart).setHours(sh, sm, 0, 0);
+                const bEnd = new Date(sessionStart).setHours(eh, em, 0, 0);
+                
+                if(bStart < sessionEnd && bEnd > sessionStart) {
+                    const realStart = Math.max(sessionStart, bStart);
+                    const realEnd = Math.min(sessionEnd, bEnd);
+                    saveToDB(`${entryText} (${b.label})`, realStart, realEnd);
+                }
+            }
+        });
+    }
+
+    function handleVZClick() {
+        if(vzSession.active) {
+            if(confirm("Vertretung beenden?")) {
+                saveToDB('Vertretung (VZ)', vzSession.start, Date.now());
+                vzSession = { active: false }; localStorage.removeItem('vzSessionV13'); addLog("VZ Ende");
+            }
+        } else {
+            if(!confirmVZ) {
+                confirmVZ = true; document.getElementById('btn-vz').innerText = "Sicher?"; document.getElementById('btn-vz').classList.add('btn-confirm');
+                setTimeout(() => { confirmVZ = false; updateUI(); }, 3000);
+            } else {
+                vzSession = { active: true, start: Date.now() };
+                localStorage.setItem('vzSessionV13', JSON.stringify(vzSession)); addLog("VZ Start"); confirmVZ = false; updateUI();
+            }
+        }
+    }
+
+    function handleExtraClick() {
+        if(extraSession.active) {
+            if(confirm("Termin beenden?")) {
+                saveToDB('Konferenz', extraSession.start, Date.now());
+                extraSession = { active: false }; localStorage.removeItem('extraSessionV13'); addLog("Konf. Ende");
+            }
+        } else {
+            if(!confirmExtra) {
+                confirmExtra = true; document.getElementById('btn-extra').innerText = "Sicher?"; document.getElementById('btn-extra').classList.add('btn-confirm');
+                setTimeout(() => { confirmExtra = false; updateUI(); }, 3000);
+            } else {
+                extraSession = { active: true, start: Date.now() };
+                localStorage.setItem('extraSessionV13', JSON.stringify(extraSession)); addLog("Konf. Start"); confirmExtra = false; updateUI();
+            }
+        }
+    }
+
+    function saveToDB(typ, start, end, manualDatum = null) {
+        let datumStr = manualDatum || new Date(start).toLocaleDateString('de-DE');
+        let diff = Math.abs(end - start);
+        if(diff < 5000 && !manualDatum) return; 
+        db.push({
+            datum: datumStr, typ: typ, start: new Date(start).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
+            ende: new Date(end).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
+            dauer: new Date(diff).toISOString().substr(11, 8), ms: diff, isVZ: (typ.includes('VZ') ? 'JA' : 'NEIN')
+        });
+        localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
+    }
+
+    function updateUI() {
+        const btnMain = document.getElementById('btn-main');
+        if(session.active) {
+            document.getElementById('main-timer').innerText = formatTime(Date.now() - session.start);
+            btnMain.innerText = "Dienst beenden"; btnMain.className = "btn btn-stop";
+        } else {
+            document.getElementById('main-timer').innerText = "00:00:00";
+            btnMain.innerText = "Dienst starten"; btnMain.className = "btn btn-start";
+        }
+
+        const vzBtn = document.getElementById('btn-vz');
+        if(vzSession.active) {
+            vzBtn.innerText = `VZ läuft (${formatTime(Date.now() - vzSession.start)})`;
+            vzBtn.classList.add('active'); vzBtn.classList.remove('btn-confirm');
+        } else if(!confirmVZ) { vzBtn.innerText = "Vertretung"; vzBtn.classList.remove('active', 'btn-confirm'); }
+
+        const exBtn = document.getElementById('btn-extra');
+        if(extraSession.active) {
+            exBtn.innerText = `LÄUFT (${formatTime(Date.now() - extraSession.start)})`;
+            exBtn.classList.add('active'); exBtn.classList.remove('btn-confirm');
+        } else if(!confirmExtra) { exBtn.innerText = "Konferenz / Termin"; exBtn.classList.remove('active', 'btn-confirm'); }
+
+        const now = new Date();
+        const vzCount = db.filter(e => {
+            const parts = e.datum.split('.');
+            return parseInt(parts[1]) === (now.getMonth() + 1) && parseInt(parts[2]) === now.getFullYear() && e.isVZ === 'JA';
+        }).length;
+        document.getElementById('vz-val').innerText = vzCount;
+        document.getElementById('vz-progress').style.width = Math.min((vzCount / 4) * 100, 100) + "%";
+
+        function getMonday(d) {
+            d = new Date(d); var day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6:1);
+            return new Date(d.setDate(diff)).setHours(0,0,0,0);
+        }
+        const monday = getMonday(now);
+        let weekMS = db.filter(e => {
+            const parts = e.datum.split('.');
+            const entryDate = new Date(parts[2], parts[1]-1, parts[0]).getTime();
+            return entryDate >= monday;
+        }).reduce((acc, curr) => acc + (curr.ms || 0), 0);
+        
+        if(session.active) weekMS += (Date.now() - session.start);
+        if(vzSession.active) weekMS += (Date.now() - vzSession.start);
+        if(extraSession.active) weekMS += (Date.now() - extraSession.start);
+
+        const targetMS = weeklySollHours * 3600000;
+        const weekPerc = Math.round((weekMS / targetMS) * 100);
+        const weekFill = document.getElementById('week-progress');
+        document.getElementById('week-percent').innerText = weekPerc + "%";
+        if(weekPerc >= 100) { weekFill.style.width = "100%"; weekFill.style.background = "var(--overtime)"; }
+        else { weekFill.style.width = weekPerc + "%"; weekFill.style.background = "var(--success)"; }
+
+        const dayKey = `${currentWeek}-${['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()]}`;
+        let firstStart = 1440, lastEnd = 0, hasPlan = false;
+        blocks.forEach(b => {
+           if(plan[dayKey] && plan[dayKey][b.id] && plan[dayKey][b.id].trim() !== "") {
+               hasPlan = true;
+               const [sh, sm] = b.start.split(':').map(Number);
+               const [eh, em] = b.end.split(':').map(Number);
+               firstStart = Math.min(firstStart, sh * 60 + sm);
+               lastEnd = Math.max(lastEnd, eh * 60 + em);
+           }
+        });
+
+        if(session.active && hasPlan) {
+            const elapsed = Math.max(0, (now.getHours()*60 + now.getMinutes()) - firstStart);
+            const total = lastEnd - firstStart;
+            const dayPerc = Math.min((elapsed / total) * 100, 100);
+            document.getElementById('day-percent').innerText = Math.round(dayPerc) + "%";
+            document.getElementById('day-progress').style.width = dayPerc + "%";
+        } else { document.getElementById('day-percent').innerText = "0%"; document.getElementById('day-progress').style.width = "0%"; }
+
+        document.getElementById('week-label').innerText = currentWeek;
+        document.getElementById('week-btn').style.background = currentWeek === 'A' ? 'var(--weekA)' : 'var(--weekB)';
+        document.getElementById('display-name').innerText = userName.toUpperCase();
+        document.getElementById('soll-info').innerText = weeklySollHours;
+        renderLogs();
+    }
+
+    function updateAssistant() {
+        const now = new Date(), currentTime = now.getHours() * 60 + now.getMinutes();
+        const tag = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()];
+        const key = `${currentWeek}-${tag}`;
+        let activeTask = null, nextTask = null;
+        for (let i = 0; i < blocks.length; i++) {
+            const b = blocks[i];
+            const [sh, sm] = b.start.split(':').map(Number);
+            const [eh, em] = b.end.split(':').map(Number);
+            const sMin = sh * 60 + sm, eMin = eh * 60 + em;
+            const text = plan[key]?.[b.id];
+            if (currentTime >= sMin && currentTime < eMin) { if (text && text.trim() !== "") activeTask = { text, ...b }; }
+            else if (currentTime < sMin && !nextTask) { if (text && text.trim() !== "") nextTask = { text, ...b }; }
+        }
+        if (activeTask) { document.getElementById('task-now').innerText = activeTask.text; document.getElementById('task-now-sub').innerText = `${activeTask.label}`; }
+        else { document.getElementById('task-now').innerText = "Frei / Pause"; document.getElementById('task-now-sub').innerText = "-"; }
+        if (nextTask) { document.getElementById('task-next').innerText = nextTask.text; document.getElementById('task-next-sub').innerText = `${nextTask.label}`; }
+        else { document.getElementById('task-next').innerText = "FEIERABEND!"; document.getElementById('task-next-sub').innerText = "Alles erledigt."; }
+    }
+
+    function openSetup() {
+        let dateOptions = "";
+        let d = new Date();
+        for(let i=0; i<7; i++) { if(d.getDay() !== 0 && d.getDay() !== 6) { let ds = d.toLocaleDateString('de-DE'); dateOptions += `<option value="${ds}">${i===0?'Heute':ds}</option>`; } d.setDate(d.getDate()-1); }
+        let html = `
+            <div class="modal-nav"><button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer;">✕ ABBRUCH</button><b style="color:var(--primary)">EINSTELLUNGEN</b><button onclick="saveSetup()" style="background:none; border:none; color:var(--success); font-weight:bold;">OK ✓</button></div>
+            <div class="manual-box" style="border-color:var(--danger); background:rgba(239, 68, 68, 0.05); margin-top:20px;"><label style="color:var(--danger)">⚠️ RESET</label><button class="btn btn-stop" style="font-size:0.8rem; padding:8px;" onclick="resetToday()">HEUTE LÖSCHEN</button></div>
+            <div class="manual-box" style="border-color:var(--success);"><label style="color:var(--success)">📊 EXPORT</label><button class="btn btn-start" style="font-size:0.8rem; padding:8px; background:var(--success);" onclick="exportData()">📥 EXPORT (CSV)</button></div>
+            <div class="manual-box"><label style="color:var(--accent)">🕒 NACHTRAG</label><select id="nachtrag-date">${dateOptions}</select><select id="nachtrag-cat"><option value="Korrektur">Korrektur</option><option value="Konferenz">Konferenz</option><option value="Vertretung (VZ)">Vertretung (VZ)</option></select><div style="display:flex; gap:10px;"><input type="time" id="nachtrag-start" value="08:00"><input type="time" id="nachtrag-end" value="13:00"></div><button class="btn btn-start" style="padding:10px; font-size:0.85rem;" onclick="processManual()">SPEICHERN</button></div>
+            <label>NAME</label><input type="text" id="setup-name" value="${userName}"><label>WOCHEN-SOLL</label><input type="number" id="setup-soll" value="${weeklySollHours}">
+            <button class="accordion-btn" onclick="toggleAcc('accA')">WOCHE A BEARBEITEN <span>▼</span></button><div id="accA" class="accordion-content">`;
+        ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
+            html += `<div style="margin-top:15px; border-bottom:1px solid #444; padding-bottom:10px;"><b style="color:var(--accent)">${tag}</b>`;
+            blocks.forEach(b => { const val = plan[`A-${tag}`]?.[b.id] || ""; html += `<div style="margin-top:8px;"><label>${b.label}</label><input type="text" id="A-${tag}-${b.id}" value="${val}"></div>`; });
+            html += `</div>`;
+        });
+        html += `</div><button class="accordion-btn" onclick="toggleAcc('accB')">WOCHE B BEARBEITEN <span>▼</span></button><div id="accB" class="accordion-content">`;
+        ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
+            html += `<div style="margin-top:15px; border-bottom:1px solid #444; padding-bottom:10px;"><b style="color:var(--accent)">${tag}</b>`;
+            blocks.forEach(b => { const val = plan[`B-${tag}`]?.[b.id] || ""; html += `<div style="margin-top:8px;"><label>${b.label}</label><input type="text" id="B-${tag}-${b.id}" value="${val}"></div>`; });
+            html += `</div>`;
+        });
+        html += `</div>`;
+        document.getElementById('modal-body').innerHTML = html;
+        document.getElementById('modal').style.display = 'block';
+    }
+
+    function toggleAcc(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
+    function processManual() {
+        const d = document.getElementById('nachtrag-date').value, c = document.getElementById('nachtrag-cat').value;
+        const s = document.getElementById('nachtrag-start').value, e = document.getElementById('nachtrag-end').value;
+        const d1 = new Date("2000-01-01T" + s), d2 = new Date("2000-01-01T" + e);
+        saveToDB(c, d1.getTime(), d2.getTime(), d); alert("Gespeichert!"); location.reload();
+    }
+    function resetToday() {
+        if(confirm("Heute löschen?")) {
+            const today = new Date().toLocaleDateString('de-DE');
+            db = db.filter(e => e.datum !== today); localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
+            localStorage.removeItem('activeSessionV13'); logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
+            location.reload();
+        }
+    }
+    function saveSetup() {
+        userName = document.getElementById('setup-name').value;
+        weeklySollHours = document.getElementById('setup-soll').value;
+        ['A','B'].forEach(w => { ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => { if(!plan[`${w}-${tag}`]) plan[`${w}-${tag}`] = {}; blocks.forEach(b => { plan[`${w}-${tag}`][b.id] = document.getElementById(`${w}-${tag}-${b.id}`).value; }); }); });
+        localStorage.setItem('userNameV13', userName); localStorage.setItem('weeklySollV13', weeklySollHours);
+        localStorage.setItem('lehrerPlanV13', JSON.stringify(plan)); location.reload();
+    }
+
+    function openHelp() {
+        document.getElementById('modal-body').innerHTML = `
+            <div class="modal-nav"><button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">✕ SCHLIESSEN</button><b style="color:var(--primary)">BEDIENUNGSANLEITUNG</b><div></div></div>
+            <div class="help-text" style="padding: 10px 20px 40px 20px;">
+                <p>Willkommen bei deiner persönlichen Arbeitszeiterfassung.</p>
+                <h2>1. Installation</h2><p>Nutze "Zum Home-Bildschirm hinzufügen" in Safari/Chrome.</p>
+                <h2>2. Setup</h2><p>Trage Namen, Soll und Plan ein. Die Wochenpläne sind einklappbar.</p>
+                <h2>3. Abrechnung (v20.1)</h2>
+                <p>Der CSV-Export erstellt nun automatisch Wochen- und Monatsübersichten. Wochensummen über 26 Stunden werden als Plus-Stunden ausgewiesen.</p>
+            </div>`;
+        document.getElementById('modal').style.display = 'block';
+    }
+
+    function addLog(m) { logs.unshift({ t: new Date().toLocaleTimeString('de-DE').substr(0,5), m }); if(logs.length > 5) logs.pop(); localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); renderLogs(); }
+    function renderLogs() { document.getElementById('log-container').innerHTML = logs.map(l => `<div class="log-entry"><span>${l.m}</span><span>${l.t}</span></div>`).join(''); }
+    function toggleWeekManual() { currentWeek = (currentWeek === 'A' ? 'B' : 'A'); localStorage.setItem('manualWeekV13', currentWeek); updateUI(); }
+
+    function exportData() {
+        // Daten nach Datum/Zeit sortieren
+        let sorted = [...db].sort((a,b) => {
+            const dateA = new Date(a.datum.split('.').reverse().join('-') + 'T' + a.start);
+            const dateB = new Date(b.datum.split('.').reverse().join('-') + 'T' + b.start);
+            return dateA - dateB;
+        });
+
+        let csv = "\ufeffWochentag;Datum;Fach/Ereignis;Beginn;Ende;Dauer (Std);Summe Woche;Überstunden (Wo)\n";
+        
+        let currentWoSum = 0;
+        let lastWeekKey = null;
+        let lastMonthKey = null;
+        let monSum = 0;
+
+        sorted.forEach((e, index) => {
+            const parts = e.datum.split('.');
+            const d = new Date(parts[2], parts[1]-1, parts[0]);
+            const dayName = ['So','Mo','Di','Mi','Do','Fr','Sa'][d.getDay()];
+            
+            // Wochen-Check (Montag ist Start)
+            const weekKey = getWeekNumber(d);
+            const monthKey = parts[1] + "." + parts[2];
+
+            // Wenn Woche wechselt, Bilanz ziehen
+            if (lastWeekKey !== null && lastWeekKey !== weekKey) {
+                const woStd = (currentWoSum / 3600000).toFixed(2);
+                const plus = (woStd - weeklySollHours).toFixed(2);
+                csv += `==========;SUMME WOCHE;KW ${lastWeekKey};---;---;${woStd};;${plus > 0 ? '+' + plus : plus}\n\n`;
+                currentWoSum = 0;
+            }
+
+            // Wenn Monat wechselt, Monatsbilanz ziehen
+            if (lastMonthKey !== null && lastMonthKey !== monthKey) {
+                csv += `##########;BILANZ MONAT;${lastMonthKey};---;---;${(monSum / 3600000).toFixed(2)};;---\n\n`;
+                monSum = 0;
+            }
+
+            const dauerH = (e.ms / 3600000).toFixed(2);
+            csv += `${dayName};${e.datum};${e.typ};${e.start};${e.ende};${dauerH};;\n`;
+            
+            currentWoSum += e.ms;
+            monSum += e.ms;
+            lastWeekKey = weekKey;
+            lastMonthKey = monthKey;
+
+            // Letzter Eintrag Check
+            if (index === sorted.length - 1) {
+                const woStd = (currentWoSum / 3600000).toFixed(2);
+                const plus = (woStd - weeklySollHours).toFixed(2);
+                csv += `==========;SUMME WOCHE;KW ${weekKey};---;---;${woStd};;${plus > 0 ? '+' + plus : plus}\n`;
+                csv += `##########;BILANZ MONAT;${monthKey};---;---;${(monSum / 3600000).toFixed(2)};;---\n`;
+            }
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Dienstbericht_${userName}_${new Date().toLocaleDateString('de-DE')}.csv`;
+        link.click();
+    }
+
+    function getWeekNumber(d) {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+        var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+    }
+</script>
+</body>
+</html>
