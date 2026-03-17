@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v20.2</title>
+    <title>Arbeitszeit-Assistent Pro v20.3</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -91,11 +91,11 @@
 <body>
 
 <div id="update-toast">
-    <div class="toast-header"><span>Update Info v20.2</span></div>
+    <div class="toast-header"><span>Update Info v20.3</span></div>
     <div class="toast-body">
-        Back to Basics: Export-Design wurde wieder vereinfacht für maximale Übersichtlichkeit.
+        XXL-Hilfe & Mitternachts-Reset wiederhergestellt. Export bleibt sauber und einfach.
     </div>
-    <button class="toast-btn" onclick="closeToast()">OK, verstanden!</button>
+    <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
 
 <div class="container">
@@ -140,13 +140,13 @@
         <button class="btn btn-setup" style="background: #475569; padding: 12px;" onclick="openSetup()">⚙️ Einstellungen</button>
         <button class="btn btn-refresh" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
     </div>
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v20.2</footer>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v20.3</footer>
 </div>
 
 <div id="modal"><div class="modal-content" id="modal-body"></div></div>
 
 <script>
-    const APP_VERSION = "20.2";
+    const APP_VERSION = "20.3";
     let db = JSON.parse(localStorage.getItem('lehrerDB_Export')) || [];
     let plan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
     let session = JSON.parse(localStorage.getItem('activeSessionV13')) || { active: false };
@@ -184,6 +184,16 @@
         const now = new Date();
         document.getElementById('live-clock').innerText = now.toLocaleTimeString('de-DE');
         document.getElementById('live-date').innerText = now.toLocaleDateString('de-DE', {weekday: 'long', day: '2-digit', month: '2-digit'});
+        
+        // Mitternachts-Reset FIX
+        const todayStr = now.toDateString();
+        if(localStorage.getItem('logDateV13') !== todayStr) {
+            logs = []; 
+            localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
+            localStorage.setItem('logDateV13', todayStr);
+            renderLogs();
+        }
+
         if (session.active) updateAssistant();
         updateUI(); 
     }, 1000);
@@ -402,15 +412,28 @@
 
     function openHelp() {
         document.getElementById('modal-body').innerHTML = `
-            <div class="modal-nav"><button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">✕ SCHLIESSEN</button><b style="color:var(--primary)">HILFE</b></div>
-            <div class="help-text" style="padding: 20px;">
-                <h2>Einfacher Export (v20.2)</h2>
-                <p>Die App dokumentiert jetzt wieder ganz schlicht deine Dienstzeiten:</p>
-                <ul>
-                    <li><b>Hauptdienst:</b> Deine reine Anwesenheit.</li>
-                    <li><b>Vertretung / Konferenz:</b> Sonderzeiten.</li>
-                </ul>
-                <p>Am Ende jeder Export-Datei findest du eine klare monatliche Gesamtrechnung.</p>
+            <div class="modal-nav"><button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">✕ SCHLIESSEN</button><b style="color:var(--primary)">BEDIENUNGSANLEITUNG</b><div></div></div>
+            <div class="help-text" style="padding: 10px 20px 40px 20px;">
+                <p>Willkommen bei deiner persönlichen Arbeitszeiterfassung. Hier erfährst du alles Wichtige:</p>
+                <h2>1. Installation & Start</h2>
+                <p>Öffne die Seite in Safari (iPhone) oder Chrome (Android). Tippe auf das <b>Teilen-Symbol</b> und wähle <b>"Zum Home-Bildschirm hinzufügen"</b>.</p>
+                <h2>2. Die erste Einrichtung (Setup)</h2>
+                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib Namen und Wochen-Soll ein. Trage dann deinen Plan für Woche A und B ein. Nutze die <b>einklappbaren Bereiche</b> (Akkordeon) für mehr Übersicht beim Editieren.</p>
+                <h2>3. Der Dienst-Alltag & Sicherheit</h2>
+                <h3>Live-Timer auf Buttons</h3>
+                <p>Sobald eine Vertretung (Orange) oder Konferenz (Blau) läuft, zeigt dir der Button direkt die bereits vergangene Zeit an.</p>
+                <h3>Scharfschalten (VZ & Konferenz)</h3>
+                <p>Um versehentliche Klicks zu vermeiden, müssen diese Buttons <b>zweimal</b> getippt werden. Beim ersten Tippen färbt sich der Button gelb ("Sicher?").</p>
+                <h3>Automatischer Log-out (VZ)</h3>
+                <p>Eine Vertretung wird automatisch nach <b>90 Minuten</b> beendet und gespeichert.</p>
+                <h3>Fehlklick-Schutz</h3>
+                <p>Einträge, die kürzer als 30 Sekunden laufen, werden beim Stoppen abgefragt. So bleibt dein Excel sauber.</p>
+                <h2>4. Auswertung & Export</h2>
+                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei im CSV-Format enthält nun eine kompakte monatliche Gesamtabrechnung am Ende der Liste.</p>
+                <h2>5. Fehler korrigieren (Nachtrag)</h2>
+                <p>In den Einstellungen kannst du unter <b>"🕒 NACHTRAG"</b> Uhrzeiten manuell nachpflegen. Du kannst das Datum für die letzten 5 Wochentage frei wählen.</p>
+                <h2>6. Automatischer Reset & Update-Info</h2>
+                <p>Die Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst. Bei neuen App-Versionen erscheint einmalig eine dezente Info-Blase am unteren Rand.</p>
             </div>`;
         document.getElementById('modal').style.display = 'block';
     }
@@ -425,23 +448,18 @@
             const dateB = new Date(b.datum.split('.').reverse().join('-') + 'T' + b.start);
             return dateA - dateB;
         });
-
         let csv = "\ufeffDatum;Kategorie;Beginn;Ende;Dauer (Std)\n";
         let monthlyTotals = {};
-
         sorted.forEach(e => {
             const dauerH = (e.ms / 3600000).toFixed(2);
             csv += `${e.datum};${e.typ};${e.start};${e.ende};${dauerH}\n`;
-            
             const monthKey = e.datum.split('.')[1] + "/" + e.datum.split('.')[2];
             monthlyTotals[monthKey] = (monthlyTotals[monthKey] || 0) + e.ms;
         });
-
         csv += "\n--- MONATS-ABRECHNUNG ---\n";
         for (let m in monthlyTotals) {
             csv += `Monat ${m}; Gesamte Arbeitszeit:; ${(monthlyTotals[m] / 3600000).toFixed(2)} Stunden\n`;
         }
-
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
