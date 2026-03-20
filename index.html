@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v20.3</title>
+    <title>Arbeitszeit-Assistent Pro v20.5</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -79,9 +79,11 @@
         .help-trigger { background: var(--primary); color: var(--bg); width: 28px; height: 28px; border-radius: 50%; font-weight: 900; border: none; }
         .log-entry { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
         .footer-info { margin-top: 25px; font-size: 0.65rem; color: #475569; text-align: center; font-weight: bold; }
+        
         .help-text { text-align: left; font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
         .help-text h2 { color: var(--primary); border-bottom: 1px solid var(--primary); padding-bottom: 5px; margin-top: 25px; }
         .help-text h3 { color: var(--accent); margin-top: 20px; margin-bottom: 5px; font-size: 1rem; }
+        
         .manual-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid var(--primary); }
         input, select { background: #0f172a; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 12px 0; font-size: 1rem; }
         .accordion-btn { background: #334155; color: white; padding: 15px; width: 100%; text-align: left; border: none; border-radius: 12px; margin-top: 10px; font-weight: bold; display: flex; justify-content: space-between; }
@@ -91,9 +93,9 @@
 <body>
 
 <div id="update-toast">
-    <div class="toast-header"><span>Update Info v20.3</span></div>
+    <div class="toast-header"><span>Update Info v20.5</span></div>
     <div class="toast-body">
-        XXL-Hilfe & Mitternachts-Reset wiederhergestellt. Export bleibt sauber und einfach.
+        XXL-Hilfe fixiert & Dashboard bereinigt. Der Wochenbalken ist nun dauerhaft entfernt.
     </div>
     <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
@@ -130,8 +132,6 @@
             <div class="progress-bar"><div id="day-progress" class="progress-fill" style="background: var(--primary);"></div></div>
             <div class="progress-label"><span>Vertretungen (Monat)</span><span id="vz-val">0</span></div>
             <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--danger);"></div></div>
-            <div class="progress-label"><span>Woche Gesamt</span><span id="week-percent">0%</span></div>
-            <div class="progress-bar"><div id="week-progress" class="progress-fill" style="background: var(--success);"></div></div>
         </div>
     </div>
 
@@ -140,13 +140,13 @@
         <button class="btn btn-setup" style="background: #475569; padding: 12px;" onclick="openSetup()">⚙️ Einstellungen</button>
         <button class="btn btn-refresh" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
     </div>
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v20.3</footer>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v20.5</footer>
 </div>
 
 <div id="modal"><div class="modal-content" id="modal-body"></div></div>
 
 <script>
-    const APP_VERSION = "20.3";
+    const APP_VERSION = "20.5";
     let db = JSON.parse(localStorage.getItem('lehrerDB_Export')) || [];
     let plan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
     let session = JSON.parse(localStorage.getItem('activeSessionV13')) || { active: false };
@@ -185,7 +185,6 @@
         document.getElementById('live-clock').innerText = now.toLocaleTimeString('de-DE');
         document.getElementById('live-date').innerText = now.toLocaleDateString('de-DE', {weekday: 'long', day: '2-digit', month: '2-digit'});
         
-        // Mitternachts-Reset FIX
         const todayStr = now.toDateString();
         if(localStorage.getItem('logDateV13') !== todayStr) {
             logs = []; 
@@ -290,28 +289,6 @@
         }).length;
         document.getElementById('vz-val').innerText = vzCount;
         document.getElementById('vz-progress').style.width = Math.min((vzCount / 4) * 100, 100) + "%";
-
-        function getMonday(d) {
-            d = new Date(d); var day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6:1);
-            return new Date(d.setDate(diff)).setHours(0,0,0,0);
-        }
-        const monday = getMonday(now);
-        let weekMS = db.filter(e => {
-            const parts = e.datum.split('.');
-            const entryDate = new Date(parts[2], parts[1]-1, parts[0]).getTime();
-            return entryDate >= monday;
-        }).reduce((acc, curr) => acc + (curr.ms || 0), 0);
-        
-        if(session.active) weekMS += (Date.now() - session.start);
-        if(vzSession.active) weekMS += (Date.now() - vzSession.start);
-        if(extraSession.active) weekMS += (Date.now() - extraSession.start);
-
-        const targetMS = weeklySollHours * 3600000;
-        const weekPerc = Math.round((weekMS / targetMS) * 100);
-        const weekFill = document.getElementById('week-progress');
-        document.getElementById('week-percent').innerText = weekPerc + "%";
-        if(weekPerc >= 100) { weekFill.style.width = "100%"; weekFill.style.background = "var(--overtime)"; }
-        else { weekFill.style.width = weekPerc + "%"; weekFill.style.background = "var(--success)"; }
 
         const dayKey = `${currentWeek}-${['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()]}`;
         let firstStart = 1440, lastEnd = 0, hasPlan = false;
