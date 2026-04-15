@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v20.5</title>
+    <title>Arbeitszeit-Assistent Pro v21.18</title>
+    <style id="dynamic-theme-style"></style>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
             --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --accent: #fbbf24; 
             --danger: #ef4444; --text: #ffffff; --success: #10b981; 
-            --overtime: #f59e0b; --weekA: #2563eb; --weekB: #9333ea; 
+            --overtime: #f59e0b; --weekA: #2563eb; --weekB: #9333ea;
+            --sus: #06b6d4;
         }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background-color: var(--bg);
@@ -19,18 +22,19 @@
             background-attachment: fixed;
             color: var(--text); padding: 15px; display: flex; flex-direction: column; align-items: center; margin: 0; 
         }
-        .container { width: 100%; max-width: 420px; box-sizing: border-box; padding-bottom: 80px; }
+        .container { width: 100%; max-width: 420px; box-sizing: border-box; padding-bottom: 30px; }
         
+        /* HEADER */
         .time-header { text-align: center; margin-bottom: 20px; width: 100%; position: relative; }
         #live-clock { font-size: 3.2rem; font-weight: 900; color: var(--primary); display: block; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        #live-date { font-size: 0.9rem; font-weight: 600; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; display: block; }
-
+        #live-date { display: none; }
+ 
+        /* CARDS */
         .card { 
             background: var(--card); padding: 20px; border-radius: 20px; margin-bottom: 12px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1); 
             text-align: center; border-left: 5px solid var(--primary); position: relative; overflow: hidden;
         }
-        
         .next-info { 
             background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px);
             border-radius: 20px; padding: 10px; margin-bottom: 15px; 
@@ -42,9 +46,13 @@
         .task-label { font-size: 0.55rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 2px; }
         .task-val { font-size: 1.1rem; font-weight: 800; line-height: 1.1; min-height: 2.2em; display: flex; align-items: center; justify-content: center; color: #fff; }
         .task-sub { font-size: 0.65rem; color: #94a3b8; font-weight: 600; }
-
+        .task-val.alert-soon { color: var(--danger) !important; animation: blink-alert 1s infinite; }
+        @keyframes blink-alert { 0%,100%{opacity:1} 50%{opacity:0.4} }
+ 
+        /* TIMER */
         .timer-display { font-size: 2.8rem; font-weight: 800; margin: 5px 0; color: var(--text); font-variant-numeric: tabular-nums; }
         
+        /* BUTTONS */
         .btn { border: none; padding: 16px; border-radius: 16px; font-weight: 800; width: 100%; margin-bottom: 10px; cursor: pointer; color: white; transition: 0.2s; font-size: 1rem; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
         .btn:active { transform: translateY(2px); box-shadow: none; }
         .btn-start { background: linear-gradient(145deg, #10b981, #059669); }
@@ -54,13 +62,43 @@
         .btn-confirm { background: var(--accent) !important; color: var(--bg) !important; animation: pulse-confirm 0.5s infinite; border: none; }
         .btn-vz.active { background: var(--overtime) !important; color: white; border: none; }
         .btn-extra.active { background: #6366f1 !important; color: white; border: none; }
-        
+        .btn-vnb { background: rgba(16, 185, 129, 0.1); border: 1.5px solid var(--success); color: var(--success); }
+        .btn-vnb.active { background: var(--success) !important; color: white; border: none; }
+        .btn-pulse { animation: pulse-btn 1.2s infinite; }
+        @keyframes pulse-btn { 0%,100%{box-shadow:0 4px 0 rgba(0,0,0,0.2)} 50%{box-shadow:0 0 20px rgba(56,189,248,0.8)} }
         @keyframes pulse-confirm { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
-
+ 
+        /* PROGRESS */
         .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-bottom: 4px; font-weight: 700; }
         .progress-bar { height: 14px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .progress-fill { height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        
+ 
+        /* CALENDAR ICON (bottom center) */
+        .cal-fab {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 80px; cursor: pointer; z-index: 500;
+            filter: drop-shadow(0 8px 20px rgba(56,189,248,0.5));
+            transition: transform 0.2s;
+        }
+        .cal-fab:active { transform: translateX(-50%) scale(0.93); }
+        .cal-icon-wrap {
+            background: var(--card);
+            border-radius: 18px;
+            border: 2px solid var(--primary);
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        }
+        .cal-icon-top {
+            background: var(--primary);
+            padding: 5px 0 4px;
+            display: flex; justify-content: center; gap: 8px;
+        }
+        .cal-ring { width: 8px; height: 12px; border: 2px solid #0f172a; border-radius: 3px; background: #0f172a; }
+        .cal-icon-body { padding: 4px 0 6px; text-align: center; }
+        .cal-day-num { font-size: 1.6rem; font-weight: 900; color: var(--text); line-height: 1; }
+        .cal-day-name { font-size: 0.45rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+ 
+        /* TOAST */
         #update-toast { 
             display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
             width: 90%; max-width: 380px; background: #fffcf0; color: #1e293b; 
@@ -71,179 +109,642 @@
         .toast-header { font-weight: 900; font-size: 0.7rem; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; display: flex; justify-content: space-between; }
         .toast-body { font-size: 0.85rem; line-height: 1.4; font-weight: 500; }
         .toast-btn { background: var(--card); color: white; border: none; padding: 5px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
-
+ 
+        /* MODAL (shared overlay system) */
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 2000; overflow-y: auto; }
         .modal-content { padding: 80px 20px 40px 20px; }
         .modal-nav { position: fixed; top: 0; left: 0; right: 0; background: var(--card); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--primary); z-index: 2001; }
         
-        .help-trigger { background: var(--primary); color: var(--bg); width: 28px; height: 28px; border-radius: 50%; font-weight: 900; border: none; }
+        /* FORMS */
+        .help-trigger { background: var(--primary); color: var(--bg); width: 32px; height: 32px; border-radius: 50%; font-weight: 900; border: none; cursor: pointer; animation: pulse-help 2.5s ease-in-out infinite; box-shadow: 0 0 0 0 rgba(239,68,68,0.8); }
+        @keyframes pulse-help { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.8);transform:scale(1);} 50%{box-shadow:0 0 0 10px rgba(239,68,68,0);transform:scale(1.05);} }
+        .btn-sus { background: rgba(6,182,212,0.15); border: 2px solid var(--sus); color: var(--sus); animation: pulse-sus 3s ease-in-out infinite; }
+        @keyframes pulse-sus { 0%,100%{box-shadow:0 4px 0 rgba(0,0,0,0.2),0 0 0 0 rgba(6,182,212,0.4);} 60%{box-shadow:0 4px 0 rgba(0,0,0,0.2),0 0 0 8px rgba(6,182,212,0);} }
+        .today-dot { position:absolute; top:-6px; right:-6px; background:#ef4444; color:white; border-radius:10px; min-width:20px; height:20px; font-size:0.65rem; font-weight:900; border:2px solid var(--card); animation:pulse-dot 1.5s ease-in-out infinite; display:none; align-items:center; justify-content:center; padding:0 4px; line-height:1; }
+        @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.3);opacity:0.7;} }
+        .cal-icon-label { font-size:0.38rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; line-height:1; }
         .log-entry { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
         .footer-info { margin-top: 25px; font-size: 0.65rem; color: #475569; text-align: center; font-weight: bold; }
-        
         .help-text { text-align: left; font-size: 0.85rem; line-height: 1.5; color: #cbd5e1; }
         .help-text h2 { color: var(--primary); border-bottom: 1px solid var(--primary); padding-bottom: 5px; margin-top: 25px; }
         .help-text h3 { color: var(--accent); margin-top: 20px; margin-bottom: 5px; font-size: 1rem; }
-        
         .manual-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid var(--primary); }
-        input, select { background: #0f172a; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 12px 0; font-size: 1rem; }
-        .accordion-btn { background: #334155; color: white; padding: 15px; width: 100%; text-align: left; border: none; border-radius: 12px; margin-top: 10px; font-weight: bold; display: flex; justify-content: space-between; }
+        input, select, textarea { background: #0f172a; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; width: 100%; margin: 5px 0 12px 0; font-size: 1rem; font-family: inherit; }
+        textarea { resize: vertical; }
+        .accordion-btn { background: #334155; color: white; padding: 15px; width: 100%; text-align: left; border: none; border-radius: 12px; margin-top: 10px; font-weight: bold; display: flex; justify-content: space-between; cursor: pointer; }
         .accordion-content { display: none; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 0 0 12px 12px; }
+ 
+        /* CALENDAR OVERLAY */
+        .cal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f1f5f9; z-index: 2000; overflow-y: auto; color: #1e293b; }
+        .cal-header-bar { position: sticky; top: 0; background: #ffffff; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); z-index: 1; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .cal-nav-btn { background: var(--primary); border: none; color: white; min-width: 80px; height: 44px; border-radius: 10px; font-size: 0.75rem; cursor: pointer; font-weight: 800; padding: 0 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }
+        .cal-week-title { font-weight: 900; font-size: 0.9rem; color: #0f172a; text-align: center; }
+        .cal-week-badge { font-size: 0.65rem; color: var(--accent); font-weight: 800; display: block; }
+        .cal-body { padding: 15px; max-width: 420px; margin: 0 auto; }
+        .cal-search { display: flex; gap: 8px; margin-bottom: 15px; }
+        .cal-search input { margin: 0; flex: 1; }
+        .cal-day-section { margin-bottom: 20px; }
+        .cal-day-header { font-size: 0.72rem; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; padding: 7px 12px; background: #e2e8f0; border-radius: 10px; }
+        .cal-day-header.today { background: var(--primary); color: white; box-shadow: 0 3px 10px rgba(56,189,248,0.3); }
+        .cal-day-header.holiday-header { background: #fef3c7; color: #92400e; }
+        .cal-tile {
+            background: #ffffff; border-radius: 14px; padding: 12px 15px;
+            margin-bottom: 8px; border-left: 4px solid #94a3b8;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: all 0.15s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07); color: #1e293b;
+        }
+        .cal-tile:active { transform: scale(0.98); }
+        .cal-tile.has-entry { border-left-color: var(--success); }
+        .cal-tile.vertretung { border-left-color: var(--danger); background: #fff5f5; }
+        .cal-tile.konferenz { border-left-color: var(--accent); background: #fffbeb; }
+        .cal-tile.ferien { border-left-color: #d97706; background: #fefce8; }
+        .cal-tile-left { text-align: left; }
+        .cal-tile-time { font-size: 0.65rem; color: #94a3b8; font-weight: 700; }
+        .cal-tile-title { font-size: 0.95rem; font-weight: 800; color: #0f172a; }
+        .cal-tile-sub { font-size: 0.7rem; color: #94a3b8; margin-top: 2px; }
+        .cal-tile-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .cal-tile-badge { font-size: 0.55rem; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+        .badge-vz { background: rgba(239,68,68,0.2); color: var(--danger); }
+        .badge-konf { background: rgba(251,191,36,0.2); color: var(--accent); }
+        .badge-sus { background: rgba(6,182,212,0.2); color: var(--sus); }
+        .anchor-icon { font-size: 0.8rem; }
+ 
+        /* ENTRY POPUP */
+        /* VZ Klassen-Popup */
+        .vz-popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2999; }
+        .vz-popup { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:var(--card); border-radius:20px; padding:20px; z-index:3000; width:92%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.8); }
+        .vz-popup-title { font-size:1rem; font-weight:900; color:var(--danger); margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; }
+
+        .entry-popup-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2999; }
+        .entry-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card); border-radius: 20px; padding: 20px; z-index: 3000; box-shadow: 0 20px 60px rgba(0,0,0,0.8); width: 92%; max-width: 400px; max-height: 88vh; overflow-y: auto; }
+
+        .popup-title { font-size: 1rem; font-weight: 900; color: var(--primary); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .popup-label { font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
+ 
+        /* SUS PANEL */
+        .sus-panel { background: rgba(6,182,212,0.1); border: 1px solid var(--sus); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
+        .sus-panel-title { color: var(--sus); font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+ 
+        /* ADMIN SECTION */
+        .admin-section { background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 15px; padding: 15px; margin-bottom: 15px; }
+        .admin-section-title { font-size: 0.7rem; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .send-log-entry { font-size: 0.7rem; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; color: #94a3b8; }
+        .send-log-entry .ok { color: var(--success); }
+ 
+        /* SEARCH RESULTS */
+        .search-result { background: white; color: #1e293b; box-shadow: 0 2px 6px rgba(0,0,0,0.07); border-radius: 10px; padding: 10px; margin-bottom: 8px; font-size: 0.8rem; }
+        .search-result-date { color: var(--primary); font-weight: 800; font-size: 0.65rem; }
+        .search-result-title { font-weight: 700; }
+        .search-result-note { color: #94a3b8; margin-top: 3px; font-style: italic; }
+ 
+        /* BOTTOM NAV AREA */
+        .bottom-actions { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 15px; }
     </style>
 </head>
 <body>
-
+ 
 <div id="update-toast">
-    <div class="toast-header"><span>Update Info v20.5</span></div>
-    <div class="toast-body">
-        XXL-Hilfe fixiert & Dashboard bereinigt. Der Wochenbalken ist nun dauerhaft entfernt.
-    </div>
+    <div class="toast-header"><span>✨ Update Info v21.18</span></div>
+    <div class="toast-body">v21.18: Schüler-Management zeigt Hinweis wenn noch nicht eingerichtet.</div>
     <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
-
+ 
 <div class="container">
     <div class="time-header">
         <span id="live-clock">--:--:--</span>
-        <span id="live-date">--.--.----</span>
-        <div class="help-container" onclick="openHelp()" style="position: absolute; right: 0; top: 5px; cursor: pointer;">
+        
+        <div style="position: absolute; right: 0; top: 5px; cursor: pointer;" onclick="openHelp()">
             <button class="help-trigger">?</button>
         </div>
     </div>
-
+ 
     <div class="next-info" id="task-card">
-        <div class="task-box"><div class="task-label">Aktuell</div><div class="task-val" id="task-now">Bereit</div><div class="task-sub" id="task-now-sub">-</div></div>
-        <div class="task-box"><div class="task-label">Nächstes</div><div class="task-val" id="task-next">Keine Termine</div><div class="task-sub" id="task-next-sub">-</div></div>
+        <div class="task-box">
+            <div class="task-label">Aktuell</div>
+            <div class="task-val" id="task-now">Bereit</div>
+            <div class="task-sub" id="task-now-sub">-</div>
+        </div>
+        <div class="task-box">
+            <div class="task-label">Nächstes</div>
+            <div class="task-val" id="task-next">Keine Termine</div>
+            <div class="task-sub" id="task-next-sub">-</div>
+        </div>
     </div>
-
+ 
     <div class="card">
-        <div id="display-name" style="font-size: 0.75rem; color: var(--accent); font-weight: 900; margin-bottom: 12px; letter-spacing: 2px;">LEHRKRAFT COCKPIT</div>
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:15px;">
-            <div style="text-align:center">
-                <span style="font-size: 0.55rem; font-weight: 900; color: var(--primary); text-transform: uppercase; display:block; margin-bottom:4px;">Wechseln</span>
-                <button id="week-btn" style="border:none; padding:10px 24px; border-radius:12px; color:white; font-weight:bold; cursor:pointer;" onclick="toggleWeekManual()">Woche <span id="week-label">A</span></button>
+        <div id="display-name" style="font-size: 0.75rem; color: var(--accent); font-weight: 900; margin-bottom: 12px; letter-spacing: 2px;">LEHRKRAFT</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; gap:10px;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
+                <span style="font-size:0.55rem; font-weight:900; color:var(--primary); text-transform:uppercase; letter-spacing:1px;">Wechseln</span>
+                <button id="week-btn" onclick="toggleWeekManual()" style="border:none; padding:10px 22px; border-radius:12px; color:white; font-weight:800; cursor:pointer;">Woche <span id="week-label">A</span></button>
+                <div style="font-size:0.72rem; font-weight:800; color:#94a3b8;">Ziel: <span id="soll-info" style="color:white;">26</span> Std</div>
             </div>
-            <div style="font-size: 0.8rem; font-weight: 800; color: #94a3b8; padding-bottom: 5px;">Ziel: <span id="soll-info" style="color:white;">26</span> Std</div>
+            <div onclick="openCalendar()" style="cursor:pointer; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:4px;" ontouchstart="this.style.opacity='0.7'" ontouchend="this.style.opacity='1'">
+                <div style="position:relative; width:70px;">
+                    <div style="background:var(--card); border-radius:14px; border:2px solid var(--primary); overflow:hidden; box-shadow:0 4px 16px rgba(56,189,248,0.3);">
+                        <div style="background:var(--primary); padding:4px 0 3px; display:flex; justify-content:center; gap:5px;">
+                            <div style="width:6px;height:9px;border:2px solid #0f172a;border-radius:2px;background:#0f172a;"></div>
+                            <div style="width:6px;height:9px;border:2px solid #0f172a;border-radius:2px;background:#0f172a;"></div>
+                            <div style="width:6px;height:9px;border:2px solid #0f172a;border-radius:2px;background:#0f172a;"></div>
+                            <div style="width:6px;height:9px;border:2px solid #0f172a;border-radius:2px;background:#0f172a;"></div>
+                        </div>
+                        <div style="padding:4px 0 6px; text-align:center;">
+                            <div id="fab-day-num" style="font-size:1.5rem; font-weight:900; color:var(--text); line-height:1.1;">25</div>
+                            <div id="fab-day-name" style="font-size:0.42rem; font-weight:800; color:var(--primary); text-transform:uppercase; letter-spacing:1px;">MI</div>
+                        </div>
+                    </div>
+                    <div class="today-dot" id="today-dot"></div>
+                </div>
+                <div class="cal-icon-label">Termine</div>
+            </div>
         </div>
         <div id="main-timer" class="timer-display">00:00:00</div>
         <button id="btn-main" class="btn btn-start" onclick="toggleMain()">Dienst starten</button>
         <button id="btn-vz" class="btn btn-vz" onclick="handleVZClick()">Vertretung</button>
         <button id="btn-extra" class="btn btn-extra" onclick="handleExtraClick()">Konferenz / Termin</button>
+        <button id="btn-vnb" class="btn btn-vnb" onclick="handleVNBClick()">📚 Vor-/Nachbereitung</button>
+        <button class="btn btn-sus" onclick="openSusManagement()">👥 Schüler-Management</button>
         <div class="progress-container" style="margin-top: 25px;">
             <div class="progress-label"><span>Tag Fortschritt</span><span id="day-percent">0%</span></div>
             <div class="progress-bar"><div id="day-progress" class="progress-fill" style="background: var(--primary);"></div></div>
             <div class="progress-label"><span>Vertretungen (Monat)</span><span id="vz-val">0</span></div>
             <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--danger);"></div></div>
+
         </div>
     </div>
-
+ 
     <div id="log-container"></div>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 15px;">
-        <button class="btn btn-setup" style="background: #475569; padding: 12px;" onclick="openSetup()">⚙️ Einstellungen</button>
-        <button class="btn btn-refresh" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
+ 
+    <div class="bottom-actions">
+        <button class="btn" style="background: #475569; padding: 12px;" onclick="openSetup()">⚙️ Einstellungen</button>
+        <button class="btn" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
     </div>
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v20.5</footer>
+ 
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v21.18</footer>
+</div>
+ 
+
+ 
+<!-- MAIN MODAL (Setup / Help) -->
+<div id="modal"><div class="modal-content" id="modal-body"></div></div>
+ 
+<!-- CALENDAR OVERLAY -->
+<div class="cal-overlay" id="cal-overlay">
+    <div class="cal-header-bar">
+        <button class="cal-nav-btn" onclick="calNavWeek(-1)"><span style="font-size:1rem;">‹</span><span style="font-size:0.55rem;">Vorherige</span></button>
+        <div style="text-align:center">
+            <div class="cal-week-title" id="cal-week-title">KW 13</div>
+            <span class="cal-week-badge" id="cal-week-badge">WOCHE A</span>
+        </div>
+        <button class="cal-nav-btn" onclick="calNavWeek(1)"><span style="font-size:1rem;">›</span><span style="font-size:0.55rem;">Nächste</span></button>
+        <button onclick="closeCalendar()" style="background:none; border:none; color:var(--danger); font-weight:bold; font-size:1.2rem; cursor:pointer; margin-left:10px;">✕</button>
+    </div>
+    <div class="cal-body">
+        <div class="cal-search">
+            <input type="text" id="cal-search-input" placeholder="🔍 Suche: Müller, Elternabend..." oninput="calSearch(this.value)" style="margin:0;">
+        </div>
+        <div id="cal-search-results" style="display:none;"></div>
+        <div id="cal-days-container"></div>
+    </div>
+</div>
+ 
+<!-- VZ KLASSEN POPUP -->
+<div class="vz-popup-overlay" id="vz-popup-overlay" onclick="closeVZPopup()"></div>
+<div class="vz-popup" id="vz-popup">
+    <div class="vz-popup-title">
+        <span>🔄 Vertretung starten</span>
+        <button onclick="closeVZPopup()" style="background:var(--danger);color:white;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:900;">✕</button>
+    </div>
+    <span style="font-size:0.7rem;color:#94a3b8;font-weight:800;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Welche Klasse vertreten Sie?</span>
+    <input type="text" id="vz-class-input" placeholder="z.B. 8a, 10b, 7c..." style="width:100%;background:#0f172a;border:1.5px solid var(--danger);color:white;padding:14px;border-radius:12px;font-size:1rem;margin-bottom:15px;">
+    <button onclick="startVZWithClass()" style="width:100%;background:linear-gradient(145deg,#ef4444,#dc2626);color:white;border:none;padding:15px;border-radius:14px;font-weight:900;font-size:1rem;cursor:pointer;">🔄 Vertretung starten</button>
+    <button onclick="closeVZPopup()" style="width:100%;margin-top:8px;background:none;border:none;color:#475569;font-weight:700;padding:8px;cursor:pointer;">Abbrechen</button>
 </div>
 
-<div id="modal"><div class="modal-content" id="modal-body"></div></div>
+<!-- ENTRY POPUP OVERLAY (Hintergrund) -->
+<div class="entry-popup-overlay" id="entry-popup-overlay" onclick="closeEntryPopup()"></div>
 
+<!-- ENTRY POPUP -->
+<div class="entry-popup" id="entry-popup">
+    <!-- Titel + ✕ Abbrechen oben rechts -->
+    <div class="popup-title">
+        <span id="popup-title-text">Termin bearbeiten</span>
+        <button onclick="closeEntryPopup()" style="background:var(--danger); color:white; border:none; width:32px; height:32px; border-radius:50%; font-size:1rem; font-weight:900; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; line-height:1;">✕</button>
+    </div>
+    <span class="popup-label">Titel / Beschreibung</span>
+    <input type="text" id="popup-entry-title" placeholder="z.B. Elterngespräch Müller">
+    <span class="popup-label">Kategorie</span>
+    <select id="popup-entry-cat" onchange="toggleCustomCat(this.value)">
+        <option value="Termin">📅 Termin</option>
+        <option value="Konferenz">📋 Konferenz</option>
+        <option value="Eigene">✏️ Eigene Kategorie...</option>
+    </select>
+    <input type="text" id="popup-entry-cat-custom" placeholder="z.B. Elternabend, Fortbildung, Prüfung..." style="display:none; margin-top:-8px;">
+    <span class="popup-label">Uhrzeit (optional)</span>
+    <div style="display:flex; gap:10px;">
+        <input type="time" id="popup-entry-start" style="flex:1; margin:0 0 12px 0;">
+        <input type="time" id="popup-entry-end" style="flex:1; margin:0 0 12px 0;">
+    </div>
+    <span class="popup-label">Notizen (SuS-Infos, Protokoll...)</span>
+    <textarea id="popup-entry-note" rows="3" placeholder="Freies Notizfeld – z.B. Fehlzeiten klären, SuS hat oft Kopfschmerzen..."></textarea>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+        <button onclick="savePopupEntry()" style="flex:2; background:linear-gradient(145deg,#10b981,#059669); color:white; border:none; padding:14px; border-radius:14px; font-weight:800; cursor:pointer;">💾 SPEICHERN</button>
+        <button onclick="exportEntryDoc()" style="flex:1; background:rgba(56,189,248,0.1); border:1.5px solid var(--primary); color:var(--primary); padding:14px; border-radius:14px; font-weight:800; cursor:pointer;">📄 DOC</button>
+        <button onclick="deletePopupEntry()" id="popup-delete-btn" style="flex:1; background:rgba(239,68,68,0.1); border:1.5px solid var(--danger); color:var(--danger); padding:14px; border-radius:14px; font-weight:800; cursor:pointer; display:none;">🗑️</button>
+    </div>
+</div>
+ 
 <script>
-    const APP_VERSION = "20.5";
-    let db = JSON.parse(localStorage.getItem('lehrerDB_Export')) || [];
-    let plan = JSON.parse(localStorage.getItem('lehrerPlanV13')) || {};
-    let session = JSON.parse(localStorage.getItem('activeSessionV13')) || { active: false };
-    let vzSession = JSON.parse(localStorage.getItem('vzSessionV13')) || { active: false };
+    const APP_VERSION = "21.18";
+ 
+    // ─── STATE ────────────────────────────────────────────────────
+    let db         = JSON.parse(localStorage.getItem('lehrerDB_Export'))    || [];
+    let plan       = JSON.parse(localStorage.getItem('lehrerPlanV13'))      || {};
+    let session    = JSON.parse(localStorage.getItem('activeSessionV13'))   || { active: false };
+    let vzSession  = JSON.parse(localStorage.getItem('vzSessionV13'))       || { active: false };
     let extraSession = JSON.parse(localStorage.getItem('extraSessionV13')) || { active: false };
-    let logs = JSON.parse(localStorage.getItem('dailyLogsV13')) || [];
-    let currentWeek = localStorage.getItem('manualWeekV13') || 'A';
-    let weeklySollHours = parseFloat(localStorage.getItem('weeklySollV13')) || 26;
-    let userName = localStorage.getItem('userNameV13') || 'Lehrkraft';
-    let confirmVZ = false, confirmExtra = false;
+    let vnbSession   = JSON.parse(localStorage.getItem('vnbSessionV13'))   || { active: false };
 
+    let logs       = JSON.parse(localStorage.getItem('dailyLogsV13'))       || [];
+    let calEntries = JSON.parse(localStorage.getItem('calEntriesV21'))      || {};   // key: "YYYY-MM-DD", value: [{...}]
+    let sendLog    = JSON.parse(localStorage.getItem('sendLogV21'))         || [];
+    let currentWeek      = localStorage.getItem('manualWeekV13')   || 'A';
+    let weeklySollHours  = parseFloat(localStorage.getItem('weeklySollV13')) || 26;
+    let userName         = localStorage.getItem('userNameV13')      || 'Lehrkraft';
+    let ghToken          = localStorage.getItem('ghTokenV21')       || '';
+    let susAdminUnlocked = localStorage.getItem('susAdminUnlocked') || '';
+    let ghUser           = localStorage.getItem('ghUserV21')        || '';
+    let ghRepo           = localStorage.getItem('ghRepoV21')        || '';
+    let class1Name       = localStorage.getItem('class1NameV21')    || 'Klasse 1';
+    let class2Name       = localStorage.getItem('class2NameV21')    || 'Klasse 2';
+    let userEmail        = localStorage.getItem('userEmailV21')     || '';
+    let userTheme        = localStorage.getItem('userThemeV21')     || '#38bdf8';
+    let confirmVZ = false, confirmExtra = false, confirmVNB = false;
+ 
+    let calOffset = 0;  // weeks from current
+    let currentPopupDate = null;
+    let currentPopupEntryIndex = null;
+ 
+    // ─── SCHEDULE BLOCKS ─────────────────────────────────────────
     const blocks = [
         { id: 'f1', label: 'Frühaufsicht', start: '07:10', end: '07:30' },
-        { id: 'b1', label: '1. Block', start: '07:30', end: '09:00' },
-        { id: 'a1', label: '1. Aufsicht', start: '09:00', end: '09:30' },
-        { id: 'b2', label: '2. Block', start: '09:30', end: '11:00' },
-        { id: 'a2', label: '2. Aufsicht', start: '11:00', end: '11:30' },
-        { id: 'b3', label: '3. Block', start: '11:30', end: '13:00' },
-        { id: 'a3', label: '3. Aufsicht', start: '13:00', end: '13:45' },
-        { id: 'b4', label: '4. Block', start: '13:45', end: '15:15' },
+        { id: 'b1', label: '1. Block',     start: '07:30', end: '09:00' },
+        { id: 'a1', label: '1. Aufsicht',  start: '09:00', end: '09:30' },
+        { id: 'b2', label: '2. Block',     start: '09:30', end: '11:00' },
+        { id: 'a2', label: '2. Aufsicht',  start: '11:00', end: '11:30' },
+        { id: 'b3', label: '3. Block',     start: '11:30', end: '13:00' },
+        { id: 'a3', label: '3. Aufsicht',  start: '13:00', end: '13:45' },
+        { id: 'b4', label: '4. Block',     start: '13:45', end: '15:15' },
         { id: 's1', label: 'Spätaufsicht', start: '15:15', end: '15:30' }
     ];
-
+ 
+    // ─── INIT ─────────────────────────────────────────────────────
     window.onload = function() {
+        // Name sofort aus localStorage setzen
+        const storedName = localStorage.getItem('userNameV13');
+        if (storedName && storedName.trim() !== '') {
+            userName = storedName;
+        }
+        document.getElementById('display-name').innerText = userName.toUpperCase();
+        // Theme beim Start anwenden
+        applyTheme(userTheme);
+
+        // Woche-Button sofort korrekt einfärben
+        const wbStart = document.getElementById('week-btn');
+        if (wbStart) {
+            wbStart.style.background = currentWeek === 'A' ? '#2563eb' : '#9333ea';
+            wbStart.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
+            wbStart.style.color = 'white';
+        }
+        
         if (localStorage.getItem('lastSeenV') !== APP_VERSION) {
             document.getElementById('update-toast').style.display = 'block';
         }
+        updateCalFab();
         updateUI();
+        updateAssistant();
+        checkAlarms();
+        // Woche-Button Farbe beim Start
+        const wbInit = document.getElementById('week-btn');
+        if (wbInit) {
+            wbInit.style.background = currentWeek === 'A' ? '#2563eb' : '#9333ea';
+            wbInit.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
+        }
     };
-
-    function closeToast() { localStorage.setItem('lastSeenV', APP_VERSION); document.getElementById('update-toast').style.display = 'none'; }
-    function forceUpdate() { if(confirm("Updates suchen?")) { window.location.href = window.location.pathname + "?u=" + Date.now(); } }
-
+ 
+    // ─── CLOCK & TICKER ──────────────────────────────────────────
     setInterval(() => {
         const now = new Date();
         document.getElementById('live-clock').innerText = now.toLocaleTimeString('de-DE');
-        document.getElementById('live-date').innerText = now.toLocaleDateString('de-DE', {weekday: 'long', day: '2-digit', month: '2-digit'});
-        
+        // live-date entfernt
+ 
+        // midnight reset
         const todayStr = now.toDateString();
-        if(localStorage.getItem('logDateV13') !== todayStr) {
-            logs = []; 
+        if (localStorage.getItem('logDateV13') !== todayStr) {
+            logs = [];
             localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
             localStorage.setItem('logDateV13', todayStr);
             renderLogs();
         }
-
+ 
         if (session.active) updateAssistant();
-        updateUI(); 
+        updateUI();
+        updateCalFab();
+        checkAlarms();
     }, 1000);
-
-    function formatTime(ms) { if (ms < 0) ms = 0; return new Date(ms).toISOString().substr(11, 8); }
-
-    function toggleMain() {
-        if (!session.active) {
-            session = { active: true, start: Date.now() };
-            localStorage.setItem('activeSessionV13', JSON.stringify(session)); addLog("Ankunft");
+ 
+    function updateCalFab() {
+        const now  = new Date();
+        const days = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+        const numEl  = document.getElementById('fab-day-num');
+        const nameEl = document.getElementById('fab-day-name');
+        const dot    = document.getElementById('today-dot');
+        if (numEl)  numEl.innerText  = now.getDate();
+        if (nameEl) nameEl.innerText = days[now.getDay()].substring(0,2).toUpperCase();
+        if (!dot) return;
+        // Alle zukünftigen Termine zählen
+        const todayKey = toLocalDateKey(now);
+        const nowMin   = now.getHours()*60 + now.getMinutes();
+        var total = 0;
+        Object.entries(calEntries).forEach(function(pair) {
+            var dateKey = pair[0];
+            var entries = pair[1];
+            if (!Array.isArray(entries)) return;
+            if (dateKey > todayKey) {
+                total += entries.length;
+            } else if (dateKey === todayKey) {
+                entries.forEach(function(e) {
+                    if (!e.start) { total++; return; }
+                    var parts = e.start.split(':');
+                    var eMin  = parseInt(parts[0])*60 + parseInt(parts[1]);
+                    if (eMin >= nowMin) total++;
+                });
+            }
+        });
+        if (total > 0) {
+            dot.style.display        = 'flex';
+            dot.style.alignItems     = 'center';
+            dot.style.justifyContent = 'center';
+            dot.innerText = total > 99 ? '99+' : String(total);
         } else {
-            if(confirm("Dienst beenden?")) {
-                const start = session.start; const end = Date.now();
-                saveToDB("Hauptdienst", start, end);
-                const gesamtH = ((end - start) / 3600000).toFixed(2);
-                alert(`Feierabend! \nHeute gearbeitet: ${gesamtH} Stunden.`);
-                session.active = false; localStorage.removeItem('activeSessionV13'); addLog("Feierabend");
+            dot.style.display = 'none';
+        }
+    }
+ 
+    // ─── ALARM SYSTEM ─────────────────────────────────────────────
+    let lastAlarmFired = {};
+    let vzAutoLogoutWarned = false;
+
+    function checkAlarms() {
+        // ── AUTO-LOGOUT VERTRETUNG nach 90 Min ──
+        if (vzSession.active) {
+            const vzElapsed = Date.now() - vzSession.start;
+            const vzMin = Math.floor(vzElapsed / 60000);
+
+            // Warnung bei 85 Min
+            if (vzMin >= 85 && vzMin < 90 && !vzAutoLogoutWarned) {
+                vzAutoLogoutWarned = true;
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                playAlarmSound();
+                addLog('VZ endet in 5 Min');
+            }
+
+            // Auto-Logout bei 90 Min
+            if (vzMin >= 90) {
+                const vzTyp = vzSession.klasse ? 'Vertretung (VZ) – Klasse ' + vzSession.klasse : 'Vertretung (VZ)';
+                saveToDB(vzTyp, vzSession.start, Date.now());
+                vzSession = { active: false };
+                localStorage.removeItem('vzSessionV13');
+                vzAutoLogoutWarned = false;
+                addLog('VZ Auto-Ende (90 Min)');
+                if (navigator.vibrate) navigator.vibrate([400,100,400,100,400]);
+                playEndSound();
+                updateUI();
+            }
+        }
+
+        const now  = new Date();
+        const todayKey = toLocalDateKey(now);
+        const entries  = calEntries[todayKey] || [];
+        const nowMin   = now.getHours() * 60 + now.getMinutes();
+ 
+        entries.forEach((entry, idx) => {
+            if (!entry.start) return;
+            const [h, m] = entry.start.split(':').map(Number);
+            const entryMin = h * 60 + m;
+            const diff = entryMin - nowMin;
+            const alarmKey = `${todayKey}-${idx}`;
+ 
+            // Alert 5 min before
+            if (diff === 5 && !lastAlarmFired[alarmKey + '-5']) {
+                lastAlarmFired[alarmKey + '-5'] = true;
+                fireAlarm(entry, 5);
+            }
+            // Alert at exact time
+            if (diff === 0 && !lastAlarmFired[alarmKey + '-0']) {
+                lastAlarmFired[alarmKey + '-0'] = true;
+                fireAlarm(entry, 0);
+            }
+ 
+            // Visual: blink task-next if < 5 min
+            if (diff > 0 && diff <= 5) {
+                document.getElementById('task-next').classList.add('alert-soon');
+                document.getElementById('btn-extra').classList.add('btn-pulse');
+            }
+        });
+
+        // ── SCHULENDE-ALARM aus Stundenplan ──
+        if (session.active) {
+            const now2  = new Date();
+            const tag   = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now2.getDay()];
+            const dayKey = currentWeek + '-' + tag;
+            const nowMin2 = now2.getHours()*60 + now2.getMinutes();
+
+            // Letzten Block mit Eintrag für heute finden
+            var lastEnd = -1;
+            var lastLabel = '';
+            blocks.forEach(function(b) {
+                if (plan[dayKey] && plan[dayKey][b.id] && plan[dayKey][b.id].trim() !== '') {
+                    const parts = b.end.split(':');
+                    const endMin = parseInt(parts[0])*60 + parseInt(parts[1]);
+                    if (endMin > lastEnd) {
+                        lastEnd = endMin;
+                        lastLabel = b.label;
+                    }
+                }
+            });
+
+            if (lastEnd > 0) {
+                const diff2 = lastEnd - nowMin2;
+                const endKey = todayKey + '-end-' + lastEnd;
+
+                // 5 Min vor Schulende
+                if (diff2 === 5 && !lastAlarmFired[endKey + '-5']) {
+                    lastAlarmFired[endKey + '-5'] = true;
+                    if (navigator.vibrate) navigator.vibrate([200,100,200,100,200]);
+                    playAlarmSound();
+                    document.getElementById('task-next').innerText = '⏰ In 5 Min Schulende!';
+                    addLog('Schulende in 5 Min (' + lastLabel + ')');
+                }
+
+                // Schulende - Zeit zum Ausloggen!
+                if (diff2 === 0 && !lastAlarmFired[endKey + '-0']) {
+                    lastAlarmFired[endKey + '-0'] = true;
+                    if (navigator.vibrate) navigator.vibrate([500,100,500,100,500,100,500]);
+                    playEndSound();
+                    document.getElementById('task-next').innerText = '🔔 DIENST BEENDEN!';
+                    addLog('Schulende! (' + lastLabel + ')');
+                }
             }
         }
     }
+ 
+    function fireAlarm(entry, minsBefore) {
+        // Vibration
+        if (navigator.vibrate) {
+            navigator.vibrate(minsBefore === 5 ? [200, 100, 200] : [400, 100, 400, 100, 400]);
+        }
+        // Sound
+        playAlarmSound();
+        // Notification-style update
+        const msg = minsBefore === 5
+            ? `⏰ In 5 Min: ${entry.title}`
+            : `🔔 JETZT: ${entry.title}`;
+        document.getElementById('task-next').innerText = msg.substring(0, 22);
+    }
+ 
+    function playEndSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const freqs = [523, 659, 784, 1047]; // C-E-G-C Akkord
+            freqs.forEach(function(freq, i) {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.12);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.3);
+                osc.start(ctx.currentTime + i * 0.12);
+                osc.stop(ctx.currentTime + i * 0.12 + 0.3);
+            });
+        } catch(e) {}
+    }
 
+    function playAlarmSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+            osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
+        } catch(e) {}
+    }
+ 
+    // ─── MAIN TIMER ───────────────────────────────────────────────
+    function formatTime(ms) { if (ms < 0) ms = 0; return new Date(ms).toISOString().substr(11, 8); }
+ 
+    function toggleMain() {
+        if (!session.active) {
+            // Check if calendar has an upcoming entry for now
+            const now = new Date();
+            const todayKey = toLocalDateKey(now);
+            const nowMin   = now.getHours() * 60 + now.getMinutes();
+            const entries  = (calEntries[todayKey] || []).filter(e => {
+                if (!e.start) return false;
+                const [h, m] = e.start.split(':').map(Number);
+                const diff = Math.abs((h * 60 + m) - nowMin);
+                return diff <= 10;
+            });
+            const autoTitle = entries.length > 0 ? entries[0].title : null;
+ 
+            session = { active: true, start: Date.now(), autoTitle };
+            localStorage.setItem('activeSessionV13', JSON.stringify(session));
+            addLog(autoTitle ? `Start: ${autoTitle}` : "Ankunft");
+        } else {
+            if (confirm("Dienst beenden?")) {
+                const start = session.start, end = Date.now();
+                const title = session.autoTitle || "Hauptdienst";
+                saveToDB(title, start, end);
+                const gesamtH = ((end - start) / 3600000).toFixed(2);
+                alert(`Feierabend!\nHeute gearbeitet: ${gesamtH} Stunden.`);
+                session.active = false;
+                localStorage.removeItem('activeSessionV13');
+                addLog("Feierabend");
+            }
+        }
+    }
+ 
     function handleVZClick() {
-        if(vzSession.active) {
-            if(confirm("Vertretung beenden?")) {
-                saveToDB('Vertretung (VZ)', vzSession.start, Date.now());
+        if (vzSession.active) {
+            if (confirm("Vertretung beenden?")) {
+                const vzTyp = vzSession.klasse ? "Vertretung (VZ) – Klasse " + vzSession.klasse : "Vertretung (VZ)";
+                saveToDB(vzTyp, vzSession.start, Date.now());
                 vzSession = { active: false }; localStorage.removeItem('vzSessionV13'); addLog("VZ Ende");
             }
         } else {
-            if(!confirmVZ) {
-                confirmVZ = true; document.getElementById('btn-vz').innerText = "Sicher?"; document.getElementById('btn-vz').classList.add('btn-confirm');
-                setTimeout(() => { confirmVZ = false; updateUI(); }, 3000);
-            } else {
-                vzSession = { active: true, start: Date.now() };
-                localStorage.setItem('vzSessionV13', JSON.stringify(vzSession)); addLog("VZ Start"); confirmVZ = false; updateUI();
-            }
+            // Popup öffnen für Klasseneingabe
+            document.getElementById('vz-popup').style.display = 'block';
+            document.getElementById('vz-popup-overlay').style.display = 'block';
+            document.getElementById('vz-class-input').value = '';
+            setTimeout(() => document.getElementById('vz-class-input').focus(), 100);
         }
     }
 
+    function closeVZPopup() {
+        document.getElementById('vz-popup').style.display = 'none';
+        document.getElementById('vz-popup-overlay').style.display = 'none';
+    }
+
+    function startVZWithClass() {
+        const klasse = document.getElementById('vz-class-input').value.trim();
+        vzSession = { active: true, start: Date.now(), klasse: klasse };
+        localStorage.setItem('vzSessionV13', JSON.stringify(vzSession));
+        addLog("VZ Start" + (klasse ? " – " + klasse : ""));
+        closeVZPopup();
+        updateUI();
+    }
+ 
     function handleExtraClick() {
-        if(extraSession.active) {
-            if(confirm("Termin beenden?")) {
+        if (extraSession.active) {
+            if (confirm("Termin beenden?")) {
                 saveToDB('Konferenz', extraSession.start, Date.now());
                 extraSession = { active: false }; localStorage.removeItem('extraSessionV13'); addLog("Konf. Ende");
             }
         } else {
-            if(!confirmExtra) {
-                confirmExtra = true; document.getElementById('btn-extra').innerText = "Sicher?"; document.getElementById('btn-extra').classList.add('btn-confirm');
+            if (!confirmExtra) {
+                confirmExtra = true;
+                document.getElementById('btn-extra').innerText = "Sicher?";
+                document.getElementById('btn-extra').classList.add('btn-confirm');
                 setTimeout(() => { confirmExtra = false; updateUI(); }, 3000);
             } else {
                 extraSession = { active: true, start: Date.now() };
-                localStorage.setItem('extraSessionV13', JSON.stringify(extraSession)); addLog("Konf. Start"); confirmExtra = false; updateUI();
+                localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
+                addLog("Konf. Start"); confirmExtra = false; updateUI();
+            }
+        }
+    }
+ 
+    function handleVNBClick() {
+        if (vnbSession.active) {
+            if (confirm("Vor-/Nachbereitung beenden?")) {
+                saveToDB('Vor-/Nachbereitung', vnbSession.start, Date.now());
+                vnbSession = { active: false }; localStorage.removeItem('vnbSessionV13'); addLog("VNB Ende");
+            }
+        } else {
+            if (!confirmVNB) {
+                confirmVNB = true;
+                document.getElementById('btn-vnb').innerText = "Sicher?";
+                document.getElementById('btn-vnb').classList.add('btn-confirm');
+                setTimeout(() => { confirmVNB = false; updateUI(); }, 3000);
+            } else {
+                vnbSession = { active: true, start: Date.now() };
+                localStorage.setItem('vnbSessionV13', JSON.stringify(vnbSession));
+                addLog("VNB Start"); confirmVNB = false; updateUI();
             }
         }
     }
@@ -251,191 +752,1171 @@
     function saveToDB(typ, start, end, manualDatum = null) {
         let datumStr = manualDatum || new Date(start).toLocaleDateString('de-DE');
         let diff = Math.abs(end - start);
-        if(diff < 5000 && !manualDatum) return; 
+        if (diff < 5000 && !manualDatum) return;
         db.push({
-            datum: datumStr, typ: typ, start: new Date(start).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
+            datum: datumStr, typ, 
+            start: new Date(start).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
             ende: new Date(end).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
-            dauer: new Date(diff).toISOString().substr(11, 8), ms: diff, isVZ: (typ.includes('VZ') ? 'JA' : 'NEIN')
+            dauer: new Date(diff).toISOString().substr(11, 8), ms: diff,
+            isVZ: (typ.includes('VZ') ? 'JA' : 'NEIN')
         });
         localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
     }
-
+ 
+    // ─── UI UPDATE ────────────────────────────────────────────────
     function updateUI() {
         const btnMain = document.getElementById('btn-main');
-        if(session.active) {
+        if (session.active) {
             document.getElementById('main-timer').innerText = formatTime(Date.now() - session.start);
             btnMain.innerText = "Dienst beenden"; btnMain.className = "btn btn-stop";
         } else {
             document.getElementById('main-timer').innerText = "00:00:00";
             btnMain.innerText = "Dienst starten"; btnMain.className = "btn btn-start";
         }
-
+ 
         const vzBtn = document.getElementById('btn-vz');
-        if(vzSession.active) {
+        if (vzSession.active) {
             vzBtn.innerText = `VZ läuft (${formatTime(Date.now() - vzSession.start)})`;
             vzBtn.classList.add('active'); vzBtn.classList.remove('btn-confirm');
-        } else if(!confirmVZ) { vzBtn.innerText = "Vertretung"; vzBtn.classList.remove('active', 'btn-confirm'); }
-
+        } else if (!confirmVZ) { vzBtn.innerText = "Vertretung"; vzBtn.classList.remove('active', 'btn-confirm'); }
+ 
         const exBtn = document.getElementById('btn-extra');
-        if(extraSession.active) {
+        if (extraSession.active) {
             exBtn.innerText = `LÄUFT (${formatTime(Date.now() - extraSession.start)})`;
-            exBtn.classList.add('active'); exBtn.classList.remove('btn-confirm');
-        } else if(!confirmExtra) { exBtn.innerText = "Konferenz / Termin"; exBtn.classList.remove('active', 'btn-confirm'); }
+            exBtn.classList.add('active'); exBtn.classList.remove('btn-confirm', 'btn-pulse');
+        } else if (!confirmExtra) { exBtn.innerText = "Konferenz / Termin"; exBtn.classList.remove('active', 'btn-confirm'); }
 
+        const vnbBtn = document.getElementById('btn-vnb');
+        if (vnbBtn) {
+            if (vnbSession.active) {
+                vnbBtn.innerText = `📚 LÄUFT (${formatTime(Date.now() - vnbSession.start)})`;
+                vnbBtn.classList.add('active'); vnbBtn.classList.remove('btn-confirm');
+            } else if (!confirmVNB) {
+                vnbBtn.innerText = "📚 Vor-/Nachbereitung";
+                vnbBtn.classList.remove('active', 'btn-confirm');
+            }
+        }
+ 
         const now = new Date();
+        // VZ count
         const vzCount = db.filter(e => {
             const parts = e.datum.split('.');
             return parseInt(parts[1]) === (now.getMonth() + 1) && parseInt(parts[2]) === now.getFullYear() && e.isVZ === 'JA';
         }).length;
         document.getElementById('vz-val').innerText = vzCount;
         document.getElementById('vz-progress').style.width = Math.min((vzCount / 4) * 100, 100) + "%";
-
+ 
+        // Week total
+        function getMonday(d) {
+            d = new Date(d); var day = d.getDay(), diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff)).setHours(0,0,0,0);
+        }
+        const monday = getMonday(now);
+        let weekMS = db.filter(e => {
+            const parts = e.datum.split('.');
+            return new Date(parts[2], parts[1]-1, parts[0]).getTime() >= monday;
+        }).reduce((acc, curr) => acc + (curr.ms || 0), 0);
+        if (session.active)    weekMS += (Date.now() - session.start);
+        if (vzSession.active)  weekMS += (Date.now() - vzSession.start);
+        if (extraSession.active) weekMS += (Date.now() - extraSession.start);
+        if (vnbSession.active) weekMS += (Date.now() - vnbSession.start);
+ 
+        const targetMS  = weeklySollHours * 3600000;
+        const weekPerc  = Math.round((weekMS / targetMS) * 100);
+        const weekFill  = document.getElementById('week-progress');
+        
+        if (weekPerc >= 100) { weekFill.style.width = "100%"; weekFill.style.background = "var(--overtime)"; }
+        else { weekFill.style.width = weekPerc + "%"; weekFill.style.background = "var(--success)"; }
+ 
+        // Day progress
         const dayKey = `${currentWeek}-${['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()]}`;
         let firstStart = 1440, lastEnd = 0, hasPlan = false;
         blocks.forEach(b => {
-           if(plan[dayKey] && plan[dayKey][b.id] && plan[dayKey][b.id].trim() !== "") {
-               hasPlan = true;
-               const [sh, sm] = b.start.split(':').map(Number);
-               const [eh, em] = b.end.split(':').map(Number);
-               firstStart = Math.min(firstStart, sh * 60 + sm);
-               lastEnd = Math.max(lastEnd, eh * 60 + em);
-           }
+            if (plan[dayKey]?.[b.id]?.trim()) {
+                hasPlan = true;
+                const [sh, sm] = b.start.split(':').map(Number);
+                const [eh, em] = b.end.split(':').map(Number);
+                firstStart = Math.min(firstStart, sh*60 + sm);
+                lastEnd    = Math.max(lastEnd,    eh*60 + em);
+            }
         });
-
-        if(session.active && hasPlan) {
-            const elapsed = Math.max(0, (now.getHours()*60 + now.getMinutes()) - firstStart);
-            const total = lastEnd - firstStart;
-            const dayPerc = Math.min((elapsed / total) * 100, 100);
+        if (session.active && hasPlan) {
+            const elapsed  = Math.max(0, (now.getHours()*60 + now.getMinutes()) - firstStart);
+            const total    = lastEnd - firstStart;
+            const dayPerc  = Math.min((elapsed / total) * 100, 100);
             document.getElementById('day-percent').innerText = Math.round(dayPerc) + "%";
             document.getElementById('day-progress').style.width = dayPerc + "%";
         } else { document.getElementById('day-percent').innerText = "0%"; document.getElementById('day-progress').style.width = "0%"; }
-
+ 
         document.getElementById('week-label').innerText = currentWeek;
-        document.getElementById('week-btn').style.background = currentWeek === 'A' ? 'var(--weekA)' : 'var(--weekB)';
+        const wBtn = document.getElementById('week-btn');
+        if (wBtn) {
+            wBtn.style.background = currentWeek === 'A' ? '#2563eb' : '#9333ea';
+            wBtn.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
+        }
         document.getElementById('display-name').innerText = userName.toUpperCase();
         document.getElementById('soll-info').innerText = weeklySollHours;
         renderLogs();
     }
-
+ 
     function updateAssistant() {
         const now = new Date(), currentTime = now.getHours() * 60 + now.getMinutes();
         const tag = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()];
         const key = `${currentWeek}-${tag}`;
+        const todayKey = toLocalDateKey(now);
+ 
         let activeTask = null, nextTask = null;
-        for (let i = 0; i < blocks.length; i++) {
-            const b = blocks[i];
-            const [sh, sm] = b.start.split(':').map(Number);
-            const [eh, em] = b.end.split(':').map(Number);
-            const sMin = sh * 60 + sm, eMin = eh * 60 + em;
-            const text = plan[key]?.[b.id];
-            if (currentTime >= sMin && currentTime < eMin) { if (text && text.trim() !== "") activeTask = { text, ...b }; }
-            else if (currentTime < sMin && !nextTask) { if (text && text.trim() !== "") nextTask = { text, ...b }; }
+ 
+        // Check calendar override first
+        const todayEntries = (calEntries[todayKey] || []).filter(e => e.start);
+        todayEntries.forEach(e => {
+            const [sh, sm] = e.start.split(':').map(Number);
+            const sMin = sh * 60 + sm;
+            const eMin = e.end ? (() => { const [eh, em] = e.end.split(':').map(Number); return eh*60+em; })() : sMin + 60;
+            if (currentTime >= sMin && currentTime < eMin) {
+                activeTask = { text: `${e.cat === 'Vertretung' ? '🔄 ' : ''}${e.title}`, label: e.cat, isCalendar: true };
+            } else if (currentTime < sMin && !nextTask) {
+                nextTask = { text: e.title, label: `${e.start} Uhr`, isCalendar: true };
+            }
+        });
+ 
+        // Fall back to plan blocks
+        if (!activeTask) {
+            for (let i = 0; i < blocks.length; i++) {
+                const b = blocks[i];
+                const [sh, sm] = b.start.split(':').map(Number);
+                const [eh, em] = b.end.split(':').map(Number);
+                const sMin = sh*60+sm, eMin = eh*60+em;
+                const text = plan[key]?.[b.id];
+                if (currentTime >= sMin && currentTime < eMin && text?.trim()) activeTask = { text, label: b.label };
+                else if (currentTime < sMin && !nextTask && text?.trim()) nextTask = { text, label: b.label };
+            }
         }
-        if (activeTask) { document.getElementById('task-now').innerText = activeTask.text; document.getElementById('task-now-sub').innerText = `${activeTask.label}`; }
-        else { document.getElementById('task-now').innerText = "Frei / Pause"; document.getElementById('task-now-sub').innerText = "-"; }
-        if (nextTask) { document.getElementById('task-next').innerText = nextTask.text; document.getElementById('task-next-sub').innerText = `${nextTask.label}`; }
-        else { document.getElementById('task-next').innerText = "FEIERABEND!"; document.getElementById('task-next-sub').innerText = "Alles erledigt."; }
+ 
+        const nowEl  = document.getElementById('task-now');
+        const nextEl = document.getElementById('task-next');
+        nowEl.classList.remove('alert-soon');
+ 
+        nowEl.innerText  = activeTask ? activeTask.text : "Frei / Pause";
+        document.getElementById('task-now-sub').innerText = activeTask ? activeTask.label : "-";
+        nextEl.innerText = nextTask ? nextTask.text : "FEIERABEND!";
+        document.getElementById('task-next-sub').innerText = nextTask ? nextTask.label : "Alles erledigt.";
+    }
+ 
+    // ─── CALENDAR ─────────────────────────────────────────────────
+    function openCalendar() {
+        document.getElementById('cal-overlay').style.display = 'block';
+        renderCalendar();
+    }
+    function closeCalendar() {
+        document.getElementById('cal-overlay').style.display = 'none';
+        document.getElementById('entry-popup').style.display = 'none';
+        document.getElementById('entry-popup-overlay').style.display = 'none';
+        updateCalFab(); // Zahl sofort aktualisieren
+    }
+    function calNavWeek(dir) { calOffset += dir; renderCalendar(); }
+ 
+    function getWeekDates(offset) {
+        const now = new Date();
+        const day = now.getDay() || 7;
+        const monday = new Date(now);
+        monday.setDate(now.getDate() - day + 1 + offset * 7);
+        monday.setHours(0,0,0,0);
+        const days = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            days.push(d);
+        }
+        return days;
+    }
+ 
+    function getKW(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+ 
+    // Lokales Datum als YYYY-MM-DD (kein UTC-Versatz!)
+    function toLocalDateKey(date) {
+        const d = date || new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
     }
 
+
+    // ─── BRANDENBURGER FERIEN & FEIERTAGE ────────────────────────
+    function getBrandenburgHolidays() {
+        const holidays = {};
+
+        // Gesetzliche Feiertage Brandenburg (jährlich wiederkehrend + fix)
+        const fixedHolidays = {
+            '01-01': 'Neujahr 🎆',
+            '05-01': 'Tag der Arbeit 🌱',
+            '10-03': 'Tag der Deutschen Einheit 🇩🇪',
+            '10-31': 'Reformationstag ⛪',
+            '12-25': '1. Weihnachtstag 🎄',
+            '12-26': '2. Weihnachtstag 🎄',
+        };
+
+        // Bewegliche Feiertage (Ostern-basiert) für 2025-2027
+        const movingHolidays = {
+            '2025': {
+                '04-18': 'Karfreitag ✝️',
+                '04-20': 'Ostersonntag 🐣',
+                '04-21': 'Ostermontag 🐣',
+                '05-29': 'Christi Himmelfahrt ✝️',
+                '06-08': 'Pfingstsonntag 🕊️',
+                '06-09': 'Pfingstmontag 🕊️',
+            },
+            '2026': {
+                '04-03': 'Karfreitag ✝️',
+                '04-05': 'Ostersonntag 🐣',
+                '04-06': 'Ostermontag 🐣',
+                '05-14': 'Christi Himmelfahrt ✝️',
+                '05-24': 'Pfingstsonntag 🕊️',
+                '05-25': 'Pfingstmontag 🕊️',
+            },
+            '2027': {
+                '03-26': 'Karfreitag ✝️',
+                '03-28': 'Ostersonntag 🐣',
+                '03-29': 'Ostermontag 🐣',
+                '05-06': 'Christi Himmelfahrt ✝️',
+                '05-16': 'Pfingstsonntag 🕊️',
+                '05-17': 'Pfingstmontag 🕊️',
+            }
+        };
+
+        // Schulferien Brandenburg 2025/2026
+        const schoolHolidays = [
+            // 2025
+            { start: '2025-01-01', end: '2025-01-03',  name: 'Winterferien 2025 ❄️' },
+            { start: '2025-03-03', end: '2025-03-14',  name: 'Frühjahrsferien 2025 🌸' },
+            { start: '2025-04-14', end: '2025-04-25',  name: 'Osterferien 2025 🐣' },
+            { start: '2025-05-30', end: '2025-05-30',  name: 'Brückentag 2025' },
+            { start: '2025-07-03', end: '2025-08-15',  name: 'Sommerferien 2025 ☀️' },
+            { start: '2025-10-06', end: '2025-10-17',  name: 'Herbstferien 2025 🍂' },
+            { start: '2025-12-22', end: '2026-01-02',  name: 'Weihnachtsferien 2025/26 🎄' },
+            // 2026
+            { start: '2026-02-02', end: '2026-02-06',  name: 'Winterferien 2026 ❄️' },
+            { start: '2026-03-23', end: '2026-04-10',  name: 'Osterferien 2026 🐣' },
+            { start: '2026-05-26', end: '2026-05-26',  name: 'Brückentag 2026' },
+            { start: '2026-06-25', end: '2026-08-07',  name: 'Sommerferien 2026 ☀️' },
+            { start: '2026-10-12', end: '2026-10-23',  name: 'Herbstferien 2026 🍂' },
+            { start: '2026-12-21', end: '2027-01-01',  name: 'Weihnachtsferien 2026/27 🎄' },
+        ];
+
+        // Jahre 2025-2027 befüllen
+        [2025, 2026, 2027].forEach(year => {
+            // Feste Feiertage
+            Object.entries(fixedHolidays).forEach(([mmdd, name]) => {
+                holidays[`${year}-${mmdd}`] = { title: name, cat: 'Feiertag' };
+            });
+            // Bewegliche Feiertage
+            if (movingHolidays[year]) {
+                Object.entries(movingHolidays[year]).forEach(([mmdd, name]) => {
+                    holidays[`${year}-${mmdd}`] = { title: name, cat: 'Feiertag' };
+                });
+            }
+        });
+
+        // Schulferien – alle Tage eintragen
+        schoolHolidays.forEach(({ start, end, name }) => {
+            const s = new Date(start + 'T12:00:00');
+            const e = new Date(end + 'T12:00:00');
+            for (let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
+                const key = toLocalDateKey(d);
+                if (!holidays[key]) {
+                    holidays[key] = { title: name, cat: 'Ferien' };
+                }
+            }
+        });
+
+        return holidays;
+    }
+
+    const BB_HOLIDAYS = getBrandenburgHolidays();
+
+    // Simple A/B week detection based on KW parity
+    function getABWeek(date) {
+        const kw = getKW(date);
+        // Use stored override if in current week
+        const now = new Date();
+        if (getKW(now) === kw) return currentWeek;
+        // Otherwise alternate from current
+        const diff = kw - getKW(now);
+        const flip = Math.abs(diff) % 2 !== 0;
+        if (flip) return currentWeek === 'A' ? 'B' : 'A';
+        return currentWeek;
+    }
+ 
+    function renderCalendar() {
+        const days = getWeekDates(calOffset);
+        const kw   = getKW(days[0]);
+        const ab   = getABWeek(days[0]);
+ 
+        document.getElementById('cal-week-title').innerText  = `KW ${kw} · ${days[0].toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} – ${days[6].toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})}`;
+        document.getElementById('cal-week-badge').innerText = `WOCHE ${ab}`;
+        document.getElementById('cal-week-badge').style.background = ab === 'A' ? '#2563eb' : '#9333ea';
+ 
+        const container = document.getElementById('cal-days-container');
+        const dayNames  = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+        const todayStr  = toLocalDateKey();
+        let html = '';
+ 
+        days.forEach(date => {
+            const dateKey = toLocalDateKey(date);
+            const isToday = dateKey === todayStr;
+            const isPast  = dateKey < todayStr;
+            const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+            const dayEntries = calEntries[dateKey] || [];
+            const planKey    = `${ab}-${dayNames[date.getDay()]}`;
+            const planBlocks = isWeekend ? [] : blocks.filter(b => plan[planKey]?.[b.id]?.trim());
+ 
+            // Feiertag/Ferien für diesen Tag prüfen
+            const holidayInfo = BB_HOLIDAYS[dateKey];
+            const isHoliday = !!holidayInfo;
+
+            html += `<div class="cal-day-section" style="${isPast ? 'opacity:0.45;' : ''}">
+                <div class="cal-day-header ${isToday ? 'today' : ''} ${isHoliday ? 'holiday-header' : ''}" style="${isPast ? 'background:#334155;color:#64748b;' : ''}">
+                    ${isPast ? '✓ ' : isToday ? '📍 ' : ''}${isHoliday ? '🏖️ ' : ''}${dayNames[date.getDay()]}, ${date.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})}
+                    ${isToday ? '– Heute' : ''}${isPast ? '– Vergangen' : ''}${isHoliday ? ' – ' + holidayInfo.title : ''}
+                </div>`;
+
+            // Goldene Ferien/Feiertag-Kachel anzeigen
+            if (isHoliday) {
+                html += `<div class="cal-tile ferien" style="cursor:default; border-left-color:${holidayInfo.cat === 'Feiertag' ? '#dc2626' : '#d97706'};">
+                    <div class="cal-tile-left">
+                        <div class="cal-tile-time">Ganztag</div>
+                        <div class="cal-tile-title">${holidayInfo.title}</div>
+                        <div class="cal-tile-sub">${holidayInfo.cat === 'Feiertag' ? 'Gesetzlicher Feiertag Brandenburg' : 'Schulferien Brandenburg'}</div>
+                    </div>
+                    <div class="cal-tile-right">
+                        <span class="cal-tile-badge" style="background:${holidayInfo.cat === 'Feiertag' ? 'rgba(220,38,38,0.15)' : 'rgba(215,119,6,0.15)'}; color:${holidayInfo.cat === 'Feiertag' ? '#dc2626' : '#d97706'};">${holidayInfo.cat}</span>
+                    </div>
+                </div>`;
+            }
+ 
+            // Plan blocks (read-only display)
+            if (planBlocks.length > 0) {
+                planBlocks.forEach(b => {
+                    const text = plan[planKey][b.id];
+                    html += `<div class="cal-tile" style="opacity:0.6; cursor:default; border-left-color:#475569;">
+                        <div class="cal-tile-left">
+                            <div class="cal-tile-time">${b.start} – ${b.end}</div>
+                            <div class="cal-tile-title">${text}</div>
+                            <div class="cal-tile-sub">${b.label}</div>
+                        </div>
+                        <div class="cal-tile-right"><span style="font-size:0.6rem;color:#475569;">PLAN</span></div>
+                    </div>`;
+                });
+            }
+ 
+            // Calendar entries
+            dayEntries.forEach((entry, idx) => {
+                const catClass = entry.cat === 'Vertretung' ? 'vertretung' : entry.cat === 'Konferenz' ? 'konferenz' : entry.cat === 'Ferien' ? 'ferien' : 'has-entry';
+                const badgeClass = entry.cat === 'Vertretung' ? 'badge-vz' : entry.cat === 'Konferenz' ? 'badge-konf' : 'badge-sus';
+                html += `<div class="cal-tile ${catClass}" onclick="openEntryPopup('${dateKey}', ${idx})">
+                    <div class="cal-tile-left">
+                        <div class="cal-tile-time">${entry.start ? entry.start + (entry.end ? ' – '+entry.end : '') : 'Ganztag'}</div>
+                        <div class="cal-tile-title">${entry.title}</div>
+                        <div class="cal-tile-sub">${entry.note ? entry.note.substring(0,40)+(entry.note.length>40?'...':'') : ''}</div>
+                    </div>
+                    <div class="cal-tile-right">
+                        <span class="cal-tile-badge ${badgeClass}">${entry.cat}</span>
+                        ${entry.susShare ? '<span class="anchor-icon">📡</span>' : ''}
+                        ${entry.note    ? '<span class="anchor-icon">📎</span>' : ''}
+                    </div>
+                </div>`;
+            });
+ 
+            // Add new entry button
+            html += `<div class="cal-tile" style="border-style:dashed; opacity:0.5; justify-content:center;" onclick="openEntryPopup('${dateKey}', null)">
+                <span style="font-size:0.85rem; font-weight:700; color:#94a3b8;">+ Termin hinzufügen</span>
+            </div>`;
+ 
+            html += `</div>`;
+        });
+ 
+        container.innerHTML = html;
+        document.getElementById('cal-search-results').style.display = 'none';
+        document.getElementById('cal-search-input').value = '';
+    }
+ 
+    // ─── ENTRY POPUP ──────────────────────────────────────────────
+    function openEntryPopup(dateKey, entryIdx) {
+        currentPopupDate  = dateKey;
+        currentPopupEntryIndex = entryIdx;
+ 
+        const d = new Date(dateKey + 'T12:00:00');
+        const dayNames = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+        document.getElementById('popup-title-text').innerText = `${dayNames[d.getDay()]}, ${d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})}`;
+ 
+        const delBtn = document.getElementById('popup-delete-btn');
+ 
+        if (entryIdx !== null) {
+            const entry = calEntries[dateKey][entryIdx];
+            document.getElementById('popup-entry-title').value = entry.title || '';
+            var knownCats = ['Termin', 'Konferenz', 'Eigene'];
+            var entryCat = entry.cat || 'Termin';
+            if (knownCats.includes(entryCat)) {
+                document.getElementById('popup-entry-cat').value = entryCat;
+                toggleCustomCat(entryCat);
+            } else {
+                // Unbekannte Kategorie → als "Eigene" laden
+                document.getElementById('popup-entry-cat').value = 'Eigene';
+                document.getElementById('popup-entry-cat-custom').value = entryCat;
+                document.getElementById('popup-entry-cat-custom').style.display = 'block';
+            }
+            document.getElementById('popup-entry-start').value = entry.start || '';
+            document.getElementById('popup-entry-end').value   = entry.end   || '';
+            document.getElementById('popup-entry-note').value  = entry.note  || '';
+            delBtn.style.display = 'block';
+        } else {
+            document.getElementById('popup-entry-title').value = '';
+            document.getElementById('popup-entry-cat').value = 'Termin';
+            var customEl = document.getElementById('popup-entry-cat-custom'); if (customEl) { customEl.value = ''; customEl.style.display = 'none'; }
+            document.getElementById('popup-entry-start').value = '';
+            document.getElementById('popup-entry-end').value   = '';
+            document.getElementById('popup-entry-note').value  = '';
+            delBtn.style.display = 'none';
+        }
+        document.getElementById('entry-popup').style.display = 'block';
+        document.getElementById('entry-popup-overlay').style.display = 'block';
+    }
+ 
+    function toggleCustomCat(val) {
+        const custom = document.getElementById('popup-entry-cat-custom');
+        if (custom) {
+            custom.style.display = val === 'Eigene' ? 'block' : 'none';
+            if (val === 'Eigene') custom.focus();
+        }
+    }
+
+    function closeEntryPopup() {
+        document.getElementById('entry-popup').style.display = 'none';
+        document.getElementById('entry-popup-overlay').style.display = 'none';
+    }
+ 
+
+
+
+
+ 
+    function savePopupEntry() {
+        const title    = document.getElementById('popup-entry-title').value.trim();
+        if (!title) { alert("Bitte einen Titel eingeben."); return; }
+        const entry = {
+            title,
+            cat: (function() {
+                var sel = document.getElementById('popup-entry-cat').value;
+                if (sel === 'Eigene') {
+                    var custom = document.getElementById('popup-entry-cat-custom').value.trim();
+                    return custom || 'Eigene';
+                }
+                return sel;
+            })(),
+            start:    document.getElementById('popup-entry-start').value,
+            end:      document.getElementById('popup-entry-end').value,
+            note:     document.getElementById('popup-entry-note').value.trim(),
+            created:  Date.now()
+        };
+ 
+        if (!calEntries[currentPopupDate]) calEntries[currentPopupDate] = [];
+        if (currentPopupEntryIndex !== null) {
+            calEntries[currentPopupDate][currentPopupEntryIndex] = entry;
+        } else {
+            calEntries[currentPopupDate].push(entry);
+        }
+        localStorage.setItem('calEntriesV21', JSON.stringify(calEntries));
+        closeEntryPopup();
+        renderCalendar();
+        updateCalFab(); // Zahl sofort aktualisieren
+    }
+ 
+    function deletePopupEntry() {
+        if (confirm("Diesen Eintrag löschen?")) {
+            calEntries[currentPopupDate].splice(currentPopupEntryIndex, 1);
+            localStorage.setItem('calEntriesV21', JSON.stringify(calEntries));
+            closeEntryPopup();
+            renderCalendar();
+            updateCalFab(); // Zahl sofort aktualisieren
+        }
+    }
+ 
+    function exportEntryDoc() {
+        const title = document.getElementById('popup-entry-title').value;
+        const note  = document.getElementById('popup-entry-note').value;
+        const d     = new Date(currentPopupDate + 'T12:00:00').toLocaleDateString('de-DE');
+        const content = `NOTIZ-DOKUMENT\n==============\nLehrkraft: ${userName}\nDatum: ${d}\nTermin: ${title}\n\n${note}\n\nErstellt: ${new Date().toLocaleString('de-DE')}`;
+        const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Notiz_${d.replace(/\./g,'_')}_${title.replace(/\s+/g,'_')}.txt`;
+        link.click();
+    }
+ 
+    // ─── CALENDAR SEARCH ──────────────────────────────────────────
+    function calSearch(q) {
+        const resultsDiv = document.getElementById('cal-search-results');
+        if (!q.trim()) { resultsDiv.style.display = 'none'; return; }
+        const lower = q.toLowerCase();
+        let html = '';
+        Object.entries(calEntries).forEach(([dateKey, entries]) => {
+            entries.forEach(e => {
+                if ((e.title + ' ' + (e.note||'')).toLowerCase().includes(lower)) {
+                    const d = new Date(dateKey + 'T12:00:00').toLocaleDateString('de-DE');
+                    html += `<div class="search-result">
+                        <div class="search-result-date">${d} · ${e.cat}</div>
+                        <div class="search-result-title">${e.title}</div>
+                        ${e.note ? `<div class="search-result-note">${e.note.substring(0,80)}...</div>` : ''}
+                    </div>`;
+                }
+            });
+        });
+        resultsDiv.innerHTML = html || '<div style="color:#94a3b8; padding:10px;">Keine Ergebnisse.</div>';
+        resultsDiv.style.display = 'block';
+        document.getElementById('cal-days-container').style.display = q ? 'none' : 'block';
+    }
+ 
+    // ─── SUS MANAGEMENT ───────────────────────────────────────────
+    function openSusManagement() {
+        // Prüfe ob GitHub-Token vorhanden (= freigeschaltet)
+        if (!ghToken && !susAdminUnlocked) {
+            var lockHTML = '<div class="modal-nav">';
+            lockHTML += '<button onclick="document.getElementById(\'modal\').style.display=\'none\'" style="background:none;border:none;color:var(--danger);font-weight:bold;cursor:pointer;">✕ SCHLIESSEN</button>';
+            lockHTML += '<b style="color:var(--sus)">👥 Schüler-Management</b><div></div></div>';
+            lockHTML += '<div style="padding:40px 20px; text-align:center;">';
+            lockHTML += '<div style="font-size:3rem; margin-bottom:16px;">🔒</div>';
+            lockHTML += '<div style="font-size:1.1rem; font-weight:900; color:var(--text); margin-bottom:12px;">Noch nicht freigeschaltet</div>';
+            lockHTML += '<div style="font-size:0.85rem; color:#94a3b8; line-height:1.6; margin-bottom:24px;">Das Schüler-Management ist nur für Klassenlehrer verfügbar und muss einmalig vom Administrator eingerichtet werden.<br><br>Bitte wenden Sie sich an den Administrator.</div>';
+            lockHTML += '<div style="background:rgba(6,182,212,0.08); border:1.5px solid var(--sus); border-radius:16px; padding:16px; font-size:0.8rem; color:var(--sus); font-weight:700; margin-bottom:24px;">';
+            lockHTML += 'ℹ️ Sobald der Administrator die GitHub-Verbindung eingerichtet hat, wird diese Funktion automatisch freigeschaltet.</div>';
+            lockHTML += '<div onclick="susLockToggle()" style="cursor:pointer; color:#334155; font-size:1.5rem; user-select:none; margin-bottom:10px;">🔒</div>';
+            lockHTML += '<div id="sus-lock-form" style="display:none;">';
+            lockHTML += '<input type="password" id="sus-lock-pw" placeholder="Passwort..." style="width:100%; background:#0f172a; border:1.5px solid #334155; color:white; padding:12px; border-radius:10px; font-size:1rem; margin-bottom:8px; text-align:center; box-sizing:border-box;">';
+            lockHTML += '<button onclick="susLockCheck()" style="width:100%; background:#334155; color:white; border:none; padding:12px; border-radius:10px; font-weight:800; cursor:pointer; font-size:0.9rem;">ENTSPERREN</button>';
+            lockHTML += '</div></div>';
+            document.getElementById('modal-body').innerHTML = lockHTML;
+            document.getElementById('modal').style.display = 'block';
+            return;
+        }
+
+                // Count pending sus entries
+        const pending = Object.values(calEntries).flat().filter(e => e.susShare).length;
+        const logHtml = sendLog.slice(-7).reverse().map(l =>
+            `<div class="send-log-entry"><span>${l.msg}</span><span class="ok">${l.time} ✅</span></div>`
+        ).join('') || '<div style="color:#475569; font-size:0.75rem;">Noch keine Sendungen.</div>';
+ 
+        document.getElementById('modal-body').innerHTML = `
+            <div class="modal-nav">
+                <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;color:var(--danger);font-weight:bold;cursor:pointer;">✕ ZURÜCK</button>
+                <b style="color:var(--sus)">📡 SuS-MANAGEMENT</b>
+                <div></div>
+            </div>
+ 
+            <div class="sus-panel" style="margin-top:20px;">
+                <div class="sus-panel-title">📱 SuS-APP VORSCHAU</div>
+                <div style="background:#0f172a; border-radius:10px; padding:10px; font-size:0.75rem; color:#94a3b8; text-align:center;">
+                    ${pending > 0 ? `<span style="color:var(--sus); font-weight:800;">${pending} Einträge</span> zur Übertragung bereit` : 'Keine freigegebenen Einträge'}
+                </div>
+            </div>
+ 
+            <div class="admin-section">
+                <div class="admin-section-title">📢 TAGES-NEWS AN SuS</div>
+                <textarea id="sus-news-input" rows="3" placeholder="z.B. Morgen Test in Physik! Bitte Formelblatt mitbringen."></textarea>
+                <select id="sus-news-class">
+                    <option value="both">Beide Klassen</option>
+                    <option value="class1">${class1Name}</option>
+                    <option value="class2">${class2Name}</option>
+                </select>
+            </div>
+ 
+            <div class="admin-section">
+                <div class="admin-section-title">🏫 KLASSEN-STUNDENPLAN</div>
+                <p style="font-size:0.75rem; color:#94a3b8; margin:0 0 10px;">Tippe auf Woche A oder B um den Plan einzutragen.</p>
+                <!-- Woche A Akkordeon -->
+                <button onclick="susWeekAccordion('A')" id="sus-acc-a" style="width:100%; padding:14px; border-radius:12px; border:none; background:#2563eb; color:white; font-weight:800; cursor:pointer; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:1rem;">
+                    <span>📅 Woche A</span><span id="sus-acc-a-arrow">▼</span>
+                </button>
+                <div id="sus-acc-a-content" style="display:none; background:rgba(37,99,235,0.05); border-radius:12px; padding:10px; margin-bottom:8px;">
+                    <div id="sus-plan-fields-a"></div>
+                </div>
+                <!-- Woche B Akkordeon -->
+                <button onclick="susWeekAccordion('B')" id="sus-acc-b" style="width:100%; padding:14px; border-radius:12px; border:none; background:#9333ea; color:white; font-weight:800; cursor:pointer; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:1rem;">
+                    <span>📅 Woche B</span><span id="sus-acc-b-arrow">▼</span>
+                </button>
+                <div id="sus-acc-b-content" style="display:none; background:rgba(147,51,234,0.05); border-radius:12px; padding:10px; margin-bottom:8px;">
+                    <div id="sus-plan-fields-b"></div>
+                </div>
+            </div>
+ 
+            <div class="admin-section" id="github-section" style="border-color:#334155; display:none;">
+                <div class="admin-section-title">🔐 GITHUB-VERBINDUNG</div>
+                <div id="admin-panel" style="display:block;">
+                    <p style="font-size:0.65rem; color:var(--success); font-weight:800;">✅ ADMIN-MODUS (MICHAEL NAGEL)</p>
+                    <label style="font-size:0.7rem; color:#94a3b8;">GitHub Token</label>
+                    <input type="password" id="gh-token-input" value="${ghToken}" placeholder="ghp_...">
+                    <label style="font-size:0.7rem; color:#94a3b8;">GitHub Username</label>
+                    <input type="text" id="gh-user-input" value="${ghUser}" placeholder="dein-github-name">
+                    <label style="font-size:0.7rem; color:#94a3b8;">Repository Name</label>
+                    <input type="text" id="gh-repo-input" value="${ghRepo}" placeholder="lehrer-app">
+                    <button onclick="saveGhCredentials()" style="width:100%; background:#334155; color:white; border:none; padding:10px; border-radius:10px; font-weight:800; cursor:pointer; margin-bottom:10px;">💾 Zugangsdaten speichern</button>
+                </div>
+            </div>
+ 
+            <div class="admin-section">
+                <div class="admin-section-title">📋 SENDE-PROTOKOLL</div>
+                ${logHtml}
+            </div>
+ 
+            <div id="admin-unlock-area" style="text-align:center; margin-top:5px;">
+                <div onclick="toggleAdminUnlock()" style="cursor:pointer; color:#334155; font-size:1.2rem; user-select:none;">🔒</div>
+                <div id="admin-unlock-form" style="display:none; margin-top:8px;">
+                    <input type="password" id="admin-pw-input" placeholder="Passwort..." style="margin-bottom:6px; text-align:center;">
+                    <button onclick="checkAdminPassword()" style="width:100%; background:#334155; color:white; border:none; padding:10px; border-radius:10px; font-weight:800; cursor:pointer;">ENTSPERREN</button>
+                </div>
+            </div>
+
+            <button onclick="pushToGitHub()" style="width:100%; background:linear-gradient(145deg,#0891b2,#0e7490); color:white; border:none; padding:18px; border-radius:16px; font-weight:900; font-size:1rem; cursor:pointer; margin-top:10px; box-shadow:0 4px 0 rgba(0,0,0,0.3);">
+                🚀 ALLES AN SuS SENDEN
+            </button>`;
+ 
+        document.getElementById('modal').style.display = 'block';
+        renderSusPlanFields('A');
+    }
+ 
+    let susPlanWeek = 'A';
+
+    function susWeekAccordion(w) {
+        const content = document.getElementById(`sus-acc-${w.toLowerCase()}-content`);
+        const arrow   = document.getElementById(`sus-acc-${w.toLowerCase()}-arrow`);
+        const isOpen  = content.style.display === 'block';
+        content.style.display = isOpen ? 'none' : 'block';
+        arrow.innerText = isOpen ? '▼' : '▲';
+        if (!isOpen) renderSusPlanFieldsFor(w);
+    }
+
+    function renderSusPlanFieldsFor(w) {
+        const container = document.getElementById(`sus-plan-fields-${w.toLowerCase()}`);
+        if (!container) return;
+        const blockLabels = [
+            { label: '1. Block', time: '07:30 – 09:00' },
+            { label: '1. Pause', time: '09:00 – 09:30' },
+            { label: '2. Block', time: '09:30 – 11:00' },
+            { label: '2. Pause', time: '11:00 – 11:30' },
+            { label: '3. Block', time: '11:30 – 13:00' },
+            { label: '3. Pause', time: '13:00 – 13:45' },
+            { label: '4. Block', time: '13:45 – 15:15' },
+        ];
+        const days = ['Mo','Di','Mi','Do','Fr'];
+        let html = '';
+        days.forEach(day => {
+            html += `<div style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
+                <b style="color:var(--accent); font-size:0.85rem; display:block; margin-bottom:6px;">${day}</b>`;
+            blockLabels.forEach((bl, i) => {
+                const val = (susPlan[w][day] && susPlan[w][day][i]) ? susPlan[w][day][i] : '';
+                html += `<div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                    <span style="font-size:0.6rem; color:#64748b; min-width:95px; font-weight:700;">${bl.time}</span>
+                    <input type="text" placeholder="${bl.label}" value="${val}"
+                        onchange="if(!susPlan['${w}']['${day}']) susPlan['${w}']['${day}']=[];susPlan['${w}']['${day}'][${i}]=this.value;localStorage.setItem('susPlanV21',JSON.stringify(susPlan));"
+                        style="flex:1; padding:8px; font-size:0.85rem; margin:0; border-radius:8px;">
+                </div>`;
+            });
+            html += `</div>`;
+        });
+        container.innerHTML = html;
+    }
+    let susPlan = JSON.parse(localStorage.getItem('susPlanV21')) || {
+        A: { Mo:['','','',''], Di:['','','',''], Mi:['','','',''], Do:['','','',''], Fr:['','','',''] },
+        B: { Mo:['','','',''], Di:['','','',''], Mi:['','','',''], Do:['','','',''], Fr:['','','',''] }
+    };
+    // ─── ADMIN PASSWORT ──────────────────────────────────────────
+    const ADMIN_PW = "Lwlmn72Neo123"; // <-- Hier dein Passwort eintragen
+
+    function susLockToggle() {
+        var form = document.getElementById('sus-lock-form');
+        if (!form) return;
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if (form.style.display === 'block') {
+            setTimeout(function() {
+                var inp = document.getElementById('sus-lock-pw');
+                if (inp) inp.focus();
+            }, 50);
+        }
+    }
+
+    function susLockCheck() {
+        var inp = document.getElementById('sus-lock-pw');
+        if (!inp) return;
+        if (inp.value === ADMIN_PW) {
+            // Admin-Flag dauerhaft setzen
+            susAdminUnlocked = 'yes';
+            localStorage.setItem('susAdminUnlocked', 'yes');
+            document.getElementById('modal').style.display = 'none';
+            // Management normal öffnen
+            setTimeout(function() {
+                openSusManagement();
+                // GitHub-Bereich direkt aufklappen
+                setTimeout(function() {
+                    var gs = document.getElementById('github-section');
+                    var ua = document.getElementById('admin-unlock-area');
+                    if (gs) gs.style.display = 'block';
+                    if (ua) ua.style.display = 'none';
+                }, 300);
+            }, 150);
+        } else {
+            inp.value = '';
+            inp.placeholder = 'Falsches Passwort...';
+            setTimeout(function() { inp.placeholder = 'Passwort...'; }, 2000);
+        }
+    }
+
+    function toggleAdminUnlockLocked() {
+        const form = document.getElementById('admin-unlock-form-locked');
+        if (!form) return;
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if (form.style.display === 'block') {
+            setTimeout(function() {
+                var inp = document.getElementById('admin-pw-input-locked');
+                if (inp) inp.focus();
+            }, 100);
+        }
+    }
+
+    function checkAdminPasswordLocked() {
+        const input = document.getElementById('admin-pw-input-locked');
+        if (!input) return;
+        if (input.value === ADMIN_PW) {
+            // Passwort korrekt: Token-Bypass setzen und Management öffnen
+            var savedToken = ghToken;
+            ghToken = '__admin__';
+            document.getElementById('modal').style.display = 'none';
+            setTimeout(function() {
+                openSusManagement();
+                // GitHub-Bereich direkt öffnen nach kurzem Delay
+                setTimeout(function() {
+                    var gs = document.getElementById('github-section');
+                    var ua = document.getElementById('admin-unlock-area');
+                    if (gs) gs.style.display = 'block';
+                    if (ua) ua.style.display = 'none';
+                    // Token wieder zurücksetzen
+                    ghToken = savedToken;
+                }, 300);
+            }, 100);
+        } else {
+            input.value = '';
+            input.placeholder = 'Falsches Passwort...';
+            setTimeout(function() { input.placeholder = 'Passwort...'; }, 2000);
+        }
+    }
+
+    function toggleAdminUnlock() {
+        const form = document.getElementById('admin-unlock-form');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if (form.style.display === 'block') {
+            document.getElementById('admin-pw-input').focus();
+        }
+    }
+
+    function checkAdminPassword() {
+        const input = document.getElementById('admin-pw-input').value;
+        if (input === ADMIN_PW) {
+            document.getElementById('github-section').style.display = 'block';
+            document.getElementById('admin-unlock-area').style.display = 'none';
+        } else {
+            document.getElementById('admin-pw-input').value = '';
+            document.getElementById('admin-pw-input').placeholder = 'Falsches Passwort...';
+            setTimeout(() => {
+                document.getElementById('admin-pw-input').placeholder = 'Passwort...';
+            }, 2000);
+        }
+    }
+
+    function saveGhCredentials() {
+        ghToken = document.getElementById('gh-token-input').value;
+        ghUser  = document.getElementById('gh-user-input').value;
+        ghRepo  = document.getElementById('gh-repo-input').value;
+        localStorage.setItem('ghTokenV21', ghToken);
+        localStorage.setItem('ghUserV21',  ghUser);
+        localStorage.setItem('ghRepoV21',  ghRepo);
+        alert("✅ Gespeichert!");
+    }
+ 
+    async function pushToGitHub() {
+        if (!ghToken || !ghUser || !ghRepo) {
+            alert("⚠️ Bitte zuerst GitHub-Zugangsdaten im Admin-Bereich eintragen!");
+            return;
+        }
+ 
+        const newsText  = document.getElementById('sus-news-input')?.value  || '';
+        const newsClass = document.getElementById('sus-news-class')?.value || 'both';
+ 
+        // Collect sus-shared calendar entries for today+future
+        const todayKey = toLocalDateKey();
+        const sharedEntries = {};
+        Object.entries(calEntries).forEach(([dateKey, entries]) => {
+            if (dateKey >= todayKey) {
+                const shared = entries.filter(e => e.susShare);
+                if (shared.length > 0) sharedEntries[dateKey] = shared;
+            }
+        });
+ 
+        const payload = {
+            currentWeek,
+            teacherName: userName,
+            teacherEmail: userEmail,
+            news: newsText,
+            newsClass,
+            newsTimestamp: Date.now(),
+            fixedDates: localStorage.getItem('fixedDatesV21') || '',
+            wocheA: susPlan.A,
+            wocheB: susPlan.B,
+            calendarEvents: sharedEntries,
+            sentAt: new Date().toLocaleString('de-DE')
+        };
+ 
+        const url = `https://api.github.com/repos/${ghUser}/${ghRepo}/contents/data.json`;
+        try {
+            const getRes  = await fetch(url, { headers: { Authorization: `token ${ghToken}` } });
+            const getFile = await getRes.json();
+            const putRes  = await fetch(url, {
+                method: "PUT",
+                headers: { Authorization: `token ${ghToken}`, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: `Update ${new Date().toLocaleString('de-DE')}`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2)))),
+                    sha: getFile.sha
+                })
+            });
+            if (putRes.ok) {
+                const logEntry = { msg: newsText ? `News: "${newsText.substring(0,30)}..."` : "Plan-Update", time: new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) };
+                sendLog.push(logEntry);
+                if (sendLog.length > 20) sendLog.shift();
+                localStorage.setItem('sendLogV21', JSON.stringify(sendLog));
+                alert("✅ Erfolgreich an SuS gesendet!");
+                document.getElementById('modal').style.display = 'none';
+            } else {
+                alert("❌ Fehler beim Senden. Token prüfen!");
+            }
+        } catch (e) { alert("❌ Verbindungsfehler: " + e.message); }
+    }
+ 
+    // ─── SETUP / SETTINGS ─────────────────────────────────────────
     function openSetup() {
         let dateOptions = "";
         let d = new Date();
-        for(let i=0; i<7; i++) { if(d.getDay() !== 0 && d.getDay() !== 6) { let ds = d.toLocaleDateString('de-DE'); dateOptions += `<option value="${ds}">${i===0?'Heute':ds}</option>`; } d.setDate(d.getDate()-1); }
+        for (let i = 0; i < 7; i++) {
+            if (d.getDay() !== 0 && d.getDay() !== 6) {
+                let ds = d.toLocaleDateString('de-DE');
+                dateOptions += `<option value="${ds}">${i===0?'Heute':ds}</option>`;
+            }
+            d.setDate(d.getDate()-1);
+        }
+ 
         let html = `
-            <div class="modal-nav"><button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer;">✕ ABBRUCH</button><b style="color:var(--primary)">EINSTELLUNGEN</b><button onclick="saveSetup()" style="background:none; border:none; color:var(--success); font-weight:bold;">OK ✓</button></div>
-            <div class="manual-box" style="border-color:var(--danger); background:rgba(239, 68, 68, 0.05); margin-top:20px;"><label style="color:var(--danger)">⚠️ RESET</label><button class="btn btn-stop" style="font-size:0.8rem; padding:8px;" onclick="resetToday()">HEUTE LÖSCHEN</button></div>
-            <div class="manual-box" style="border-color:var(--success);"><label style="color:var(--success)">📊 EXPORT</label><button class="btn btn-start" style="font-size:0.8rem; padding:8px; background:var(--success);" onclick="exportData()">📥 EXPORT (CSV)</button></div>
-            <div class="manual-box"><label style="color:var(--accent)">🕒 NACHTRAG</label><select id="nachtrag-date">${dateOptions}</select><select id="nachtrag-cat"><option value="Korrektur">Korrektur</option><option value="Konferenz">Konferenz</option><option value="Vertretung (VZ)">Vertretung (VZ)</option></select><div style="display:flex; gap:10px;"><input type="time" id="nachtrag-start" value="08:00"><input type="time" id="nachtrag-end" value="13:00"></div><button class="btn btn-start" style="padding:10px; font-size:0.85rem;" onclick="processManual()">SPEICHERN</button></div>
-            <label>NAME</label><input type="text" id="setup-name" value="${userName}"><label>WOCHEN-SOLL</label><input type="number" id="setup-soll" value="${weeklySollHours}">
-            <button class="accordion-btn" onclick="toggleAcc('accA')">WOCHE A BEARBEITEN <span>▼</span></button><div id="accA" class="accordion-content">`;
+            <div class="modal-nav">
+                <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;color:var(--danger);font-weight:bold;cursor:pointer;">✕ ABBRUCH</button>
+                <b style="color:var(--primary)">EINSTELLUNGEN</b>
+                <button onclick="saveSetup()" style="background:none;border:none;color:var(--success);font-weight:bold;">OK ✓</button>
+            </div>
+            <div class="manual-box" style="border-color:var(--danger);background:rgba(239,68,68,0.05);margin-top:20px;">
+                <label style="color:var(--danger)">⚠️ RESET</label>
+                <button class="btn btn-stop" style="font-size:0.8rem;padding:8px;" onclick="resetToday()">HEUTE LÖSCHEN</button>
+            </div>
+            <div class="manual-box" style="border-color:var(--success);">
+                <label style="color:var(--success)">📊 EXPORT</label>
+                <button class="btn btn-start" style="font-size:0.8rem;padding:8px;background:var(--success);" onclick="exportData()">📥 EXPORT (CSV)</button>
+            </div>
+            <div class="manual-box">
+                <label style="color:var(--accent)">🕒 NACHTRAG</label>
+                <select id="nachtrag-date">${dateOptions}</select>
+                <select id="nachtrag-cat">
+                    <option value="Korrektur">Korrektur</option>
+                    <option value="Konferenz">Konferenz</option>
+                    <option value="Vertretung (VZ)">Vertretung (VZ)</option>
+                </select>
+                <div style="display:flex;gap:10px;">
+                    <input type="time" id="nachtrag-start" value="08:00">
+                    <input type="time" id="nachtrag-end" value="13:00">
+                </div>
+                <button class="btn btn-start" style="padding:10px;font-size:0.85rem;" onclick="processManual()">SPEICHERN</button>
+            </div>
+<!-- Theme Akkordeon -->
+            <button class="accordion-btn" onclick="toggleAcc('accTheme')" style="margin-bottom:8px;">🎨 APP-FARBE ÄNDERN <span>▼</span></button>
+            <div id="accTheme" class="accordion-content" style="padding:15px; border-radius:0 0 15px 15px;">
+                <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:12px;">
+                    <div onclick="applyTheme('#38bdf8')" title="Blau" style="width:44px;height:44px;border-radius:50%;background:#38bdf8;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🔵</div><div onclick="applyTheme('#8b5cf6')" title="Lila" style="width:44px;height:44px;border-radius:50%;background:#8b5cf6;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🟣</div><div onclick="applyTheme('#10b981')" title="Grün" style="width:44px;height:44px;border-radius:50%;background:#10b981;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🟢</div><div onclick="applyTheme('#f59e0b')" title="Gelb" style="width:44px;height:44px;border-radius:50%;background:#f59e0b;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🟡</div><div onclick="applyTheme('#ef4444')" title="Rot" style="width:44px;height:44px;border-radius:50%;background:#ef4444;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🔴</div><div onclick="applyTheme('#ec4899')" title="Pink" style="width:44px;height:44px;border-radius:50%;background:#ec4899;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🩷</div><div onclick="applyTheme('#06b6d4')" title="Türkis" style="width:44px;height:44px;border-radius:50%;background:#06b6d4;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🩵</div><div onclick="applyTheme('#64748b')" title="Grau" style="width:44px;height:44px;border-radius:50%;background:#64748b;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">⚫</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <label style="font-size:0.75rem;color:#94a3b8;white-space:nowrap;">Eigene Farbe:</label>
+                    <input type="color" id="custom-color-picker" value="${userTheme}" oninput="applyTheme(this.value)" style="width:100%;height:44px;border-radius:10px;border:1px solid #334155;background:#0f172a;cursor:pointer;padding:2px 4px;">
+                </div>
+            </div>
+            <label>NAME</label><input type="text" id="setup-name" value="${userName}">
+            <label>WOCHEN-SOLL</label><input type="number" id="setup-soll" value="${weeklySollHours}">
+            <label>E-MAIL (für SuS-Kontakt)</label><input type="email" id="setup-email" value="${userEmail}"><label>KLASSENNAME 1</label><input type="text" id="setup-class1" value="${class1Name}">
+            <label>KLASSENNAME 2</label><input type="text" id="setup-class2" value="${class2Name}">
+            <button class="accordion-btn" onclick="toggleAcc('accA')">WOCHE A BEARBEITEN <span>▼</span></button>
+            <div id="accA" class="accordion-content">`;
+ 
         ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
-            html += `<div style="margin-top:15px; border-bottom:1px solid #444; padding-bottom:10px;"><b style="color:var(--accent)">${tag}</b>`;
-            blocks.forEach(b => { const val = plan[`A-${tag}`]?.[b.id] || ""; html += `<div style="margin-top:8px;"><label>${b.label}</label><input type="text" id="A-${tag}-${b.id}" value="${val}"></div>`; });
+            html += `<div style="margin-top:15px;border-bottom:1px solid #444;padding-bottom:10px;"><b style="color:var(--accent)">${tag}</b>`;
+            blocks.forEach(b => {
+                const val = plan[`A-${tag}`]?.[b.id] || '';
+                html += `<div style="margin-top:8px;"><label>${b.label}</label><input type="text" id="A-${tag}-${b.id}" value="${val}"></div>`;
+            });
             html += `</div>`;
         });
+ 
         html += `</div><button class="accordion-btn" onclick="toggleAcc('accB')">WOCHE B BEARBEITEN <span>▼</span></button><div id="accB" class="accordion-content">`;
+ 
         ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
-            html += `<div style="margin-top:15px; border-bottom:1px solid #444; padding-bottom:10px;"><b style="color:var(--accent)">${tag}</b>`;
-            blocks.forEach(b => { const val = plan[`B-${tag}`]?.[b.id] || ""; html += `<div style="margin-top:8px;"><label>${b.label}</label><input type="text" id="B-${tag}-${b.id}" value="${val}"></div>`; });
+            html += `<div style="margin-top:15px;border-bottom:1px solid #444;padding-bottom:10px;"><b style="color:var(--accent)">${tag}</b>`;
+            blocks.forEach(b => {
+                const val = plan[`B-${tag}`]?.[b.id] || '';
+                html += `<div style="margin-top:8px;"><label>${b.label}</label><input type="text" id="B-${tag}-${b.id}" value="${val}"></div>`;
+            });
             html += `</div>`;
         });
+ 
         html += `</div>`;
         document.getElementById('modal-body').innerHTML = html;
         document.getElementById('modal').style.display = 'block';
     }
-
-    function toggleAcc(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
-    function processManual() {
-        const d = document.getElementById('nachtrag-date').value, c = document.getElementById('nachtrag-cat').value;
-        const s = document.getElementById('nachtrag-start').value, e = document.getElementById('nachtrag-end').value;
-        const d1 = new Date("2000-01-01T" + s), d2 = new Date("2000-01-01T" + e);
-        saveToDB(c, d1.getTime(), d2.getTime(), d); alert("Gespeichert!"); location.reload();
+ 
+    function saveSetup() {
+        userName       = document.getElementById('setup-name').value;
+        weeklySollHours = document.getElementById('setup-soll').value;
+        userEmail      = document.getElementById('setup-email').value;
+        // Theme wird live gespeichert, hier nur sicherstellen
+        localStorage.setItem('userThemeV21', userTheme);
+        class1Name     = document.getElementById('setup-class1').value;
+        class2Name     = document.getElementById('setup-class2').value;
+        ['A','B'].forEach(w => {
+            ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
+                if (!plan[`${w}-${tag}`]) plan[`${w}-${tag}`] = {};
+                blocks.forEach(b => { plan[`${w}-${tag}`][b.id] = document.getElementById(`${w}-${tag}-${b.id}`).value; });
+            });
+        });
+        localStorage.setItem('userNameV13',    userName);
+        localStorage.setItem('weeklySollV13',  weeklySollHours);
+        localStorage.setItem('lehrerPlanV13',  JSON.stringify(plan));
+        localStorage.setItem('userEmailV21',   userEmail);
+        localStorage.setItem('class1NameV21',  class1Name);
+        localStorage.setItem('class2NameV21',  class2Name);
+        // Sofort im UI aktualisieren ohne Reload
+        document.getElementById('display-name').innerText = userName.toUpperCase();
+        document.getElementById('soll-info').innerText = weeklySollHours;
+        document.getElementById('modal').style.display = 'none';
+        updateUI();
+        updateAssistant();
     }
+ 
+    function toggleAcc(id) { const el = document.getElementById(id); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
+ 
+    function processManual() {
+        const d = document.getElementById('nachtrag-date').value;
+        const c = document.getElementById('nachtrag-cat').value;
+        const s = document.getElementById('nachtrag-start').value;
+        const e = document.getElementById('nachtrag-end').value;
+        const d1 = new Date("2000-01-01T" + s), d2 = new Date("2000-01-01T" + e);
+        saveToDB(c, d1.getTime(), d2.getTime(), d);
+        alert("Gespeichert!"); location.reload();
+    }
+ 
     function resetToday() {
-        if(confirm("Heute löschen?")) {
+        if (confirm("Heute löschen?")) {
             const today = new Date().toLocaleDateString('de-DE');
-            db = db.filter(e => e.datum !== today); localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
-            localStorage.removeItem('activeSessionV13'); logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
+            db = db.filter(e => e.datum !== today);
+            localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
+            localStorage.removeItem('activeSessionV13');
+            logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
             location.reload();
         }
     }
-    function saveSetup() {
-        userName = document.getElementById('setup-name').value;
-        weeklySollHours = document.getElementById('setup-soll').value;
-        ['A','B'].forEach(w => { ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => { if(!plan[`${w}-${tag}`]) plan[`${w}-${tag}`] = {}; blocks.forEach(b => { plan[`${w}-${tag}`][b.id] = document.getElementById(`${w}-${tag}-${b.id}`).value; }); }); });
-        localStorage.setItem('userNameV13', userName); localStorage.setItem('weeklySollV13', weeklySollHours);
-        localStorage.setItem('lehrerPlanV13', JSON.stringify(plan)); location.reload();
-    }
-
-    function openHelp() {
+ 
+    // ─── HELP ─────────────────────────────────────────────────────
+                function openHelp() {
         document.getElementById('modal-body').innerHTML = `
-            <div class="modal-nav"><button onclick="document.getElementById('modal').style.display='none'" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">✕ SCHLIESSEN</button><b style="color:var(--primary)">BEDIENUNGSANLEITUNG</b><div></div></div>
-            <div class="help-text" style="padding: 10px 20px 40px 20px;">
-                <p>Willkommen bei deiner persönlichen Arbeitszeiterfassung. Hier erfährst du alles Wichtige:</p>
-                <h2>1. Installation & Start</h2>
-                <p>Öffne die Seite in Safari (iPhone) oder Chrome (Android). Tippe auf das <b>Teilen-Symbol</b> und wähle <b>"Zum Home-Bildschirm hinzufügen"</b>.</p>
-                <h2>2. Die erste Einrichtung (Setup)</h2>
-                <p>Gehe auf <b>⚙️ Einstellungen</b>. Gib Namen und Wochen-Soll ein. Trage dann deinen Plan für Woche A und B ein. Nutze die <b>einklappbaren Bereiche</b> (Akkordeon) für mehr Übersicht beim Editieren.</p>
-                <h2>3. Der Dienst-Alltag & Sicherheit</h2>
-                <h3>Live-Timer auf Buttons</h3>
-                <p>Sobald eine Vertretung (Orange) oder Konferenz (Blau) läuft, zeigt dir der Button direkt die bereits vergangene Zeit an.</p>
-                <h3>Scharfschalten (VZ & Konferenz)</h3>
-                <p>Um versehentliche Klicks zu vermeiden, müssen diese Buttons <b>zweimal</b> getippt werden. Beim ersten Tippen färbt sich der Button gelb ("Sicher?").</p>
-                <h3>Automatischer Log-out (VZ)</h3>
-                <p>Eine Vertretung wird automatisch nach <b>90 Minuten</b> beendet und gespeichert.</p>
-                <h3>Fehlklick-Schutz</h3>
-                <p>Einträge, die kürzer als 30 Sekunden laufen, werden beim Stoppen abgefragt. So bleibt dein Excel sauber.</p>
-                <h2>4. Auswertung & Export</h2>
-                <p>Tippe in den Einstellungen auf <b>📥 EXPORT FÜR EXCEL</b>. Die Datei im CSV-Format enthält nun eine kompakte monatliche Gesamtabrechnung am Ende der Liste.</p>
-                <h2>5. Fehler korrigieren (Nachtrag)</h2>
-                <p>In den Einstellungen kannst du unter <b>"🕒 NACHTRAG"</b> Uhrzeiten manuell nachpflegen. Du kannst das Datum für die letzten 5 Wochentage frei wählen.</p>
-                <h2>6. Automatischer Reset & Update-Info</h2>
-                <p>Die Historie (Logs) unter den Buttons löscht sich jede Nacht um 00:00 Uhr von selbst. Bei neuen App-Versionen erscheint einmalig eine dezente Info-Blase am unteren Rand.</p>
+            <div class="modal-nav">
+                <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;color:var(--primary);font-weight:bold;cursor:pointer;">✕ SCHLIESSEN</button>
+                <b style="color:var(--primary)">BEDIENUNGSANLEITUNG v21.16</b>
+                <div></div>
+            </div>
+            <div class="help-text" style="padding:10px 20px 60px;">
+
+                <p style="background:rgba(56,189,248,0.1);border-left:4px solid var(--primary);padding:12px;border-radius:8px;margin-bottom:20px;">
+                    Diese App hilft dir dabei, deine <b>Arbeitszeit lückenlos zu dokumentieren</b>, Termine zu verwalten und deine Klassen über die Schüler-App zu informieren. Alle Daten werden <b>nur auf deinem Handy</b> gespeichert.
+                </p>
+
+                <h2>1. Installation</h2>
+                <p>Öffne die App in <b>Safari (iPhone)</b> oder <b>Chrome (Android)</b>. Tippe auf das <b>Teilen-Symbol</b> → <b>„Zum Home-Bildschirm hinzufügen"</b>. Die App verhält sich dann wie eine native App – kein App Store nötig.</p>
+
+                <h2>2. Erste Einrichtung (Einstellungen ⚙️)</h2>
+                <p>Tippe auf <b>⚙️ Einstellungen</b> unten links. Folgende Felder ausfüllen:</p>
+                <p>
+                    <b>Name:</b> Dein Name – erscheint oben auf dem Dashboard.<br>
+                    <b>Wochen-Soll:</b> Deine Wochenstunden laut Vertrag (z.B. 26). Wird für den Wochen-Fortschrittsbalken verwendet.<br>
+                    <b>E-Mail:</b> Deine Schul-E-Mail – wird an die Schüler-App übertragen damit Schüler dir schreiben können.<br>
+                    <b>Klassenname 1 &amp; 2:</b> Deine Klassen (z.B. 10b, 7a) – werden für den QR-Code und das Schüler-Management verwendet.<br>
+                    <b>Woche A / B bearbeiten:</b> Hier trägst du deinen festen Stundenplan ein. Jeder Block hat ein Eingabefeld. Diese Einträge erscheinen grau im Kalender und steuern den <b>Schulende-Alarm</b>.
+                </p>
+                <p>Mit <b>OK ✓</b> oben rechts speichern. Die App aktualisiert sich sofort ohne Neustart.</p>
+
+                <h2>3. Das Dashboard – Übersicht</h2>
+                <p>Das Dashboard ist deine Zentrale. Von oben nach unten:</p>
+                <p>
+                    <b>Uhr &amp; Datum:</b> Läuft in Echtzeit. Links daneben das <b>Kalender-Icon</b> mit roter Zahl (= offene Termine).<br>
+                    <b>Woche A / B Button:</b> Zeigt die aktuelle Woche. Antippen zum Wechseln. <b>Blau = Woche A, Lila = Woche B.</b><br>
+                    <b>Aktuell / Nächstes:</b> Zeigt was gerade läuft und was als nächstes kommt – aus deinem Stundenplan und deinen Kalender-Einträgen. Ab 16:00 Uhr erscheint hier schon der erste Termin von morgen als Erinnerung.<br>
+                    <b>Timer (00:00:00):</b> Zeigt die laufende Dienstzeit an.<br>
+                    <b>Fortschrittsbalken:</b> Tag-Fortschritt (wie weit im Schulblock), Vertretungen diesen Monat, Woche gesamt vs. Soll.
+                </p>
+
+                <h2>4. Die Buttons – Was macht was?</h2>
+
+                <h3>🟢 Dienst starten / beenden</h3>
+                <p>Einmal tippen bei <b>Ankunft in der Schule</b> → Timer startet. Einmal tippen bei <b>Feierabend</b> → Zeit wird gespeichert. Wenn ein Kalender-Termin innerhalb von 10 Minuten ansteht, übernimmt die App dessen Namen automatisch als Kategorie im Export.</p>
+
+                <h3>🔴 Vertretung</h3>
+                <p>Tippen öffnet ein <b>Popup</b> – dort trägst du die Klasse ein die du vertrittst (z.B. „8a"). Dann auf <b>„Vertretung starten"</b>. Der Timer läuft separat. Im Export steht dann z.B. „Vertretung (VZ) – Klasse 8a".<br>
+                <b>Wichtig:</b> Die Vertretung stoppt nach <b>90 Minuten automatisch</b>. Bei 85 Minuten gibt es eine Vorwarnung (Vibration + Ton). Zum manuellen Beenden nochmal auf den Button tippen → bestätigen.</p>
+
+                <h3>🔵 Konferenz / Termin</h3>
+                <p>Für Konferenzen, Elterngespräche und ähnliche schulische Termine. <b>Sicherheitsmechanismus:</b> Der Button muss <b>zweimal</b> getippt werden. Beim ersten Tippen erscheint „Sicher?" in Gelb – so werden versehentliche Klicks verhindert. Zum Beenden wieder antippen und bestätigen.</p>
+
+                <h3>📚 Vor-/Nachbereitung</h3>
+                <p>Für alle Arbeiten die du <b>außerhalb der Schule</b> für den Unterricht erledigst: Korrekturen, Unterrichtsvorbereitung, Zeugnisse schreiben, Konferenzen vorbereiten etc. Ebenfalls Zweifach-Sicherung. Wird separat im CSV-Export ausgewiesen – wichtig für die Gewerkschaftsdokumentation.</p>
+
+                <h3>👥 Schüler-Management</h3>
+                <p>Öffnet den Bereich für die Kommunikation mit deinen Schülern. Mehr dazu in Abschnitt 7.</p>
+
+                <h2>5. Der Kalender 📅</h2>
+                <p>Tippe auf das <b>Kalender-Icon</b> rechts im Dashboard (unter „Termine"). Die <b>rote Zahl</b> zeigt wie viele Termine heute und in der Zukunft noch offen sind.</p>
+
+                <h3>Navigation</h3>
+                <p>Mit den Pfeilen <b>„Vorherige / Nächste"</b> wochenweise vor und zurück blättern – beliebig weit in Vergangenheit und Zukunft.</p>
+
+                <h3>Termin hinzufügen</h3>
+                <p>Tippe auf <b>„+ Termin hinzufügen"</b> unter einem Tag. Es öffnet sich ein Eingabefenster:<br>
+                <b>Titel:</b> z.B. „Elterngespräch Müller"<br>
+                <b>Kategorie:</b> Termin, Konferenz oder eigene freie Eingabe<br>
+                <b>Uhrzeit:</b> Start und Ende (optional)<br>
+                <b>Notizen:</b> Freies Textfeld für Schülerinfos, Protokolle etc.<br>
+                Mit <b>💾 SPEICHERN</b> bestätigen. Mit <b>✕</b> oben rechts abbrechen.</p>
+
+                <h3>Termin bearbeiten / löschen</h3>
+                <p>Auf einen bestehenden Termin tippen → Eingabefenster öffnet sich mit allen Daten. Änderungen speichern oder mit <b>🗑️</b> löschen.</p>
+
+                <h3>Termin als Dokument speichern</h3>
+                <p>Im Eingabefenster auf <b>📄 DOC</b> tippen → eine Textdatei mit Datum, Titel und Notizen wird heruntergeladen. Gut für Dokumentationszwecke.</p>
+
+                <h3>Suche</h3>
+                <p>Das Suchfeld oben im Kalender durchsucht alle Einträge und Notizen sofort. Nützlich um alte Protokolle oder Schülerinfos schnell zu finden.</p>
+
+                <h3>Verbindung zum Dashboard</h3>
+                <p>Kalender-Einträge mit Uhrzeit erscheinen automatisch unter <b>„Aktuell"</b> und <b>„Nächstes"</b> auf dem Dashboard – sie haben Vorrang vor dem festen Stundenplan. 5 Minuten vor einem Termin vibriert das Handy und ein Ton ertönt.</p>
+
+                <h3>Vergangene Termine</h3>
+                <p>Vergangene Tage werden im Kalender grau dargestellt (✓ – Vergangen) aber nicht gelöscht. Du kannst jederzeit zurückblättern.</p>
+
+                <h3>Ferien &amp; Feiertage Brandenburg</h3>
+                <p>Alle Brandenburger Schulferien und gesetzlichen Feiertage für 2025–2027 sind automatisch eingetragen – als goldene (Ferien) oder rote (Feiertag) Kacheln sichtbar.</p>
+
+                <h2>6. Alarm-System &amp; automatische Erinnerungen</h2>
+                <p>
+                    <b>5 Min vor Kalender-Termin:</b> Vibration + Ton, „Nächstes"-Bereich blinkt rot.<br>
+                    <b>Schulende-Alarm:</b> Die App liest deinen Stundenplan und berechnet automatisch wann dein letzter Block endet. 5 Minuten vorher: Vibration + Ton + „⏰ In 5 Min Schulende!". Genau zur Endzeit: stärkerer Akkord-Ton + „🔔 DIENST BEENDEN!" – auch wenn du das Handy in der Tasche hast.<br>
+                    <b>VZ Auto-Ende:</b> Eine laufende Vertretung wird nach genau 90 Minuten automatisch beendet und gespeichert.
+                </p>
+                <p><b>Wichtig:</b> Alle Alarme funktionieren nur wenn die App im Vordergrund geöffnet ist oder der Bildschirm aktiv ist. Echte Hintergrund-Benachrichtigungen sind mit einer HTML-App technisch nicht möglich.</p>
+
+                <h2>7. Schüler-Management &amp; GitHub-Sync</h2>
+                <p>Über <b>👥 Schüler-Management</b> sendest du Informationen direkt an die Schüler-App deiner Klasse.</p>
+                <p>
+                    <b>Tages-News:</b> Kurze Nachricht an deine Klasse – z.B. „Morgen Test! Formelblatt mitbringen." Erscheint nach dem Senden sofort in der Schüler-App.<br>
+                    <b>Klassen-Stundenplan:</b> Tippe auf „📅 Woche A" oder „📅 Woche B" um den Plan aufzuklappen. Hier trägst du ein was die Schüler sehen sollen – Fach und ggf. Raum.<br>
+                    <b>QR-Code:</b> Wähle deine Klasse aus dem Dropdown – ein QR-Code wird automatisch generiert. Diesen zeigst du deinen Schülern (z.B. an die Tafel projizieren). Die Schüler scannen einmal und sind dauerhaft verbunden.<br>
+                    <b>GitHub-Verbindung (🔒):</b> Nur für den System-Administrator. Einmalig GitHub-Token eintragen um den „🚀 ALLES AN SuS SENDEN" Button zu aktivieren.
+                </p>
+
+                <h2>8. Auswertung &amp; CSV-Export</h2>
+                <p>Unter <b>⚙️ Einstellungen → 📥 EXPORT (CSV)</b> exportierst du alle gespeicherten Zeiten als Excel-kompatible Datei. Der Export enthält:</p>
+                <p>
+                    • Datum, Kategorie, Beginn, Ende, Dauer in Stunden<br>
+                    • Alle Kategorien getrennt: Hauptdienst, Vertretung (mit Klasse!), Konferenz, Vor-/Nachbereitung<br>
+                    • Am Ende eine <b>monatliche Gesamtabrechnung</b>
+                </p>
+
+                <h2>9. Nachtrag</h2>
+                <p>Vergessene Zeiten manuell eintragen: <b>⚙️ Einstellungen → 🕒 NACHTRAG</b>. Datum (letzte 5 Wochentage wählbar), Kategorie und Uhrzeiten eintragen → Speichern.</p>
+
+                <h2>10. Heute löschen &amp; Reset</h2>
+                <p>Unter <b>⚙️ Einstellungen → ⚠️ RESET → HEUTE LÖSCHEN</b> werden alle Einträge des heutigen Tages gelöscht. <b>Achtung: nicht rückgängig zu machen!</b></p>
+
+                <h2>11. App-Farbe anpassen</h2>
+                <p>Unter <b>⚙️ Einstellungen → 🎨 APP-FARBE ÄNDERN</b> kannst du aus 8 Farb-Themes wählen oder mit dem Farbwähler jede beliebige Farbe einstellen. Wird dauerhaft gespeichert.</p>
+
+                <h2>12. Updates &amp; Aktualisierung</h2>
+                <p>Beim ersten Öffnen nach einem Update erscheint automatisch eine <b>Info-Blase</b> mit den Neuerungen. Mit <b>🔄 Aktualisierung</b> unten rechts kannst du manuell auf neue Versionen prüfen.</p>
+
+                <h2>13. Datenschutz &amp; Datensicherheit</h2>
+                <p>Alle Zeiterfassungsdaten, Kalendereinträge und Einstellungen werden <b>ausschließlich lokal auf deinem Handy</b> gespeichert (localStorage). Es werden keine persönlichen Daten an externe Server übertragen. Nur die Schüler-Infos die du aktiv über den GitHub-Sync sendest, werden im Repository gespeichert.</p>
+
+                <p style="margin-top:30px;font-size:0.7rem;color:#475569;text-align:center;">
+                    Arbeitszeit-Assistent Pro v21.16 · © 2026 Michael Nagel · Alle Rechte vorbehalten
+                </p>
             </div>`;
         document.getElementById('modal').style.display = 'block';
     }
-
-    function addLog(m) { logs.unshift({ t: new Date().toLocaleTimeString('de-DE').substr(0,5), m }); if(logs.length > 5) logs.pop(); localStorage.setItem('dailyLogsV13', JSON.stringify(logs)); renderLogs(); }
-    function renderLogs() { document.getElementById('log-container').innerHTML = logs.map(l => `<div class="log-entry"><span>${l.m}</span><span>${l.t}</span></div>`).join(''); }
-    function toggleWeekManual() { currentWeek = (currentWeek === 'A' ? 'B' : 'A'); localStorage.setItem('manualWeekV13', currentWeek); updateUI(); }
-
+ 
+    // ─── LOGS ─────────────────────────────────────────────────────
+    function addLog(m) {
+        logs.unshift({ t: new Date().toLocaleTimeString('de-DE').substr(0,5), m });
+        if (logs.length > 5) logs.pop();
+        localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
+        renderLogs();
+    }
+    function renderLogs() {
+        document.getElementById('log-container').innerHTML = logs.map(l =>
+            `<div class="log-entry"><span>${l.m}</span><span>${l.t}</span></div>`
+        ).join('');
+    }
+ 
+    function toggleWeekManual() {
+        currentWeek = currentWeek === 'A' ? 'B' : 'A';
+        localStorage.setItem('manualWeekV13', currentWeek);
+        // Sofort sichtbar - direkt DOM updaten
+        document.getElementById('week-label').innerText = currentWeek;
+        const wb = document.getElementById('week-btn');
+        wb.style.background = currentWeek === 'A' ? '#2563eb' : '#9333ea';
+        wb.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
+        updateUI();
+        updateAssistant();
+    }
+ 
+    // ─── EXPORT ───────────────────────────────────────────────────
     function exportData() {
         let sorted = [...db].sort((a,b) => {
-            const dateA = new Date(a.datum.split('.').reverse().join('-') + 'T' + a.start);
-            const dateB = new Date(b.datum.split('.').reverse().join('-') + 'T' + b.start);
-            return dateA - dateB;
+            const da = new Date(a.datum.split('.').reverse().join('-') + 'T' + a.start);
+            const db2 = new Date(b.datum.split('.').reverse().join('-') + 'T' + b.start);
+            return da - db2;
         });
         let csv = "\ufeffDatum;Kategorie;Beginn;Ende;Dauer (Std)\n";
         let monthlyTotals = {};
         sorted.forEach(e => {
-            const dauerH = (e.ms / 3600000).toFixed(2);
-            csv += `${e.datum};${e.typ};${e.start};${e.ende};${dauerH}\n`;
-            const monthKey = e.datum.split('.')[1] + "/" + e.datum.split('.')[2];
-            monthlyTotals[monthKey] = (monthlyTotals[monthKey] || 0) + e.ms;
+            csv += `${e.datum};${e.typ};${e.start};${e.ende};${(e.ms/3600000).toFixed(2)}\n`;
+            const mk = e.datum.split('.')[1] + "/" + e.datum.split('.')[2];
+            monthlyTotals[mk] = (monthlyTotals[mk] || 0) + e.ms;
         });
         csv += "\n--- MONATS-ABRECHNUNG ---\n";
         for (let m in monthlyTotals) {
-            csv += `Monat ${m}; Gesamte Arbeitszeit:; ${(monthlyTotals[m] / 3600000).toFixed(2)} Stunden\n`;
+            csv += `Monat ${m}; Gesamte Arbeitszeit:; ${(monthlyTotals[m]/3600000).toFixed(2)} Stunden\n`;
         }
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
@@ -443,6 +1924,21 @@
         link.download = `Arbeitszeit_${userName}.csv`;
         link.click();
     }
+ 
+    // ─── THEME ───────────────────────────────────────────────────
+    function applyTheme(color) {
+        userTheme = color;
+        document.documentElement.style.setProperty('--primary', color);
+        // Kalender heute-Header Box-Shadow auch anpassen
+        const style = document.getElementById('dynamic-theme-style');
+        if (style) {
+            style.innerHTML = `.cal-day-header.today { background: ${color} !important; box-shadow: 0 3px 10px ${color}66 !important; } .cal-week-badge { background: ${color} !important; }`;
+        }
+    }
+
+    // ─── MISC ─────────────────────────────────────────────────────
+    function closeToast() { localStorage.setItem('lastSeenV', APP_VERSION); document.getElementById('update-toast').style.display = 'none'; }
+    function forceUpdate() { if (confirm("Updates suchen?")) { window.location.href = window.location.pathname + "?u=" + Date.now(); } }
 </script>
 </body>
 </html>
