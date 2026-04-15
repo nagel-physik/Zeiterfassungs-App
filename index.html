@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v21.18</title>
+    <title>Arbeitszeit-Assistent Pro v21.19</title>
     <style id="dynamic-theme-style"></style>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
@@ -205,8 +205,8 @@
 <body>
  
 <div id="update-toast">
-    <div class="toast-header"><span>✨ Update Info v21.18</span></div>
-    <div class="toast-body">v21.18: Schüler-Management zeigt Hinweis wenn noch nicht eingerichtet.</div>
+    <div class="toast-header"><span>✨ Update Info v21.19</span></div>
+    <div class="toast-body">v21.19: Stundenplan nicht mehr im Kalender – nur eigene Termine sichtbar.</div>
     <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
  
@@ -281,7 +281,7 @@
         <button class="btn" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
     </div>
  
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v21.18</footer>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v21.19</footer>
 </div>
  
 
@@ -356,7 +356,7 @@
 </div>
  
 <script>
-    const APP_VERSION = "21.18";
+    const APP_VERSION = "21.19";
  
     // ─── STATE ────────────────────────────────────────────────────
     let db         = JSON.parse(localStorage.getItem('lehrerDB_Export'))    || [];
@@ -1074,8 +1074,7 @@
             const isPast  = dateKey < todayStr;
             const isWeekend = date.getDay() === 0 || date.getDay() === 6;
             const dayEntries = calEntries[dateKey] || [];
-            const planKey    = `${ab}-${dayNames[date.getDay()]}`;
-            const planBlocks = isWeekend ? [] : blocks.filter(b => plan[planKey]?.[b.id]?.trim());
+            // Stundenplan nur im Dashboard, nicht im Kalender
  
             // Feiertag/Ferien für diesen Tag prüfen
             const holidayInfo = BB_HOLIDAYS[dateKey];
@@ -1101,20 +1100,7 @@
                 </div>`;
             }
  
-            // Plan blocks (read-only display)
-            if (planBlocks.length > 0) {
-                planBlocks.forEach(b => {
-                    const text = plan[planKey][b.id];
-                    html += `<div class="cal-tile" style="opacity:0.6; cursor:default; border-left-color:#475569;">
-                        <div class="cal-tile-left">
-                            <div class="cal-tile-time">${b.start} – ${b.end}</div>
-                            <div class="cal-tile-title">${text}</div>
-                            <div class="cal-tile-sub">${b.label}</div>
-                        </div>
-                        <div class="cal-tile-right"><span style="font-size:0.6rem;color:#475569;">PLAN</span></div>
-                    </div>`;
-                });
-            }
+            // Stundenplan wird nicht im Kalender angezeigt
  
             // Calendar entries
             dayEntries.forEach((entry, idx) => {
