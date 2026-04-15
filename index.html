@@ -206,7 +206,7 @@
  
 <div id="update-toast">
     <div class="toast-header"><span>✨ Update Info v21.19</span></div>
-    <div class="toast-body">v21.19: Stundenplan nicht mehr im Kalender – nur eigene Termine sichtbar.</div>
+    <div class="toast-body">v21.19: Stundenplan weg aus Kalender, Tag-Fortschritt fix, Nächstes-Logik korrigiert.</div>
     <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
  
@@ -840,8 +840,9 @@
                 lastEnd    = Math.max(lastEnd,    eh*60 + em);
             }
         });
-        if (session.active && hasPlan) {
-            const elapsed  = Math.max(0, (now.getHours()*60 + now.getMinutes()) - firstStart);
+        if (hasPlan) {
+            const nowMin3  = now.getHours()*60 + now.getMinutes();
+            const elapsed  = Math.max(0, nowMin3 - firstStart);
             const total    = lastEnd - firstStart;
             const dayPerc  = Math.min((elapsed / total) * 100, 100);
             document.getElementById('day-percent').innerText = Math.round(dayPerc) + "%";
@@ -864,39 +865,45 @@
         const tag = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()];
         const key = `${currentWeek}-${tag}`;
         const todayKey = toLocalDateKey(now);
- 
+
         let activeTask = null, nextTask = null;
- 
-        // Check calendar override first
+
+        // SCHRITT 1: Stundenplan zuerst – aktiver Block + nächster Block
+        for (let i = 0; i < blocks.length; i++) {
+            const b = blocks[i];
+            const [sh, sm] = b.start.split(':').map(Number);
+            const [eh, em] = b.end.split(':').map(Number);
+            const sMin = sh*60+sm, eMin = eh*60+em;
+            const text = plan[key]?.[b.id];
+            if (!text?.trim()) continue;
+            if (currentTime >= sMin && currentTime < eMin) {
+                activeTask = { text, label: b.label };
+            } else if (currentTime < sMin && !nextTask) {
+                nextTask = { text, label: b.label };
+            }
+        }
+
+        // SCHRITT 2: Kalender-Termine
         const todayEntries = (calEntries[todayKey] || []).filter(e => e.start);
         todayEntries.forEach(e => {
             const [sh, sm] = e.start.split(':').map(Number);
             const sMin = sh * 60 + sm;
             const eMin = e.end ? (() => { const [eh, em] = e.end.split(':').map(Number); return eh*60+em; })() : sMin + 60;
+
+            // Kalender überschreibt aktiven Block wenn Termin gerade läuft
             if (currentTime >= sMin && currentTime < eMin) {
-                activeTask = { text: `${e.cat === 'Vertretung' ? '🔄 ' : ''}${e.title}`, label: e.cat, isCalendar: true };
-            } else if (currentTime < sMin && !nextTask) {
-                nextTask = { text: e.title, label: `${e.start} Uhr`, isCalendar: true };
+                activeTask = { text: (e.cat === 'Vertretung' ? '🔄 ' : '') + e.title, label: e.cat, isCalendar: true };
+            }
+            // Kalender-Termin als Nächstes NUR wenn kein Stundenplan-Block mehr kommt
+            else if (currentTime < sMin && !nextTask) {
+                nextTask = { text: e.title, label: e.start + ' Uhr', isCalendar: true };
             }
         });
- 
-        // Fall back to plan blocks
-        if (!activeTask) {
-            for (let i = 0; i < blocks.length; i++) {
-                const b = blocks[i];
-                const [sh, sm] = b.start.split(':').map(Number);
-                const [eh, em] = b.end.split(':').map(Number);
-                const sMin = sh*60+sm, eMin = eh*60+em;
-                const text = plan[key]?.[b.id];
-                if (currentTime >= sMin && currentTime < eMin && text?.trim()) activeTask = { text, label: b.label };
-                else if (currentTime < sMin && !nextTask && text?.trim()) nextTask = { text, label: b.label };
-            }
-        }
- 
+
         const nowEl  = document.getElementById('task-now');
         const nextEl = document.getElementById('task-next');
         nowEl.classList.remove('alert-soon');
- 
+
         nowEl.innerText  = activeTask ? activeTask.text : "Frei / Pause";
         document.getElementById('task-now-sub').innerText = activeTask ? activeTask.label : "-";
         nextEl.innerText = nextTask ? nextTask.text : "FEIERABEND!";
