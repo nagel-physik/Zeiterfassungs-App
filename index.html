@@ -842,12 +842,12 @@
                 var dp_dayKey = currentWeek + '-' + ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][dp_dow];
                 var dp_first  = 999, dp_last = 0, dp_hasPlan = false;
                 for (var di = 0; di < blocks.length; di++) {
-                    var db = blocks[di];
-                    var dbVal = (plan[dp_dayKey] && plan[dp_dayKey][db.id]) ? plan[dp_dayKey][db.id].trim() : '';
+                    var dpb = blocks[di];
+                    var dbVal = (plan[dp_dayKey] && plan[dp_dayKey][dpb.id]) ? plan[dp_dayKey][dpb.id].trim() : '';
                     if (dbVal) {
                         dp_hasPlan = true;
-                        var dsp = db.start.split(':');
-                        var dep = db.end.split(':');
+                        var dsp = dpb.start.split(':');
+                        var dep = dpb.end.split(':');
                         var dsMin = parseInt(dsp[0])*60 + parseInt(dsp[1]);
                         var deMin = parseInt(dep[0])*60 + parseInt(dep[1]);
                         if (dsMin < dp_first) dp_first = dsMin;
