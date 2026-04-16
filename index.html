@@ -271,6 +271,7 @@
             <div class="progress-label"><span>Vertretungen (Monat)</span><span id="vz-val">0</span></div>
             <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--danger);"></div></div>
 
+
         </div>
     </div>
  
@@ -824,9 +825,10 @@
         const targetMS  = weeklySollHours * 3600000;
         const weekPerc  = Math.round((weekMS / targetMS) * 100);
         const weekFill  = document.getElementById('week-progress');
-        
-        if (weekPerc >= 100) { weekFill.style.width = "100%"; weekFill.style.background = "var(--overtime)"; }
-        else { weekFill.style.width = weekPerc + "%"; weekFill.style.background = "var(--success)"; }
+        if (weekFill) {
+            if (weekPerc >= 100) { weekFill.style.width = "100%"; weekFill.style.background = "var(--overtime)"; }
+            else { weekFill.style.width = weekPerc + "%"; weekFill.style.background = "var(--success)"; }
+        }
  
         // Day progress
         try {
@@ -867,7 +869,7 @@
             document.getElementById('day-percent').innerText = "–";
         }
  
-        document.getElementById('week-label').innerText = currentWeek;
+        if (document.getElementById('week-label')) document.getElementById('week-label').innerText = currentWeek;
         const wBtn = document.getElementById('week-btn');
         if (wBtn) {
             wBtn.style.background = currentWeek === 'A' ? '#2563eb' : '#9333ea';
@@ -1903,7 +1905,7 @@
         currentWeek = currentWeek === 'A' ? 'B' : 'A';
         localStorage.setItem('manualWeekV13', currentWeek);
         // Sofort sichtbar - direkt DOM updaten
-        document.getElementById('week-label').innerText = currentWeek;
+        if (document.getElementById('week-label')) document.getElementById('week-label').innerText = currentWeek;
         const wb = document.getElementById('week-btn');
         wb.style.background = currentWeek === 'A' ? '#2563eb' : '#9333ea';
         wb.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
