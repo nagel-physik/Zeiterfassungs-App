@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v21.20</title>
+    <title>Arbeitszeit-Assistent Pro v21.21</title>
     <style id="dynamic-theme-style"></style>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
@@ -205,8 +205,8 @@
 <body>
  
 <div id="update-toast">
-    <div class="toast-header"><span>✨ Update Info v21.20</span></div>
-    <div class="toast-body">v21.20: Tag-Fortschritt mit Fallback auf Schulzeiten – funktioniert immer.</div>
+    <div class="toast-header"><span>✨ Update Info v21.21</span></div>
+    <div class="toast-body">v21.21: Nachtrag erweitert – Vor-/Nachbereitung und Hauptdienst jetzt eintragbar.</div>
     <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
  
@@ -282,7 +282,7 @@
         <button class="btn" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
     </div>
  
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v21.20</footer>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v21.21</footer>
 </div>
  
 
@@ -357,7 +357,7 @@
 </div>
  
 <script>
-    const APP_VERSION = "21.20";
+    const APP_VERSION = "21.21";
  
     // ─── STATE ────────────────────────────────────────────────────
     let db         = JSON.parse(localStorage.getItem('lehrerDB_Export'))    || [];
@@ -1649,9 +1649,10 @@
                 <label style="color:var(--accent)">🕒 NACHTRAG</label>
                 <select id="nachtrag-date">${dateOptions}</select>
                 <select id="nachtrag-cat">
-                    <option value="Korrektur">Korrektur</option>
-                    <option value="Konferenz">Konferenz</option>
-                    <option value="Vertretung (VZ)">Vertretung (VZ)</option>
+                    <option value="Hauptdienst">🟢 Hauptdienst</option>
+                    <option value="Vertretung (VZ)">🔴 Vertretung (VZ)</option>
+                    <option value="Konferenz">🔵 Konferenz</option>
+                    <option value="Vor-/Nachbereitung">📚 Vor-/Nachbereitung</option>
                 </select>
                 <div style="display:flex;gap:10px;">
                     <input type="time" id="nachtrag-start" value="08:00">
@@ -1737,6 +1738,7 @@
         const c = document.getElementById('nachtrag-cat').value;
         const s = document.getElementById('nachtrag-start').value;
         const e = document.getElementById('nachtrag-end').value;
+        if (!d || !s || !e) { alert('Bitte Datum und Uhrzeiten eintragen.'); return; }
         const d1 = new Date("2000-01-01T" + s), d2 = new Date("2000-01-01T" + e);
         saveToDB(c, d1.getTime(), d2.getTime(), d);
         alert("Gespeichert!"); location.reload();
