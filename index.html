@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v21.21</title>
+    <title>Arbeitszeit-Assistent Pro v21.22</title>
     <style id="dynamic-theme-style"></style>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
@@ -121,6 +121,10 @@
         .btn-sus { background: rgba(6,182,212,0.15); border: 2px solid var(--sus); color: var(--sus); animation: pulse-sus 3s ease-in-out infinite; }
         @keyframes pulse-sus { 0%,100%{box-shadow:0 4px 0 rgba(0,0,0,0.2),0 0 0 0 rgba(6,182,212,0.4);} 60%{box-shadow:0 4px 0 rgba(0,0,0,0.2),0 0 0 8px rgba(6,182,212,0);} }
         .today-dot { position:absolute; top:-6px; right:-6px; background:#ef4444; color:white; border-radius:10px; min-width:20px; height:20px; font-size:0.65rem; font-weight:900; border:2px solid var(--card); animation:pulse-dot 1.5s ease-in-out infinite; display:none; align-items:center; justify-content:center; padding:0 4px; line-height:1; }
+        @keyframes pulse-schulrecht {
+            0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.7); }
+            50%      { box-shadow: 0 0 0 8px rgba(99,102,241,0); }
+        }
         @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.3);opacity:0.7;} }
         .cal-icon-label { font-size:0.38rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; line-height:1; }
         .log-entry { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
@@ -205,8 +209,8 @@
 <body>
  
 <div id="update-toast">
-    <div class="toast-header"><span>✨ Update Info v21.21</span></div>
-    <div class="toast-body">v21.21: Nachtrag erweitert – Vor-/Nachbereitung und Hauptdienst jetzt eintragbar.</div>
+    <div class="toast-header"><span>✨ Update Info v21.22</span></div>
+    <div class="toast-body">v21.22: ⚖️ Schulrecht Brandenburg verknüpft – Gesetze, VV und Dokument-Generator.</div>
     <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
  
@@ -264,6 +268,11 @@
         <button id="btn-vz" class="btn btn-vz" onclick="handleVZClick()">Vertretung</button>
         <button id="btn-extra" class="btn btn-extra" onclick="handleExtraClick()">Konferenz / Termin</button>
         <button id="btn-vnb" class="btn btn-vnb" onclick="handleVNBClick()">📚 Vor-/Nachbereitung</button>
+        <a href="schulrecht.html" style="display:block; text-decoration:none;">
+            <button class="btn" style="width:100%; background:linear-gradient(135deg,#4f46e5,#7c3aed); border:none; color:white; padding:12px; font-size:0.88rem; font-weight:900; animation:pulse-schulrecht 2.5s ease-in-out infinite;">
+                ⚖️ Schulrecht &amp; Dokumente
+            </button>
+        </a>
         <button class="btn btn-sus" onclick="openSusManagement()">👥 Schüler-Management</button>
         <div class="progress-container" style="margin-top: 25px;">
             <div class="progress-label"><span>Tag Fortschritt</span><span id="day-percent">0%</span></div>
@@ -282,7 +291,7 @@
         <button class="btn" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
     </div>
  
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v21.21</footer>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v21.22</footer>
 </div>
  
 
@@ -357,7 +366,7 @@
 </div>
  
 <script>
-    const APP_VERSION = "21.21";
+    const APP_VERSION = "21.22";
  
     // ─── STATE ────────────────────────────────────────────────────
     let db         = JSON.parse(localStorage.getItem('lehrerDB_Export'))    || [];
@@ -1756,135 +1765,91 @@
     }
  
     // ─── HELP ─────────────────────────────────────────────────────
-                function openHelp() {
+                    function openHelp() {
         document.getElementById('modal-body').innerHTML = `
             <div class="modal-nav">
                 <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;color:var(--primary);font-weight:bold;cursor:pointer;">✕ SCHLIESSEN</button>
-                <b style="color:var(--primary)">BEDIENUNGSANLEITUNG v21.16</b>
+                <b style="color:var(--primary)">BEDIENUNGSANLEITUNG v21.22</b>
                 <div></div>
             </div>
             <div class="help-text" style="padding:10px 20px 60px;">
-
                 <p style="background:rgba(56,189,248,0.1);border-left:4px solid var(--primary);padding:12px;border-radius:8px;margin-bottom:20px;">
-                    Diese App hilft dir dabei, deine <b>Arbeitszeit lückenlos zu dokumentieren</b>, Termine zu verwalten und deine Klassen über die Schüler-App zu informieren. Alle Daten werden <b>nur auf deinem Handy</b> gespeichert.
+                    Diese App hilft dir dabei, deine <b>Arbeitszeit lückenlos zu dokumentieren</b>, Termine zu verwalten, Schüler zu informieren und Schulrecht nachzuschlagen. Alle Daten werden <b>nur auf deinem Gerät</b> gespeichert.
                 </p>
 
                 <h2>1. Installation</h2>
                 <p>Öffne die App in <b>Safari (iPhone)</b> oder <b>Chrome (Android)</b>. Tippe auf das <b>Teilen-Symbol</b> → <b>„Zum Home-Bildschirm hinzufügen"</b>. Die App verhält sich dann wie eine native App – kein App Store nötig.</p>
 
-                <h2>2. Erste Einrichtung (Einstellungen ⚙️)</h2>
-                <p>Tippe auf <b>⚙️ Einstellungen</b> unten links. Folgende Felder ausfüllen:</p>
-                <p>
-                    <b>Name:</b> Dein Name – erscheint oben auf dem Dashboard.<br>
-                    <b>Wochen-Soll:</b> Deine Wochenstunden laut Vertrag (z.B. 26). Wird für den Wochen-Fortschrittsbalken verwendet.<br>
-                    <b>E-Mail:</b> Deine Schul-E-Mail – wird an die Schüler-App übertragen damit Schüler dir schreiben können.<br>
-                    <b>Klassenname 1 &amp; 2:</b> Deine Klassen (z.B. 10b, 7a) – werden für den QR-Code und das Schüler-Management verwendet.<br>
-                    <b>Woche A / B bearbeiten:</b> Hier trägst du deinen festen Stundenplan ein. Jeder Block hat ein Eingabefeld. Diese Einträge erscheinen grau im Kalender und steuern den <b>Schulende-Alarm</b>.
-                </p>
-                <p>Mit <b>OK ✓</b> oben rechts speichern. Die App aktualisiert sich sofort ohne Neustart.</p>
+                <h2>2. Erste Einrichtung</h2>
+                <p>Tippe auf <b>⚙️ Einstellungen</b>:<br>
+                • <b>Name:</b> Erscheint oben auf dem Dashboard<br>
+                • <b>Wochen-Soll:</b> Deine Vertragsstunden (z.B. 26)<br>
+                • <b>E-Mail:</b> Für Schüler-Kontakt über die SuS-App<br>
+                • <b>Klassenname 1 &amp; 2:</b> z.B. 10b, 7a – für QR-Code und SuS-Management<br>
+                • <b>Woche A/B:</b> Stundenplan eintragen – steuert Schulende-Alarm und Dashboard</p>
 
-                <h2>3. Das Dashboard – Übersicht</h2>
-                <p>Das Dashboard ist deine Zentrale. Von oben nach unten:</p>
-                <p>
-                    <b>Uhr &amp; Datum:</b> Läuft in Echtzeit. Links daneben das <b>Kalender-Icon</b> mit roter Zahl (= offene Termine).<br>
-                    <b>Woche A / B Button:</b> Zeigt die aktuelle Woche. Antippen zum Wechseln. <b>Blau = Woche A, Lila = Woche B.</b><br>
-                    <b>Aktuell / Nächstes:</b> Zeigt was gerade läuft und was als nächstes kommt – aus deinem Stundenplan und deinen Kalender-Einträgen. Ab 16:00 Uhr erscheint hier schon der erste Termin von morgen als Erinnerung.<br>
-                    <b>Timer (00:00:00):</b> Zeigt die laufende Dienstzeit an.<br>
-                    <b>Fortschrittsbalken:</b> Tag-Fortschritt (wie weit im Schulblock), Vertretungen diesen Monat, Woche gesamt vs. Soll.
-                </p>
+                <h2>3. Dashboard – Übersicht</h2>
+                <p><b>Uhr &amp; Datum</b> – Echtzeit. Daneben das Kalender-Icon mit roter Zahl (offene Termine).<br>
+                <b>Woche A/B Button</b> – Antippen zum Wechseln. Blau = A, Lila = B.<br>
+                <b>Aktuell/Nächstes</b> – Aus Stundenplan + Kalender. Ab 16:00 Uhr: morgiges erstes Fach.<br>
+                <b>Fortschrittsbalken</b> – Tag-Fortschritt und Vertretungen des Monats.</p>
 
-                <h2>4. Die Buttons – Was macht was?</h2>
-
+                <h2>4. Die Buttons</h2>
                 <h3>🟢 Dienst starten / beenden</h3>
-                <p>Einmal tippen bei <b>Ankunft in der Schule</b> → Timer startet. Einmal tippen bei <b>Feierabend</b> → Zeit wird gespeichert. Wenn ein Kalender-Termin innerhalb von 10 Minuten ansteht, übernimmt die App dessen Namen automatisch als Kategorie im Export.</p>
-
+                <p>Tippen bei Ankunft → Timer läuft. Tippen bei Feierabend → Zeit gespeichert.</p>
                 <h3>🔴 Vertretung</h3>
-                <p>Tippen öffnet ein <b>Popup</b> – dort trägst du die Klasse ein die du vertrittst (z.B. „8a"). Dann auf <b>„Vertretung starten"</b>. Der Timer läuft separat. Im Export steht dann z.B. „Vertretung (VZ) – Klasse 8a".<br>
-                <b>Wichtig:</b> Die Vertretung stoppt nach <b>90 Minuten automatisch</b>. Bei 85 Minuten gibt es eine Vorwarnung (Vibration + Ton). Zum manuellen Beenden nochmal auf den Button tippen → bestätigen.</p>
-
+                <p>Öffnet Popup → Klasse eintragen (z.B. 8a) → Starten. <b>Auto-Logout nach 90 Min</b>, Vorwarnung bei 85 Min. Im CSV-Export mit Klasse.</p>
                 <h3>🔵 Konferenz / Termin</h3>
-                <p>Für Konferenzen, Elterngespräche und ähnliche schulische Termine. <b>Sicherheitsmechanismus:</b> Der Button muss <b>zweimal</b> getippt werden. Beim ersten Tippen erscheint „Sicher?" in Gelb – so werden versehentliche Klicks verhindert. Zum Beenden wieder antippen und bestätigen.</p>
-
+                <p><b>Zweimal tippen</b> (Sicherheit gegen versehentliches Klicken). Timer läuft separat.</p>
                 <h3>📚 Vor-/Nachbereitung</h3>
-                <p>Für alle Arbeiten die du <b>außerhalb der Schule</b> für den Unterricht erledigst: Korrekturen, Unterrichtsvorbereitung, Zeugnisse schreiben, Konferenzen vorbereiten etc. Ebenfalls Zweifach-Sicherung. Wird separat im CSV-Export ausgewiesen – wichtig für die Gewerkschaftsdokumentation.</p>
+                <p>Für Heimarbeit: Korrekturen, Unterrichtsvorbereitung, Zeugnisse etc. Zweimal tippen. Wird separat im CSV ausgewiesen – wichtig für Gewerkschaftsdokumentation.</p>
 
-                <h3>👥 Schüler-Management</h3>
-                <p>Öffnet den Bereich für die Kommunikation mit deinen Schülern. Mehr dazu in Abschnitt 7.</p>
+                <h2>5. ⚖️ Schulrecht &amp; Dokumente</h2>
+                <p>Der Button <b>„⚖️ Schulrecht &amp; Dokumente"</b> direkt unter Vor-/Nachbereitung öffnet eine eigene App mit 5 Bereichen:</p>
+                <p><b>📋 Ordnungsmaßnahmen</b> – §63/§64 BbgSchulG mit der vollständigen Stufenfolge (mündlicher Verweis → schriftlicher Verweis → Ausschluss → Schulwechsel), Praxisleitfaden und Warnhinweisen.</p>
+                <p><b>📚 Unterricht &amp; Bewertung</b> – Notenscala, VV Klassenarbeiten (Ankündigungspflicht 5 Tage, max. 2/Woche), Versetzungsregeln.</p>
+                <p><b>👨‍🏫 Lehrerpflichten</b> – Aufsichtspflicht, Arbeitszeitverordnung (26 Std/Woche Oberschule), Handyregeln, Kinderschutz-Meldepflicht.</p>
+                <p><b>👨‍👩‍👧 Eltern &amp; Schüler</b> – Elternrechte, Schülerpflichten, DSGVO-Regeln für die Schule.</p>
+                <p><b>📄 Dokumente erstellen</b> – Felder ausfüllen → Dokument mit offiziellem Briefkopf der Friedrich-Gedike-Oberschule erstellen → <b>Drucken oder per Mail senden</b>. Verfügbar:<br>
+                &nbsp;&nbsp;• Schriftlicher Verweis (mit Rückmeldebogen für Eltern)<br>
+                &nbsp;&nbsp;• Elternbrief (Einladung, Fehlzeiten, Leistung, Verhalten)<br>
+                &nbsp;&nbsp;• Gesprächsprotokoll (Elterngespräch, Schülergespräch, Konferenz)</p>
+                <p><b>Bei jedem Paragrafen</b> gibt es direkte Buttons zum passenden Dokument – kein Suchen nötig.</p>
+                <p><b>🔍 Suchfunktion</b> – Stichwort eingeben (z.B. „Verweis", „Aufsicht") → findet automatisch den richtigen Bereich.</p>
 
-                <h2>5. Der Kalender 📅</h2>
-                <p>Tippe auf das <b>Kalender-Icon</b> rechts im Dashboard (unter „Termine"). Die <b>rote Zahl</b> zeigt wie viele Termine heute und in der Zukunft noch offen sind.</p>
+                <h2>6. 🤖 KI-Assistent</h2>
+                <p>In der Schulrecht-App unter Tab <b>„🤖 KI-Assistent"</b> kannst du Fragen direkt zum Brandenburger Schulrecht stellen.</p>
+                <p><b>Schritt 1 – KI-Anbieter wählen:</b><br>
+                🤖 <b>Claude (Anthropic)</b> – Empfehlung, sehr gute Rechtsantworten<br>
+                💬 <b>ChatGPT (OpenAI)</b> – Alternative<br>
+                🔷 <b>Gemini (Google)</b> – Kostenlose Option</p>
+                <p><b>Schritt 2 – API-Key beantragen (kostenlos registrieren):</b><br>
+                • <b>Claude:</b> console.anthropic.com → Registrieren → „API Keys" → „Create Key"<br>
+                • <b>ChatGPT:</b> platform.openai.com → Registrieren → „API Keys" → „Create new secret key"<br>
+                • <b>Gemini:</b> aistudio.google.com → Mit Google-Konto anmelden → „Get API Key"</p>
+                <p><b>Schritt 3 – Key eintragen:</b> Anbieter auswählen → Key ins Feld einfügen → 💾 Speichern. Der Key wird nur auf deinem Gerät gespeichert – kein anderer hat Zugriff.</p>
+                <p><b>Schritt 4 – Fragen stellen:</b> Frage eingeben oder Schnell-Button tippen → Antwort erscheint mit Paragraphenangabe.</p>
+                <p><b>Kosten:</b> Jeder Lehrer nutzt seinen eigenen Key. Bei normaler Nutzung (wenige Fragen täglich) entstehen nur minimale Kosten – oft gibt es kostenlose Kontingente.</p>
 
-                <h3>Navigation</h3>
-                <p>Mit den Pfeilen <b>„Vorherige / Nächste"</b> wochenweise vor und zurück blättern – beliebig weit in Vergangenheit und Zukunft.</p>
+                <h2>7. 👥 Schüler-Management</h2>
+                <p>News, Stundenplan und Infos an die Schüler-App senden. Benötigt GitHub-Token (einmalig vom Administrator einrichten). Ohne Token: Hinweis „Noch nicht freigeschaltet" → Schloss-Symbol tippen → Admin-Passwort eingeben.</p>
 
-                <h3>Termin hinzufügen</h3>
-                <p>Tippe auf <b>„+ Termin hinzufügen"</b> unter einem Tag. Es öffnet sich ein Eingabefenster:<br>
-                <b>Titel:</b> z.B. „Elterngespräch Müller"<br>
-                <b>Kategorie:</b> Termin, Konferenz oder eigene freie Eingabe<br>
-                <b>Uhrzeit:</b> Start und Ende (optional)<br>
-                <b>Notizen:</b> Freies Textfeld für Schülerinfos, Protokolle etc.<br>
-                Mit <b>💾 SPEICHERN</b> bestätigen. Mit <b>✕</b> oben rechts abbrechen.</p>
+                <h2>8. Kalender</h2>
+                <p>Kalender-Icon tippen (rote Zahl = heutige + zukünftige Termine). Navigation mit „Vorherige/Nächste Woche". Termine erscheinen automatisch unter Aktuell/Nächstes auf dem Dashboard.<br>
+                <b>Kategorien:</b> Termin, Konferenz, Eigene Kategorie (freies Textfeld).<br>
+                <b>Brandenburger Ferien 2025–2027</b> und alle gesetzlichen Feiertage sind automatisch eingetragen.</p>
 
-                <h3>Termin bearbeiten / löschen</h3>
-                <p>Auf einen bestehenden Termin tippen → Eingabefenster öffnet sich mit allen Daten. Änderungen speichern oder mit <b>🗑️</b> löschen.</p>
+                <h2>9. Export &amp; Nachtrag</h2>
+                <p><b>CSV-Export:</b> ⚙️ → 📥 EXPORT – alle Zeiten mit Datum, Kategorie, Dauer. Vertretungen mit Klasse. Monatliche Gesamtabrechnung.<br>
+                <b>Nachtrag:</b> ⚙️ → 🕒 NACHTRAG – vergessene Zeiten eintragen (Hauptdienst, Vertretung, Konferenz, Vor-/Nachbereitung).<br>
+                <b>Reset:</b> ⚙️ → Heute löschen (nicht rückgängig!).</p>
 
-                <h3>Termin als Dokument speichern</h3>
-                <p>Im Eingabefenster auf <b>📄 DOC</b> tippen → eine Textdatei mit Datum, Titel und Notizen wird heruntergeladen. Gut für Dokumentationszwecke.</p>
-
-                <h3>Suche</h3>
-                <p>Das Suchfeld oben im Kalender durchsucht alle Einträge und Notizen sofort. Nützlich um alte Protokolle oder Schülerinfos schnell zu finden.</p>
-
-                <h3>Verbindung zum Dashboard</h3>
-                <p>Kalender-Einträge mit Uhrzeit erscheinen automatisch unter <b>„Aktuell"</b> und <b>„Nächstes"</b> auf dem Dashboard – sie haben Vorrang vor dem festen Stundenplan. 5 Minuten vor einem Termin vibriert das Handy und ein Ton ertönt.</p>
-
-                <h3>Vergangene Termine</h3>
-                <p>Vergangene Tage werden im Kalender grau dargestellt (✓ – Vergangen) aber nicht gelöscht. Du kannst jederzeit zurückblättern.</p>
-
-                <h3>Ferien &amp; Feiertage Brandenburg</h3>
-                <p>Alle Brandenburger Schulferien und gesetzlichen Feiertage für 2025–2027 sind automatisch eingetragen – als goldene (Ferien) oder rote (Feiertag) Kacheln sichtbar.</p>
-
-                <h2>6. Alarm-System &amp; automatische Erinnerungen</h2>
-                <p>
-                    <b>5 Min vor Kalender-Termin:</b> Vibration + Ton, „Nächstes"-Bereich blinkt rot.<br>
-                    <b>Schulende-Alarm:</b> Die App liest deinen Stundenplan und berechnet automatisch wann dein letzter Block endet. 5 Minuten vorher: Vibration + Ton + „⏰ In 5 Min Schulende!". Genau zur Endzeit: stärkerer Akkord-Ton + „🔔 DIENST BEENDEN!" – auch wenn du das Handy in der Tasche hast.<br>
-                    <b>VZ Auto-Ende:</b> Eine laufende Vertretung wird nach genau 90 Minuten automatisch beendet und gespeichert.
-                </p>
-                <p><b>Wichtig:</b> Alle Alarme funktionieren nur wenn die App im Vordergrund geöffnet ist oder der Bildschirm aktiv ist. Echte Hintergrund-Benachrichtigungen sind mit einer HTML-App technisch nicht möglich.</p>
-
-                <h2>7. Schüler-Management &amp; GitHub-Sync</h2>
-                <p>Über <b>👥 Schüler-Management</b> sendest du Informationen direkt an die Schüler-App deiner Klasse.</p>
-                <p>
-                    <b>Tages-News:</b> Kurze Nachricht an deine Klasse – z.B. „Morgen Test! Formelblatt mitbringen." Erscheint nach dem Senden sofort in der Schüler-App.<br>
-                    <b>Klassen-Stundenplan:</b> Tippe auf „📅 Woche A" oder „📅 Woche B" um den Plan aufzuklappen. Hier trägst du ein was die Schüler sehen sollen – Fach und ggf. Raum.<br>
-                    <b>QR-Code:</b> Wähle deine Klasse aus dem Dropdown – ein QR-Code wird automatisch generiert. Diesen zeigst du deinen Schülern (z.B. an die Tafel projizieren). Die Schüler scannen einmal und sind dauerhaft verbunden.<br>
-                    <b>GitHub-Verbindung (🔒):</b> Nur für den System-Administrator. Einmalig GitHub-Token eintragen um den „🚀 ALLES AN SuS SENDEN" Button zu aktivieren.
-                </p>
-
-                <h2>8. Auswertung &amp; CSV-Export</h2>
-                <p>Unter <b>⚙️ Einstellungen → 📥 EXPORT (CSV)</b> exportierst du alle gespeicherten Zeiten als Excel-kompatible Datei. Der Export enthält:</p>
-                <p>
-                    • Datum, Kategorie, Beginn, Ende, Dauer in Stunden<br>
-                    • Alle Kategorien getrennt: Hauptdienst, Vertretung (mit Klasse!), Konferenz, Vor-/Nachbereitung<br>
-                    • Am Ende eine <b>monatliche Gesamtabrechnung</b>
-                </p>
-
-                <h2>9. Nachtrag</h2>
-                <p>Vergessene Zeiten manuell eintragen: <b>⚙️ Einstellungen → 🕒 NACHTRAG</b>. Datum (letzte 5 Wochentage wählbar), Kategorie und Uhrzeiten eintragen → Speichern.</p>
-
-                <h2>10. Heute löschen &amp; Reset</h2>
-                <p>Unter <b>⚙️ Einstellungen → ⚠️ RESET → HEUTE LÖSCHEN</b> werden alle Einträge des heutigen Tages gelöscht. <b>Achtung: nicht rückgängig zu machen!</b></p>
-
-                <h2>11. App-Farbe anpassen</h2>
-                <p>Unter <b>⚙️ Einstellungen → 🎨 APP-FARBE ÄNDERN</b> kannst du aus 8 Farb-Themes wählen oder mit dem Farbwähler jede beliebige Farbe einstellen. Wird dauerhaft gespeichert.</p>
-
-                <h2>12. Updates &amp; Aktualisierung</h2>
-                <p>Beim ersten Öffnen nach einem Update erscheint automatisch eine <b>Info-Blase</b> mit den Neuerungen. Mit <b>🔄 Aktualisierung</b> unten rechts kannst du manuell auf neue Versionen prüfen.</p>
-
-                <h2>13. Datenschutz &amp; Datensicherheit</h2>
-                <p>Alle Zeiterfassungsdaten, Kalendereinträge und Einstellungen werden <b>ausschließlich lokal auf deinem Handy</b> gespeichert (localStorage). Es werden keine persönlichen Daten an externe Server übertragen. Nur die Schüler-Infos die du aktiv über den GitHub-Sync sendest, werden im Repository gespeichert.</p>
+                <h2>10. App-Farbe &amp; Datenschutz</h2>
+                <p><b>Farbe:</b> ⚙️ → 🎨 APP-FARBE ÄNDERN – 8 Themes + freier Farbwähler.<br>
+                <b>Datenschutz:</b> Alle Zeiterfassungsdaten werden nur lokal gespeichert. Keine externen Server außer beim GitHub-Sync (Admin) und KI-Anfragen (eigener API-Key).</p>
 
                 <p style="margin-top:30px;font-size:0.7rem;color:#475569;text-align:center;">
-                    Arbeitszeit-Assistent Pro v21.16 · © 2026 Michael Nagel · Alle Rechte vorbehalten
+                    Arbeitszeit-Assistent Pro v21.22 · © 2026 Michael Nagel · Alle Rechte vorbehalten
                 </p>
             </div>`;
         document.getElementById('modal').style.display = 'block';
