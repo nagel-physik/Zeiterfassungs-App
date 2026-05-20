@@ -2,9 +2,9 @@
   "currentWeek": "B",
   "teacherName": "Michael Nagel ",
   "teacherEmail": "",
-  "news": "",
+  "news": "Hallo ",
   "newsClass": "class1",
-  "newsTimestamp": 1779284396462,
+  "newsTimestamp": 1779285210226,
   "fixedDates": "",
   "wocheA": {
     "Mo": [
@@ -71,5 +71,6 @@
     ]
   },
   "calendarEvents": {},
-  "sentAt": "20.5.2026, 15:39:56"
+  "sentAt": "20.5.2026, 15:53:30",
+  "className": "alle"
 }
