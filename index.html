@@ -1460,10 +1460,17 @@
         setTimeout(function() { generateQRCode(); }, 300);
         // Klassen-Select Wert wiederherstellen
         setTimeout(function() {
-            var sel = document.getElementById('sus-news-class');
-            var saved = localStorage.getItem('susNewsClass');
-            if (sel && saved) sel.value = saved;
-        }, 100);
+            // Klassen-Select wiederherstellen
+            var newsSelEl = document.getElementById('sus-news-class');
+            var savedNews = localStorage.getItem('susNewsClass');
+            if (newsSelEl && savedNews) newsSelEl.value = savedNews;
+            // QR-Klassen-Select wiederherstellen
+            var qrSelEl = document.getElementById('qr-class-select');
+            var savedQr = localStorage.getItem('activeClassV21');
+            if (qrSelEl && savedQr) qrSelEl.value = savedQr;
+            // QR-Code generieren
+            generateQRCode();
+        }, 300);
     }
  
     let susPlanWeek = 'A';
@@ -1626,9 +1633,9 @@
     function generateQRCode() {
         var classSelect = document.getElementById('qr-class-select');
         if (!classSelect) return;
-        var sel = classSelect.value;
-        var slug = sel.toLowerCase().replace(/ /g, '_');
-        var base = window.location.origin;
+        var sel   = classSelect.value;
+        var slug  = sel.toLowerCase().replace(/ /g, '_');
+        var base  = window.location.origin;
         var susUrl = base + '/sus-app.html?klasse=' + slug + '&user=' + encodeURIComponent(ghUser) + '&repo=' + encodeURIComponent(ghRepo);
 
         var display = document.getElementById('qr-code-display');
@@ -1636,8 +1643,24 @@
         if (!display) return;
         if (urlText) urlText.innerText = susUrl;
 
-        var src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&bgcolor=ffffff&color=0f172a&data=' + encodeURIComponent(susUrl);
-        display.innerHTML = '<img src="' + src + '" style="width:180px;height:180px;border-radius:8px;" alt="QR-Code">';
+        // Google Charts QR API
+        var src = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=' + encodeURIComponent(susUrl) + '&choe=UTF-8';
+        var img = new Image();
+        img.style.cssText = 'width:200px;height:200px;border-radius:8px;display:block;margin:0 auto;';
+        img.alt = 'QR-Code';
+        img.onload = function() { display.innerHTML = ''; display.appendChild(img); };
+        img.onerror = function() {
+            // Fallback: Link zum Teilen
+            display.innerHTML = '<div style="background:#f1f5f9;padding:14px;border-radius:8px;text-align:left;">' +
+                '<div style="font-size:0.7rem;font-weight:800;color:#1e293b;margin-bottom:6px;">🔗 Link zum Teilen:</div>' +
+                '<div style="font-size:0.6rem;color:#475569;word-break:break-all;margin-bottom:10px;">' + susUrl + '</div>' +
+                '<button onclick="if(navigator.share){navigator.share({url:\'' + susUrl + '\'});}else if(navigator.clipboard){navigator.clipboard.writeText(\'' + susUrl + '\').then(function(){alert(\'Kopiert!\');});}" ' +
+                'style="background:#3b82f6;color:white;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:800;font-size:0.8rem;">📋 Link teilen</button>' +
+                '</div>';
+        };
+        display.innerHTML = '<div style="color:#94a3b8;font-size:0.75rem;padding:20px;">QR-Code wird geladen...</div>';
+        img.src = src;
+
         localStorage.setItem('activeClassV21', sel);
     }
 
