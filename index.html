@@ -1377,9 +1377,21 @@
             </div>
  
             <div class="sus-panel" style="margin-top:20px;">
-                <div class="sus-panel-title">📱 SuS-APP VORSCHAU</div>
-                <div style="background:#0f172a; border-radius:10px; padding:10px; font-size:0.75rem; color:#94a3b8; text-align:center;">
-                    ${pending > 0 ? `<span style="color:var(--sus); font-weight:800;">${pending} Einträge</span> zur Übertragung bereit` : 'Keine freigegebenen Einträge'}
+                <div class="sus-panel-title">📱 QR-CODE FÜR SuS</div>
+
+                <select id="qr-class-select" onchange="updateQRCode()" style="width:100%;margin-bottom:12px;background:#0f172a;border:1.5px solid var(--sus);color:white;padding:10px;border-radius:10px;font-weight:800;font-size:0.9rem;">
+                    <option value="${class1Name}">${class1Name}</option>
+                    <option value="${class2Name}">${class2Name}</option>
+                </select>
+
+                <div style="background:white;border-radius:16px;padding:16px;text-align:center;margin-bottom:10px;">
+                    <div id="qr-code-display" style="display:flex;justify-content:center;margin-bottom:8px;min-height:80px;align-items:center;"></div>
+                    <div id="qr-url-text" style="font-size:0.58rem;color:#64748b;word-break:break-all;margin-bottom:4px;"></div>
+                    <div style="font-size:0.65rem;font-weight:800;color:#0f172a;">SuS einmal scannen – fertig!</div>
+                </div>
+
+                <div style="background:#0f172a;border-radius:10px;padding:10px;font-size:0.75rem;color:#94a3b8;text-align:center;">
+                    ${pending > 0 ? `<span style="color:var(--sus);font-weight:800;">${pending} Einträge</span> zur Übertragung bereit` : 'Keine freigegebenen Einträge'}
                 </div>
             </div>
  
