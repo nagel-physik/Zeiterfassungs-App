@@ -1,0 +1,75 @@
+{
+  "currentWeek": "B",
+  "teacherName": "Michael Nagel ",
+  "teacherEmail": "",
+  "news": "Hallo an alle ",
+  "newsClass": "class1",
+  "newsTimestamp": 1779282991949,
+  "fixedDates": "",
+  "wocheA": {
+    "Mo": [
+      "Mathe ",
+      "",
+      "",
+      ""
+    ],
+    "Di": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "Mi": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "Do": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "Fr": [
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  "wocheB": {
+    "Mo": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "Di": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "Mi": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "Do": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "Fr": [
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  "calendarEvents": {},
+  "sentAt": "20.5.2026, 15:16:31"
+}
