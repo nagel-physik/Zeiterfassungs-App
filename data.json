@@ -3,8 +3,8 @@
   "teacherName": "Michael Nagel ",
   "teacherEmail": "",
   "news": "",
-  "newsClass": "class2",
-  "newsTimestamp": 1779284384388,
+  "newsClass": "class1",
+  "newsTimestamp": 1779284396462,
   "fixedDates": "",
   "wocheA": {
     "Mo": [
@@ -71,5 +71,5 @@
     ]
   },
   "calendarEvents": {},
-  "sentAt": "20.5.2026, 15:39:44"
+  "sentAt": "20.5.2026, 15:39:56"
 }
