@@ -55,10 +55,11 @@
         /* ── SETUP SCREEN ── */
         #setup-screen {
             min-height: 100vh;
-            display: flex; flex-direction: column;
+            flex-direction: column;
             align-items: center; justify-content: center;
             padding: 30px 20px;
         }
+        #setup-screen.active { display: flex !important; }
         .setup-logo { font-size: 4rem; margin-bottom: 10px; animation: bounce-in 0.6s ease; }
         @keyframes bounce-in { 0%{transform:scale(0)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
         .setup-title { font-size: 2rem; font-weight: 900; margin-bottom: 5px; }
@@ -812,9 +813,9 @@
     const TEACHER_PARAM = urlParams.get('lehrer') || '';
 
     // GitHub Daten aus URL oder localStorage
-    // URL Parameter haben Vorrang (kommen aus QR-Code)
-    if (urlParams.get('user')) localStorage.setItem('susGhUser', urlParams.get('user'));
-    if (urlParams.get('repo')) localStorage.setItem('susGhRepo', urlParams.get('repo'));
+    if (urlParams.get('user')) localStorage.setItem('susGhUser', decodeURIComponent(urlParams.get('user')));
+    if (urlParams.get('repo')) localStorage.setItem('susGhRepo', decodeURIComponent(urlParams.get('repo')));
+    if (urlParams.get('klasse')) localStorage.setItem('susClassSlug', decodeURIComponent(urlParams.get('klasse')));
     const GH_USER = localStorage.getItem('susGhUser') || '';
     const GH_REPO = localStorage.getItem('susGhRepo') || '';
 
@@ -1111,7 +1112,7 @@
             return;
         }
 
-        const dataFile = `data_${classSlug}.json`;
+        const dataFile = classSlug ? `data_${classSlug}.json` : 'data.json';
         const url = `https://raw.githubusercontent.com/${ghUser}/${ghRepo}/main/${dataFile}?t=${Date.now()}`;
 
         try {
