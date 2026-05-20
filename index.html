@@ -1379,15 +1379,19 @@
             <div class="sus-panel" style="margin-top:20px;">
                 <div class="sus-panel-title">📱 QR-CODE FÜR SuS</div>
 
-                <select id="qr-class-select" onchange="updateQRCode()" style="width:100%;margin-bottom:12px;background:#0f172a;border:1.5px solid var(--sus);color:white;padding:10px;border-radius:10px;font-weight:800;font-size:0.9rem;">
+                <select id="qr-class-select" style="width:100%;margin-bottom:12px;background:#0f172a;border:1.5px solid var(--sus);color:white;padding:10px;border-radius:10px;font-weight:800;font-size:0.9rem;">
                     <option value="${class1Name}">${class1Name}</option>
                     <option value="${class2Name}">${class2Name}</option>
                 </select>
 
-                <div style="background:white;border-radius:16px;padding:16px;text-align:center;margin-bottom:10px;">
-                    <div id="qr-code-display" style="display:flex;justify-content:center;margin-bottom:8px;min-height:80px;align-items:center;"></div>
+                <button onclick="generateQRCode()" style="width:100%;background:linear-gradient(135deg,var(--sus),#0e7490);color:white;border:none;padding:14px;border-radius:12px;font-weight:900;font-size:1rem;cursor:pointer;margin-bottom:12px;font-family:inherit;">
+                    📱 QR-Code generieren
+                </button>
+
+                <div id="qr-code-display" style="background:white;border-radius:16px;padding:16px;text-align:center;margin-bottom:10px;min-height:60px;display:none;">
+                    <div id="qr-img-wrap" style="display:flex;justify-content:center;margin-bottom:8px;"></div>
                     <div id="qr-url-text" style="font-size:0.58rem;color:#64748b;word-break:break-all;margin-bottom:4px;"></div>
-                    <div style="font-size:0.65rem;font-weight:800;color:#0f172a;">SuS einmal scannen – fertig!</div>
+                    <div style="font-size:0.65rem;font-weight:800;color:#0f172a;">👆 SuS einmal scannen – fertig!</div>
                 </div>
 
                 <div style="background:#0f172a;border-radius:10px;padding:10px;font-size:0.75rem;color:#94a3b8;text-align:center;">
@@ -1460,17 +1464,13 @@
         setTimeout(function() { generateQRCode(); }, 300);
         // Klassen-Select Wert wiederherstellen
         setTimeout(function() {
-            // Klassen-Select wiederherstellen
             var newsSelEl = document.getElementById('sus-news-class');
             var savedNews = localStorage.getItem('susNewsClass');
             if (newsSelEl && savedNews) newsSelEl.value = savedNews;
-            // QR-Klassen-Select wiederherstellen
             var qrSelEl = document.getElementById('qr-class-select');
             var savedQr = localStorage.getItem('activeClassV21');
             if (qrSelEl && savedQr) qrSelEl.value = savedQr;
-            // QR-Code generieren
-            generateQRCode();
-        }, 300);
+        }, 200);
     }
  
     let susPlanWeek = 'A';
@@ -1632,43 +1632,63 @@
  
     function generateQRCode() {
         var classSelect = document.getElementById('qr-class-select');
-        if (!classSelect) return;
-        var sel   = classSelect.value;
-        var slug  = sel.toLowerCase().replace(/ /g, '_');
-        var base  = window.location.origin;
+        if (!classSelect) { alert('Klassen-Auswahl nicht gefunden!'); return; }
+        var sel  = classSelect.value;
+        var slug = sel.toLowerCase().replace(/ /g, '_');
+        var base = window.location.origin;
         var susUrl = base + '/sus-app.html?klasse=' + slug + '&user=' + encodeURIComponent(ghUser) + '&repo=' + encodeURIComponent(ghRepo);
 
-        var display = document.getElementById('qr-code-display');
+        var wrap    = document.getElementById('qr-img-wrap');
         var urlText = document.getElementById('qr-url-text');
-        if (!display) return;
+        var display = document.getElementById('qr-code-display');
+        if (!wrap || !display) { alert('Anzeige-Element fehlt!'); return; }
+
+        // URL global speichern für teileLink
+        window._lastQrUrl = susUrl;
+
+        display.style.display = 'block';
+        wrap.innerHTML = '<div style="color:#94a3b8;font-size:0.8rem;padding:20px;">⏳ QR-Code wird geladen...</div>';
         if (urlText) urlText.innerText = susUrl;
 
-        // Google Charts QR API
-        var src = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=' + encodeURIComponent(susUrl) + '&choe=UTF-8';
         var img = new Image();
         img.style.cssText = 'width:200px;height:200px;border-radius:8px;display:block;margin:0 auto;';
-        img.alt = 'QR-Code';
-        img.onload = function() { display.innerHTML = ''; display.appendChild(img); };
+        img.onload = function() { wrap.innerHTML = ''; wrap.appendChild(img); };
         img.onerror = function() {
-            // Fallback: Link zum Teilen
-            display.innerHTML = '<div style="background:#f1f5f9;padding:14px;border-radius:8px;text-align:left;">' +
-                '<div style="font-size:0.7rem;font-weight:800;color:#1e293b;margin-bottom:6px;">🔗 Link zum Teilen:</div>' +
-                '<div style="font-size:0.6rem;color:#475569;word-break:break-all;margin-bottom:10px;">' + susUrl + '</div>' +
-                '<button onclick="if(navigator.share){navigator.share({url:\'' + susUrl + '\'});}else if(navigator.clipboard){navigator.clipboard.writeText(\'' + susUrl + '\').then(function(){alert(\'Kopiert!\');});}" ' +
-                'style="background:#3b82f6;color:white;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:800;font-size:0.8rem;">📋 Link teilen</button>' +
+            wrap.innerHTML =
+                '<div style="background:#f0f9ff;border:1px solid #bae6fd;padding:12px;border-radius:8px;text-align:left;">' +
+                '<div style="font-size:0.7rem;font-weight:800;color:#0369a1;margin-bottom:6px;">🔗 Link für SuS:</div>' +
+                '<div style="font-size:0.58rem;color:#334155;word-break:break-all;margin-bottom:10px;">' + susUrl + '</div>' +
+                '<button onclick="teileLink()" style="width:100%;background:#0ea5e9;color:white;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:800;font-size:0.85rem;">📤 Link teilen / kopieren</button>' +
                 '</div>';
         };
-        display.innerHTML = '<div style="color:#94a3b8;font-size:0.75rem;padding:20px;">QR-Code wird geladen...</div>';
-        img.src = src;
-
+        img.src = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=' + encodeURIComponent(susUrl) + '&choe=UTF-8';
         localStorage.setItem('activeClassV21', sel);
     }
 
-    function updateQRCode() {
-        var display = document.getElementById('qr-code-display');
-        if (display) display.innerHTML = '';
-        setTimeout(function() { generateQRCode(); }, 50);
+    function teileLink() {
+        var url = window._lastQrUrl || '';
+        if (!url) return;
+        if (navigator.share) {
+            navigator.share({ title: 'SchulHub App', url: url });
+        } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function() { alert('Link kopiert!'); });
+        } else {
+            prompt('Link kopieren:', url);
+        }
     }
+
+    function teileLink(encodedUrl) {
+        var url = decodeURIComponent(encodedUrl);
+        if (navigator.share) {
+            navigator.share({ title: 'SchulHub App', url: url });
+        } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function() { alert('✅ Link kopiert!'); });
+        } else {
+            prompt('Link kopieren:', url);
+        }
+    }
+
+    function updateQRCode() { /* manuell über Button */ }
 
     async function pushToGitHub() {
         if (!ghToken || !ghUser || !ghRepo) {
