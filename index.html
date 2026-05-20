@@ -1632,45 +1632,57 @@
  
     function generateQRCode() {
         var classSelect = document.getElementById('qr-class-select');
-        if (!classSelect) { alert('Fehler: Klassen-Select nicht gefunden'); return; }
-
+        if (!classSelect) return;
         var sel  = classSelect.value;
         var slug = sel.toLowerCase().replace(/ /g, '_');
-        var base = 'https://zeiterfassungs-app-three.vercel.app';
-
-        // Basis-URL immer funktionierend
-        var susUrl = base + '/sus-app.html?klasse=' + encodeURIComponent(slug);
+        var susUrl = 'https://zeiterfassungs-app-three.vercel.app/s.html?klasse=' + encodeURIComponent(slug);
         if (ghUser) susUrl += '&user=' + encodeURIComponent(ghUser);
         if (ghRepo) susUrl += '&repo=' + encodeURIComponent(ghRepo);
 
-        var wrap    = document.getElementById('qr-img-wrap');
-        var urlText = document.getElementById('qr-url-text');
-        var display = document.getElementById('qr-code-display');
-        if (!wrap || !display) { alert('Fehler: Anzeige nicht gefunden'); return; }
-
         window._lastQrUrl = susUrl;
+
+        var wrap    = document.getElementById('qr-img-wrap');
+        var display = document.getElementById('qr-code-display');
+        var urlText = document.getElementById('qr-url-text');
+        if (!wrap || !display) return;
+
         display.style.display = 'block';
         if (urlText) urlText.innerText = susUrl;
 
-        // Direkt den Link und Teilen-Button anzeigen (immer sichtbar)
         wrap.innerHTML =
-            '<div style="background:#e0f2fe;border:1px solid #7dd3fc;padding:12px;border-radius:10px;margin-bottom:10px;text-align:left;">' +
-            '<div style="font-size:0.68rem;font-weight:900;color:#0369a1;margin-bottom:4px;">🔗 Link für SuS:</div>' +
-            '<div id="qr-link-text" style="font-size:0.58rem;color:#1e3a5f;word-break:break-all;margin-bottom:8px;">' + susUrl + '</div>' +
-            '<button onclick="teileLink()" style="width:100%;background:#0ea5e9;color:white;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:900;font-size:0.9rem;font-family:inherit;">📤 Link teilen / kopieren</button>' +
-            '</div>' +
+            '<div style="background:#e0f2fe;border:2px solid #0ea5e9;padding:14px;border-radius:12px;margin-bottom:12px;">' +
+            '<div style="font-size:0.7rem;font-weight:900;color:#0369a1;margin-bottom:8px;">🔗 SuS-App Link:</div>' +
+            '<div id="sus-link-box" style="background:white;border:1.5px solid #bae6fd;padding:10px;border-radius:8px;font-size:0.6rem;color:#1e3a5f;word-break:break-all;margin-bottom:10px;font-family:monospace;">' + susUrl + '</div>' +
+            '<div style="display:flex;gap:8px;">' +
+            '<button onclick="kopierSusLink()" style="flex:1;background:#0ea5e9;color:white;border:none;padding:12px;border-radius:8px;cursor:pointer;font-weight:900;font-size:0.9rem;font-family:inherit;">📋 Kopieren</button>' +
+            '<button onclick="teileLink()" style="flex:1;background:#7c3aed;color:white;border:none;padding:12px;border-radius:8px;cursor:pointer;font-weight:900;font-size:0.9rem;font-family:inherit;">📤 Teilen</button>' +
+            '</div></div>' +
             '<div id="qr-img-inner" style="text-align:center;"></div>';
 
-        // Zusätzlich QR-Code laden
-        var imgWrap = document.getElementById('qr-img-inner');
-        if (imgWrap) {
-            var img = new Image();
-            img.style.cssText = 'width:180px;height:180px;border-radius:8px;margin:8px auto;display:block;';
-            img.onload = function() { imgWrap.appendChild(img); };
-            img.src = 'https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=' + encodeURIComponent(susUrl);
-        }
-
+        var imgEl = new Image();
+        imgEl.style.cssText = 'width:180px;height:180px;border-radius:8px;margin:0 auto;display:block;';
+        imgEl.onload = function() { var w = document.getElementById('qr-img-inner'); if(w) w.appendChild(imgEl); };
+        imgEl.src = 'https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=' + encodeURIComponent(susUrl);
         localStorage.setItem('activeClassV21', sel);
+    }
+
+    function kopierSusLink() {
+        var url = window._lastQrUrl || '';
+        if (!url) { alert('Bitte zuerst QR-Code generieren!'); return; }
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function() {
+                var box = document.getElementById('sus-link-box');
+                if (box) { box.style.background = '#dcfce7'; setTimeout(function(){ box.style.background='white'; }, 1500); }
+                alert('Link kopiert! Jetzt an SuS senden.');
+            });
+        } else { prompt('Link:', url); }
+    }
+
+    function teileLink() {
+        var url = window._lastQrUrl || '';
+        if (!url) return;
+        if (navigator.share) { navigator.share({ title: 'SchulHub', url: url }); }
+        else { kopierSusLink(); }
     }
 
     function teileLink() {
@@ -1708,7 +1720,7 @@
         }
     }
 
-    function updateQRCode() { /* manuell über Button */ }
+    function updateQRCode() { generateQRCode(); }
 
     async function pushToGitHub() {
         if (!ghToken || !ghUser || !ghRepo) {
