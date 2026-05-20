@@ -812,6 +812,9 @@
     const TEACHER_PARAM = urlParams.get('lehrer') || '';
 
     // GitHub Daten aus URL oder localStorage
+    // URL Parameter haben Vorrang (kommen aus QR-Code)
+    if (urlParams.get('user')) localStorage.setItem('susGhUser', urlParams.get('user'));
+    if (urlParams.get('repo')) localStorage.setItem('susGhRepo', urlParams.get('repo'));
     const GH_USER = localStorage.getItem('susGhUser') || '';
     const GH_REPO = localStorage.getItem('susGhRepo') || '';
 

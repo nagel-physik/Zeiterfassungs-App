@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Arbeitszeit-Assistent Pro v21.23</title>
     <style id="dynamic-theme-style"></style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -1385,7 +1386,7 @@
             <div class="admin-section">
                 <div class="admin-section-title">📢 TAGES-NEWS AN SuS</div>
                 <textarea id="sus-news-input" rows="3" placeholder="z.B. Morgen Test in Physik! Bitte Formelblatt mitbringen."></textarea>
-                <select id="sus-news-class">
+                <select id="sus-news-class" onchange="localStorage.setItem('susNewsClass', this.value)">
                     <option value="both">Beide Klassen</option>
                     <option value="class1">${class1Name}</option>
                     <option value="class2">${class2Name}</option>
@@ -1444,6 +1445,13 @@
  
         document.getElementById('modal').style.display = 'block';
         renderSusPlanFields('A');
+        setTimeout(function() { generateQRCode(); }, 300);
+        // Klassen-Select Wert wiederherstellen
+        setTimeout(function() {
+            var sel = document.getElementById('sus-news-class');
+            var saved = localStorage.getItem('susNewsClass');
+            if (sel && saved) sel.value = saved;
+        }, 100);
     }
  
     let susPlanWeek = 'A';
@@ -1603,6 +1611,37 @@
         alert("✅ Gespeichert!");
     }
  
+    function generateQRCode() {
+        const classSelect = document.getElementById('qr-class-select');
+        if (!classSelect) return;
+        const selectedClass = classSelect.value;
+        const classSlug = selectedClass.toLowerCase().replace(/\s+/g, '_');
+        const baseUrl = window.location.origin;
+        const susUrl = baseUrl + '/sus-app.html?klasse=' + classSlug + '&user=' + encodeURIComponent(ghUser) + '&repo=' + encodeURIComponent(ghRepo);
+
+        var display = document.getElementById('qr-code-display');
+        var urlText = document.getElementById('qr-url-text');
+        if (display) display.innerHTML = '';
+        if (urlText) urlText.innerText = susUrl;
+
+        try {
+            if (typeof QRCode !== 'undefined' && display) {
+                new QRCode(display, { text: susUrl, width: 180, height: 180, colorDark: '#0f172a', colorLight: '#ffffff' });
+            } else if (display) {
+                display.innerHTML = '<div style="background:#f1f5f9;padding:12px;border-radius:8px;font-size:0.65rem;color:#1e293b;word-break:break-all;">' + susUrl + '</div>';
+            }
+        } catch(e) {
+            if (display) display.innerHTML = '<div style="background:#f1f5f9;padding:12px;border-radius:8px;font-size:0.65rem;color:#1e293b;word-break:break-all;">' + susUrl + '</div>';
+        }
+        localStorage.setItem('activeClassV21', selectedClass);
+    }
+
+    function updateQRCode() {
+        var display = document.getElementById('qr-code-display');
+        if (display) display.innerHTML = '';
+        setTimeout(function() { generateQRCode(); }, 50);
+    }
+
     async function pushToGitHub() {
         if (!ghToken || !ghUser || !ghRepo) {
             alert("⚠️ Bitte zuerst GitHub-Zugangsdaten im Admin-Bereich eintragen!");
@@ -1610,7 +1649,7 @@
         }
  
         const newsText  = document.getElementById('sus-news-input')?.value  || '';
-        const newsClass = document.getElementById('sus-news-class')?.value || 'both';
+        const newsClass = document.getElementById('sus-news-class')?.value || localStorage.getItem('susNewsClass') || 'both';
  
         // Collect sus-shared calendar entries for today+future
         const todayKey = toLocalDateKey();
@@ -1636,30 +1675,48 @@
             sentAt: new Date().toLocaleString('de-DE')
         };
  
-        const url = `https://api.github.com/repos/${ghUser}/${ghRepo}/contents/data.json`;
+        // Bestimme welche Dateien geschrieben werden sollen
+        const filesToWrite = [];
+        if (newsClass === 'both' || newsClass === class1Name) {
+            const slug1 = class1Name.toLowerCase().replace(/\s+/g, '_');
+            filesToWrite.push({ file: 'data_' + slug1 + '.json', className: class1Name });
+        }
+        if (newsClass === 'both' || newsClass === class2Name) {
+            const slug2 = class2Name.toLowerCase().replace(/\s+/g, '_');
+            filesToWrite.push({ file: 'data_' + slug2 + '.json', className: class2Name });
+        }
+        // Fallback: immer data.json schreiben
+        filesToWrite.push({ file: 'data.json', className: 'alle' });
+
         try {
-            const getRes  = await fetch(url, { headers: { Authorization: `token ${ghToken}` } });
-            const getFile = await getRes.json();
-            const putRes  = await fetch(url, {
-                method: "PUT",
-                headers: { Authorization: `token ${ghToken}`, "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    message: `Update ${new Date().toLocaleString('de-DE')}`,
-                    content: btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2)))),
-                    sha: getFile.sha
-                })
-            });
-            if (putRes.ok) {
-                const logEntry = { msg: newsText ? `News: "${newsText.substring(0,30)}..."` : "Plan-Update", time: new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) };
+            let allOk = true;
+            for (const f of filesToWrite) {
+                const filePayload = Object.assign({}, payload, { className: f.className });
+                const url = 'https://api.github.com/repos/' + ghUser + '/' + ghRepo + '/contents/' + f.file;
+                const getRes  = await fetch(url, { headers: { Authorization: 'token ' + ghToken } });
+                const getFile = await getRes.json();
+                const putRes  = await fetch(url, {
+                    method: 'PUT',
+                    headers: { Authorization: 'token ' + ghToken, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'Update ' + new Date().toLocaleString('de-DE'),
+                        content: btoa(unescape(encodeURIComponent(JSON.stringify(filePayload, null, 2)))),
+                        sha: getFile.sha || undefined
+                    })
+                });
+                if (!putRes.ok) { allOk = false; }
+            }
+            if (allOk) {
+                const logEntry = { msg: newsText ? 'News: "' + newsText.substring(0,30) + '..."' : 'Plan-Update', time: new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) };
                 sendLog.push(logEntry);
                 if (sendLog.length > 20) sendLog.shift();
                 localStorage.setItem('sendLogV21', JSON.stringify(sendLog));
-                alert("✅ Erfolgreich an SuS gesendet!");
+                alert('✅ Erfolgreich an SuS gesendet!');
                 document.getElementById('modal').style.display = 'none';
             } else {
-                alert("❌ Fehler beim Senden. Token prüfen!");
+                alert('❌ Fehler beim Senden. Token prüfen!');
             }
-        } catch (e) { alert("❌ Verbindungsfehler: " + e.message); }
+        } catch (e) { alert('❌ Verbindungsfehler: ' + e.message); }
     }
  
     // ─── SETUP / SETTINGS ─────────────────────────────────────────
