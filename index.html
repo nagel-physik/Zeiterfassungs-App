@@ -1624,28 +1624,21 @@
     }
  
     function generateQRCode() {
-        const classSelect = document.getElementById('qr-class-select');
+        var classSelect = document.getElementById('qr-class-select');
         if (!classSelect) return;
-        const selectedClass = classSelect.value;
-        const classSlug = selectedClass.toLowerCase().replace(/\s+/g, '_');
-        const baseUrl = window.location.origin;
-        const susUrl = baseUrl + '/sus-app.html?klasse=' + classSlug + '&user=' + encodeURIComponent(ghUser) + '&repo=' + encodeURIComponent(ghRepo);
+        var sel = classSelect.value;
+        var slug = sel.toLowerCase().replace(/ /g, '_');
+        var base = window.location.origin;
+        var susUrl = base + '/sus-app.html?klasse=' + slug + '&user=' + encodeURIComponent(ghUser) + '&repo=' + encodeURIComponent(ghRepo);
 
         var display = document.getElementById('qr-code-display');
         var urlText = document.getElementById('qr-url-text');
-        if (display) display.innerHTML = '';
+        if (!display) return;
         if (urlText) urlText.innerText = susUrl;
 
-        try {
-            if (typeof QRCode !== 'undefined' && display) {
-                new QRCode(display, { text: susUrl, width: 180, height: 180, colorDark: '#0f172a', colorLight: '#ffffff' });
-            } else if (display) {
-                display.innerHTML = '<div style="background:#f1f5f9;padding:12px;border-radius:8px;font-size:0.65rem;color:#1e293b;word-break:break-all;">' + susUrl + '</div>';
-            }
-        } catch(e) {
-            if (display) display.innerHTML = '<div style="background:#f1f5f9;padding:12px;border-radius:8px;font-size:0.65rem;color:#1e293b;word-break:break-all;">' + susUrl + '</div>';
-        }
-        localStorage.setItem('activeClassV21', selectedClass);
+        var src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&bgcolor=ffffff&color=0f172a&data=' + encodeURIComponent(susUrl);
+        display.innerHTML = '<img src="' + src + '" style="width:180px;height:180px;border-radius:8px;" alt="QR-Code">';
+        localStorage.setItem('activeClassV21', sel);
     }
 
     function updateQRCode() {
