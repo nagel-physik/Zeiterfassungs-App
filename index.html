@@ -1762,15 +1762,20 @@
                 const filePayload = Object.assign({}, payload, { className: f.className });
                 const url = 'https://api.github.com/repos/' + ghUser + '/' + ghRepo + '/contents/' + f.file;
                 const getRes  = await fetch(url, { headers: { Authorization: 'token ' + ghToken } });
-                const getFile = await getRes.json();
+                var sha = undefined;
+                if (getRes.ok) {
+                    var getFile = await getRes.json();
+                    sha = getFile.sha;
+                }
+                var body = {
+                    message: 'Update ' + new Date().toLocaleString('de-DE'),
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(filePayload, null, 2))))
+                };
+                if (sha) body.sha = sha;
                 const putRes  = await fetch(url, {
                     method: 'PUT',
                     headers: { Authorization: 'token ' + ghToken, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: 'Update ' + new Date().toLocaleString('de-DE'),
-                        content: btoa(unescape(encodeURIComponent(JSON.stringify(filePayload, null, 2)))),
-                        sha: getFile.sha || undefined
-                    })
+                    body: JSON.stringify(body)
                 });
                 if (!putRes.ok) { allOk = false; }
             }
