@@ -4,7 +4,7 @@
   "teacherEmail": "",
   "news": "Hallo ",
   "newsClass": "class1",
-  "newsTimestamp": 1779291310087,
+  "newsTimestamp": 1779291720878,
   "fixedDates": "",
   "wocheA": {
     "Mo": [
@@ -71,6 +71,6 @@
     ]
   },
   "calendarEvents": {},
-  "sentAt": "20.5.2026, 17:35:10",
+  "sentAt": "20.5.2026, 17:42:00",
   "className": "alle"
 }
