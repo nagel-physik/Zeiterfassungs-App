@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* Ã¢ÂÂÃ¢ÂÂ VARIABLEN Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ VARIABLEN ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         :root {
             --accent: #6366f1;
             --accent2: #8b5cf6;
@@ -31,7 +31,7 @@
             overflow-x: hidden;
         }
 
-        /* Ã¢ÂÂÃ¢ÂÂ HINTERGRUND Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ HINTERGRUND ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .bg-glow {
             position: fixed; top: -30%; left: -20%;
             width: 70vw; height: 70vw;
@@ -48,11 +48,11 @@
         }
         @keyframes float-glow { 0%,100%{transform:translate(0,0)} 50%{transform:translate(3%,5%)} }
 
-        /* Ã¢ÂÂÃ¢ÂÂ SCREENS Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ SCREENS ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .screen { display: none; position: relative; z-index: 1; }
         .screen.active { display: block; }
 
-        /* Ã¢ÂÂÃ¢ÂÂ SETUP SCREEN Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ SETUP SCREEN ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         #setup-screen {
             min-height: 100vh;
             flex-direction: column;
@@ -90,10 +90,10 @@
         }
         .setup-btn:active { transform: scale(0.97); }
 
-        /* Ã¢ÂÂÃ¢ÂÂ HAUPT-APP Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ HAUPT-APP ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         #main-screen { padding-bottom: 80px; }
 
-        /* Ã¢ÂÂÃ¢ÂÂ TOP BAR Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ TOP BAR ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .top-bar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 20px 20px 10px;
@@ -110,7 +110,7 @@
         }
         .top-avatar:active { transform: scale(0.92); }
 
-        /* Ã¢ÂÂÃ¢ÂÂ UHR Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ UHR ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .clock-section { padding: 10px 20px 20px; text-align: center; }
         .clock-display { font-size: 4rem; font-weight: 900; letter-spacing: -2px; line-height: 1; }
         .clock-date { font-size: 0.85rem; color: var(--sub); font-weight: 600; margin-top: 4px; text-transform: uppercase; letter-spacing: 2px; }
@@ -122,7 +122,7 @@
             color: white;
         }
 
-        /* Ã¢ÂÂÃ¢ÂÂ STATUS KACHELN Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ STATUS KACHELN ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 16px; }
         .status-tile {
             background: var(--card); border-radius: 20px; padding: 16px;
@@ -148,7 +148,7 @@
 
 
 
-        /* Ã¢ÂÂÃ¢ÂÂ NEWS Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ NEWS ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .section-header { padding: 8px 20px 8px; display: flex; justify-content: space-between; align-items: center; }
         .section-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--sub); }
         .news-card {
@@ -159,7 +159,7 @@
             position: relative; overflow: hidden;
         }
         .news-card::after {
-            content: 'Ã°ÂÂÂ¢'; position: absolute; right: 16px; top: 16px;
+            content: 'ÃÂ°ÃÂÃÂÃÂ¢'; position: absolute; right: 16px; top: 16px;
             font-size: 1.8rem; opacity: 0.3;
         }
         .news-title { font-size: 0.65rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
@@ -167,7 +167,7 @@
         .news-time { font-size: 0.65rem; color: var(--sub); margin-top: 8px; }
         .news-empty { color: var(--sub); font-size: 0.85rem; font-style: italic; }
 
-        /* Ã¢ÂÂÃ¢ÂÂ STUNDENPLAN BUTTON Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ STUNDENPLAN BUTTON ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .plan-btn {
             margin: 0 16px 12px;
             background: var(--card); border: 1.5px solid rgba(99,102,241,0.3);
@@ -182,7 +182,7 @@
         .plan-btn-sub { font-size: 0.72rem; color: var(--sub); margin-top: 2px; }
         .plan-btn-arrow { color: var(--accent); font-size: 1.2rem; font-weight: 900; }
 
-        /* Ã¢ÂÂÃ¢ÂÂ MAIL BUTTON Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ MAIL BUTTON ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .mail-section { margin: 0 16px 16px; }
         .mail-card {
             background: var(--card); border-radius: 20px; padding: 18px;
@@ -205,7 +205,7 @@
         }
         .mail-send-btn:active { transform: scale(0.97); }
 
-        /* Ã¢ÂÂÃ¢ÂÂ BOTTOM NAV Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ BOTTOM NAV ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: rgba(10,10,15,0.9); backdrop-filter: blur(20px);
@@ -223,7 +223,7 @@
         .nav-icon { font-size: 1.4rem; }
         .nav-label { font-size: 0.55rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Ã¢ÂÂÃ¢ÂÂ STUNDENPLAN OVERLAY Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ STUNDENPLAN OVERLAY ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         #plan-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg); z-index: 200; overflow-y: auto;
@@ -262,7 +262,7 @@
         .plan-block-subject { font-size: 0.95rem; font-weight: 800; }
         .plan-block-label { font-size: 0.65rem; color: var(--sub); margin-top: 2px; }
 
-        /* Ã¢ÂÂÃ¢ÂÂ SETTINGS OVERLAY Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ SETTINGS OVERLAY ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         #settings-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg); z-index: 200; overflow-y: auto; padding-bottom: 40px;
@@ -287,7 +287,7 @@
         .avatar-opt.selected { border-color: var(--accent); background: rgba(99,102,241,0.2); transform: scale(1.1); }
 
         /* Theme Grid */
-        /* Ã¢ÂÂÃ¢ÂÂ HINTERGRUND THEMES Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ HINTERGRUND THEMES ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .bg-theme-1  { background: linear-gradient(135deg, #0a0a0f 0%, #1a0533 100%) !important; }
         .bg-theme-2  { background: linear-gradient(135deg, #0a0f0a 0%, #003320 100%) !important; }
         .bg-theme-3  { background: linear-gradient(135deg, #0a0a0f 0%, #330015 100%) !important; }
@@ -359,7 +359,7 @@
             font-family: 'Outfit', sans-serif;
         }
 
-        /* Ã¢ÂÂÃ¢ÂÂ HILFE BUTTON Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ HILFE BUTTON ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         .help-btn {
             width: 34px; height: 34px; border-radius: 50%;
             background: var(--accent); color: white; border: none;
@@ -373,7 +373,7 @@
             0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); transform: scale(1); }
             50%     { box-shadow: 0 0 0 10px rgba(239,68,68,0); transform: scale(1.06); }
         }
-        /* Ã¢ÂÂÃ¢ÂÂ HILFE OVERLAY Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ HILFE OVERLAY ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         #help-overlay {
             display: none; position: fixed; top: 0; left: 0;
             width: 100%; height: 100%; background: var(--bg);
@@ -405,7 +405,7 @@
         .help-parents-title { font-size: 0.85rem; font-weight: 900; color: var(--accent); margin-bottom: 10px; }
         .help-parents-text { font-size: 0.8rem; color: var(--sub); line-height: 1.6; }
 
-        /* Ã¢ÂÂÃ¢ÂÂ LOADING Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ LOADING ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         #loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg); z-index: 999;
@@ -419,7 +419,7 @@
         .loading-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); animation: loading-anim 1.5s ease-in-out infinite; }
         @keyframes loading-anim { 0%{width:0%} 50%{width:80%} 100%{width:100%} }
 
-        /* Ã¢ÂÂÃ¢ÂÂ MOTIVATIONS-SPRUCH Ã¢ÂÂÃ¢ÂÂ */
+        /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ MOTIVATIONS-SPRUCH ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
         /* UPDATE BUTTON */
         .update-btn {
             display: block; margin: 0 auto 8px;
@@ -527,22 +527,22 @@
 
 <!-- Loading Screen -->
 <div id="loading-screen">
-    <div class="loading-logo">Ã°ÂÂÂ</div>
+    <div class="loading-logo">ÃÂ°ÃÂÃÂÃÂ</div>
     <div class="loading-text">SchulHub wird geladen...</div>
     <div class="loading-bar"><div class="loading-fill"></div></div>
 </div>
 
 <!-- Setup Screen (beim ersten Start) -->
 <div id="setup-screen" class="screen">
-    <div class="setup-logo">Ã°ÂÂÂ</div>
+    <div class="setup-logo">ÃÂ°ÃÂÃÂÃÂ</div>
     <div class="setup-title">Hey! Ich bin SchulHub.</div>
-    <div class="setup-sub">Deine persÃÂ¶nliche Schul-App.<br>Kurz einrichten Ã¢ÂÂ dauert 10 Sekunden!</div>
+    <div class="setup-sub">Deine persÃÂÃÂ¶nliche Schul-App.<br>Kurz einrichten ÃÂ¢ÃÂÃÂ dauert 10 Sekunden!</div>
     <div class="setup-card">
         <span class="setup-label">Dein Name</span>
         <input type="text" class="setup-input" id="setup-name-input" placeholder="z.B. Luca oder Max...">
         <span class="setup-label">Dein Klassen-Code</span>
         <input type="text" class="setup-input" id="setup-class-input" placeholder="Vom Lehrer bekommen (z.B. 10b)">
-        <button class="setup-btn" onclick="finishSetup()">Ã°ÂÂÂ LOS GEHT'S!</button>
+        <button class="setup-btn" onclick="finishSetup()">ÃÂ°ÃÂÃÂÃÂ LOS GEHT'S!</button>
     </div>
 </div>
 
@@ -553,11 +553,11 @@
     <div class="top-bar">
         <div>
             <div class="top-greeting" id="greeting-text">Guten Morgen,</div>
-            <div class="top-name" id="user-name-display">SchÃÂ¼ler</div>
+            <div class="top-name" id="user-name-display">SchÃÂÃÂ¼ler</div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;">
             <button class="help-btn" onclick="openHelp()">?</button>
-            <div class="top-avatar" id="avatar-display" onclick="openSettings()">Ã°ÂÂÂ</div>
+            <div class="top-avatar" id="avatar-display" onclick="openSettings()">ÃÂ°ÃÂÃÂÃÂ</div>
         </div>
     </div>
 
@@ -572,24 +572,24 @@
         </div>
         <div class="clock-date" id="main-date">Montag</div>
         <div class="week-badge" id="week-badge-display" onclick="flipWeek()" style="cursor:pointer;" title="Tippen zum Wechseln">WOCHE A</div>
-        <div style="font-size:0.5rem;color:var(--sub);margin-top:3px;letter-spacing:1px;">Ã¢ÂÂ° Uhr antippen zum Wechseln</div>
+        <div style="font-size:0.5rem;color:var(--sub);margin-top:3px;letter-spacing:1px;">ÃÂ¢ÃÂÃÂ° Uhr antippen zum Wechseln</div>
     </div>
 
     <!-- Status Kacheln -->
     <div class="dashboard-section">
     <div class="status-grid" style="margin:0;">
         <div class="status-tile" id="tile-current">
-            <div class="tile-label">Ã°ÂÂÂ¢ Aktuell</div>
+            <div class="tile-label">ÃÂ°ÃÂÃÂÃÂ¢ Aktuell</div>
             <div class="tile-subject" id="current-subject">Frei</div>
-            <div class="tile-room" id="current-room">Ã¢ÂÂ</div>
-            <div class="tile-time" id="current-time">Ã¢ÂÂ</div>
+            <div class="tile-room" id="current-room">ÃÂ¢ÃÂÃÂ</div>
+            <div class="tile-time" id="current-time">ÃÂ¢ÃÂÃÂ</div>
             <div class="tile-progress"><div class="tile-progress-fill" id="current-progress" style="width:0%"></div></div>
         </div>
         <div class="status-tile next" id="tile-next">
-            <div class="tile-label">Ã¢ÂÂ­ NÃÂ¤chstes</div>
-            <div class="tile-subject" id="next-subject">Ã¢ÂÂ</div>
-            <div class="tile-room" id="next-room">Ã¢ÂÂ</div>
-            <div class="tile-time" id="next-time">Ã¢ÂÂ</div>
+            <div class="tile-label">ÃÂ¢ÃÂÃÂ­ NÃÂÃÂ¤chstes</div>
+            <div class="tile-subject" id="next-subject">ÃÂ¢ÃÂÃÂ</div>
+            <div class="tile-room" id="next-room">ÃÂ¢ÃÂÃÂ</div>
+            <div class="tile-time" id="next-time">ÃÂ¢ÃÂÃÂ</div>
         </div>
     </div>
 
@@ -599,7 +599,7 @@
 
     <!-- News -->
     <div class="section-header">
-        <div class="section-title">Ã°ÂÂÂ¢ News vom Lehrer</div>
+        <div class="section-title">ÃÂ°ÃÂÃÂÃÂ¢ News vom Lehrer</div>
     </div>
     <div class="news-card" id="news-card">
         <div class="news-title">Aktuelle Info</div>
@@ -609,30 +609,30 @@
 
     <!-- Update Button -->
     <div class="update-btn-wrap">
-        <button class="update-btn" onclick="forceRefresh()">Ã°ÂÂÂ Aktualisieren</button>
+        <button class="update-btn" onclick="forceRefresh()">ÃÂ°ÃÂÃÂÃÂ Aktualisieren</button>
         <div class="version-tag">SchulHub v1.2</div>
     </div>
 
     <!-- Motivation -->
-    <div class="motivation-card" id="motivation-card">Ã¢ÂÂJeder Tag ist eine neue Chance, besser zu werden."</div>
+    <div class="motivation-card" id="motivation-card">ÃÂ¢ÃÂÃÂJeder Tag ist eine neue Chance, besser zu werden."</div>
 
     <!-- Stundenplan Button -->
     <div class="plan-btn" onclick="openPlan()">
-        <div class="plan-btn-icon">Ã°ÂÂÂ</div>
+        <div class="plan-btn-icon">ÃÂ°ÃÂÃÂÃÂ</div>
         <div class="plan-btn-text">
             <div class="plan-btn-title">Stundenplan</div>
             <div class="plan-btn-sub" id="plan-btn-sub">Woche A & B ansehen</div>
         </div>
-        <div class="plan-btn-arrow">Ã¢ÂÂº</div>
+        <div class="plan-btn-arrow">ÃÂ¢ÃÂÃÂº</div>
     </div>
 
     <!-- Mail an Lehrer -->
     <div class="mail-section">
         <div class="mail-card">
-            <div class="mail-title">Ã¢ÂÂÃ¯Â¸Â Nachricht an</div>
+            <div class="mail-title">ÃÂ¢ÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Nachricht an</div>
             <div class="mail-teacher" id="mail-teacher-name">deinen Lehrer</div>
             <textarea class="mail-textarea" id="mail-text" rows="3" placeholder="Deine Nachricht..."></textarea>
-            <button class="mail-send-btn" onclick="sendMail()">Ã°ÂÂÂ¨ Nachricht senden</button>
+            <button class="mail-send-btn" onclick="sendMail()">ÃÂ°ÃÂÃÂÃÂ¨ Nachricht senden</button>
         </div>
     </div>
 
@@ -642,82 +642,82 @@
 <!-- Hilfe Overlay -->
 <div id="help-overlay">
     <div class="help-header">
-        <button style="background:none;border:none;color:var(--danger);font-size:1.5rem;cursor:pointer;font-weight:900;" onclick="closeHelp()">Ã¢ÂÂ</button>
-        <div style="font-size:1.1rem;font-weight:900;">Ã¢ÂÂ Hilfe & Info</div>
+        <button style="background:none;border:none;color:var(--danger);font-size:1.5rem;cursor:pointer;font-weight:900;" onclick="closeHelp()">ÃÂ¢ÃÂÃÂ</button>
+        <div style="font-size:1.1rem;font-weight:900;">ÃÂ¢ÃÂÃÂ Hilfe & Info</div>
         <div style="width:32px;"></div>
     </div>
     <div class="help-body">
         <div class="help-section">
-            <div class="help-section-title">Ã°ÂÂÂ So geht das hier</div>
+            <div class="help-section-title">ÃÂ°ÃÂÃÂÃÂ So geht das hier</div>
             <div class="help-item">
-                <div class="help-item-title">Ã°ÂÂÂ Aktualisieren Ã¢ÂÂ WICHTIG!</div>
-                <div class="help-item-text">Die App lÃÂ¤dt NICHT automatisch neue Daten. DrÃÂ¼ck immer auf den orangenen Button wenn du schauen willst ob dein Lehrer was Neues geschickt hat. Sonst siehst du immer das Alte.</div>
+                <div class="help-item-title">ÃÂ°ÃÂÃÂÃÂ Aktualisieren ÃÂ¢ÃÂÃÂ WICHTIG!</div>
+                <div class="help-item-text">Die App lÃÂÃÂ¤dt NICHT automatisch neue Daten. DrÃÂÃÂ¼ck immer auf den orangenen Button wenn du schauen willst ob dein Lehrer was Neues geschickt hat. Sonst siehst du immer das Alte.</div>
             </div>
             <div class="help-item">
-                <div class="help-item-title">Ã¢ÂÂ° Die Uhr</div>
-                <div class="help-item-text">Einfach auf die Uhr tippen Ã¢ÂÂ dann wechselt sie zwischen Digital und Analog. Die Farbe kannst du unter Ã¢ÂÂÃ¯Â¸Â Style ÃÂ¤ndern.</div>
+                <div class="help-item-title">ÃÂ¢ÃÂÃÂ° Die Uhr</div>
+                <div class="help-item-text">Einfach auf die Uhr tippen ÃÂ¢ÃÂÃÂ dann wechselt sie zwischen Digital und Analog. Die Farbe kannst du unter ÃÂ¢ÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Style ÃÂÃÂ¤ndern.</div>
             </div>
             <div class="help-item">
-                <div class="help-item-title">Ã°ÂÂÂ¢ Aktuell & NÃÂ¤chstes</div>
-                <div class="help-item-text">Zeigt dir was gerade los ist und was als nÃÂ¤chstes kommt. Ab 16:00 Uhr siehst du schon was morgen frÃÂ¼h als erstes dran ist Ã¢ÂÂ damit du nichts vergisst!</div>
+                <div class="help-item-title">ÃÂ°ÃÂÃÂÃÂ¢ Aktuell & NÃÂÃÂ¤chstes</div>
+                <div class="help-item-text">Zeigt dir was gerade los ist und was als nÃÂÃÂ¤chstes kommt. Ab 16:00 Uhr siehst du schon was morgen frÃÂÃÂ¼h als erstes dran ist ÃÂ¢ÃÂÃÂ damit du nichts vergisst!</div>
             </div>
             <div class="help-item">
-                <div class="help-item-title">Ã°ÂÂÂ¢ News vom Lehrer</div>
-                <div class="help-item-text">Hier landen alle Infos von deinem Lehrer Ã¢ÂÂ Vertretungen, Hausaufgaben, wichtige Termine. Erst nach dem Aktualisieren sichtbar!</div>
+                <div class="help-item-title">ÃÂ°ÃÂÃÂÃÂ¢ News vom Lehrer</div>
+                <div class="help-item-text">Hier landen alle Infos von deinem Lehrer ÃÂ¢ÃÂÃÂ Vertretungen, Hausaufgaben, wichtige Termine. Erst nach dem Aktualisieren sichtbar!</div>
             </div>
             <div class="help-item">
-                <div class="help-item-title">Ã°ÂÂÂ Stundenplan</div>
-                <div class="help-item-text">Tippe auf Ã¢ÂÂStundenplan" im MenÃÂ¼ unten. Du siehst Woche A Ã¢ÂÂ mit dem Ã¢ÂÂ» Button wechselst du zu Woche B und zurÃÂ¼ck. Auch auf dem Dashboard kannst du direkt auf Ã¢ÂÂWOCHE A" tippen zum Wechseln. Die gewÃÂ¤hlte Woche wird gespeichert!</div>
+                <div class="help-item-title">ÃÂ°ÃÂÃÂÃÂ Stundenplan</div>
+                <div class="help-item-text">Tippe auf ÃÂ¢ÃÂÃÂStundenplan" im MenÃÂÃÂ¼ unten. Du siehst Woche A ÃÂ¢ÃÂÃÂ mit dem ÃÂ¢ÃÂÃÂ» Button wechselst du zu Woche B und zurÃÂÃÂ¼ck. Auch auf dem Dashboard kannst du direkt auf ÃÂ¢ÃÂÃÂWOCHE A" tippen zum Wechseln. Die gewÃÂÃÂ¤hlte Woche wird gespeichert!</div>
             </div>
             <div class="help-item">
-                <div class="help-item-title">Ã¢ÂÂÃ¯Â¸Â Nachricht an den Lehrer</div>
-                <div class="help-item-text">Schreib deine Nachricht ins Textfeld und drÃÂ¼ck Ã¢ÂÂSenden". Dein Handy ÃÂ¶ffnet dann automatisch deine Mail-App mit der Nachricht schon drin Ã¢ÂÂ du musst nur noch abschicken.</div>
+                <div class="help-item-title">ÃÂ¢ÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Nachricht an den Lehrer</div>
+                <div class="help-item-text">Schreib deine Nachricht ins Textfeld und drÃÂÃÂ¼ck ÃÂ¢ÃÂÃÂSenden". Dein Handy ÃÂÃÂ¶ffnet dann automatisch deine Mail-App mit der Nachricht schon drin ÃÂ¢ÃÂÃÂ du musst nur noch abschicken.</div>
             </div>
             <div class="help-item">
-                <div class="help-item-title">Ã¢ÂÂÃ¯Â¸Â Dein Style</div>
-                <div class="help-item-text">Oben rechts auf dein Avatar-Emoji tippen. Dann kannst du deinen Namen ÃÂ¤ndern, einen anderen Avatar wÃÂ¤hlen und die App-Farbe komplett anpassen. Wird nur auf deinem Handy gespeichert.</div>
+                <div class="help-item-title">ÃÂ¢ÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Dein Style</div>
+                <div class="help-item-text">Oben rechts auf dein Avatar-Emoji tippen. Dann kannst du deinen Namen ÃÂÃÂ¤ndern, einen anderen Avatar wÃÂÃÂ¤hlen und die App-Farbe komplett anpassen. Wird nur auf deinem Handy gespeichert.</div>
             </div>
             <div class="help-item">
-                <div class="help-item-title">Ã°ÂÂÂ± Als App speichern</div>
-                <div class="help-item-text">iPhone: Safari ÃÂ¶ffnen Ã¢ÂÂ Teilen-Symbol Ã¢ÂÂ Ã¢ÂÂZum Home-Bildschirm". Android: Chrome Ã¢ÂÂ MenÃÂ¼ Ã¢ÂÂ Ã¢ÂÂZum Startbildschirm". Dann sieht es aus wie eine echte App!</div>
+                <div class="help-item-title">ÃÂ°ÃÂÃÂÃÂ± Als App speichern</div>
+                <div class="help-item-text">iPhone: Safari ÃÂÃÂ¶ffnen ÃÂ¢ÃÂÃÂ Teilen-Symbol ÃÂ¢ÃÂÃÂ ÃÂ¢ÃÂÃÂZum Home-Bildschirm". Android: Chrome ÃÂ¢ÃÂÃÂ MenÃÂÃÂ¼ ÃÂ¢ÃÂÃÂ ÃÂ¢ÃÂÃÂZum Startbildschirm". Dann sieht es aus wie eine echte App!</div>
             </div>
         </div>
         <div class="help-section">
-            <div class="help-section-title">Ã°ÂÂÂ¨Ã¢ÂÂÃ°ÂÂÂ©Ã¢ÂÂÃ°ÂÂÂ§ Info fÃÂ¼r Eltern</div>
+            <div class="help-section-title">ÃÂ°ÃÂÃÂÃÂ¨ÃÂ¢ÃÂÃÂÃÂ°ÃÂÃÂÃÂ©ÃÂ¢ÃÂÃÂÃÂ°ÃÂÃÂÃÂ§ Info fÃÂÃÂ¼r Eltern</div>
             <div class="help-parents">
                 <div class="help-parents-title">Was ist SchulHub?</div>
                 <div class="help-parents-text">
-                    SchulHub ist eine schulinterne App die Ihr Kind ÃÂ¼ber den aktuellen Stundenplan, Vertretungen und Neuigkeiten der Lehrkraft informiert.<br><br>
+                    SchulHub ist eine schulinterne App die Ihr Kind ÃÂÃÂ¼ber den aktuellen Stundenplan, Vertretungen und Neuigkeiten der Lehrkraft informiert.<br><br>
                     <b>Was die App kann:</b><br>
-                    Ã¢ÂÂ¢ Stundenplan anzeigen (Woche A &amp; B)<br>
-                    Ã¢ÂÂ¢ Nachrichten der Lehrkraft empfangen<br>
-                    Ã¢ÂÂ¢ Kontakt zur Lehrkraft per E-Mail<br><br>
+                    ÃÂ¢ÃÂÃÂ¢ Stundenplan anzeigen (Woche A &amp; B)<br>
+                    ÃÂ¢ÃÂÃÂ¢ Nachrichten der Lehrkraft empfangen<br>
+                    ÃÂ¢ÃÂÃÂ¢ Kontakt zur Lehrkraft per E-Mail<br><br>
                     <b>Datenschutz:</b><br>
-                    Die App speichert ausschlieÃÂlich den selbst eingegebenen Namen und persÃÂ¶nliche Einstellungen lokal auf dem GerÃÂ¤t. Es werden keine personenbezogenen Daten an externe Server ÃÂ¼bertragen.<br><br>
+                    Die App speichert ausschlieÃÂÃÂlich den selbst eingegebenen Namen und persÃÂÃÂ¶nliche Einstellungen lokal auf dem GerÃÂÃÂ¤t. Es werden keine personenbezogenen Daten an externe Server ÃÂÃÂ¼bertragen.<br><br>
                     <b>Bei Fragen:</b><br>
-                    Wenden Sie sich direkt an die Lehrkraft ÃÂ¼ber den Nachrichtenbereich der App.
+                    Wenden Sie sich direkt an die Lehrkraft ÃÂÃÂ¼ber den Nachrichtenbereich der App.
                 </div>
             </div>
         </div>
-        <div style="text-align:center;font-size:0.65rem;color:var(--sub);margin-top:10px;">SchulHub Ã¢ÂÂ Schulinterne App ÃÂ· Kein App Store nÃÂ¶tig</div>
+        <div style="text-align:center;font-size:0.65rem;color:var(--sub);margin-top:10px;">SchulHub ÃÂ¢ÃÂÃÂ Schulinterne App ÃÂÃÂ· Kein App Store nÃÂÃÂ¶tig</div>
     </div>
 </div>
 
 <div class="bottom-nav" id="bottom-nav" style="display:none;">
     <div class="nav-btn active" onclick="showTab('home')">
-        <div class="nav-icon">Ã°ÂÂÂ </div>
+        <div class="nav-icon">ÃÂ°ÃÂÃÂÃÂ </div>
         <div class="nav-label">Home</div>
     </div>
     <div class="nav-btn" onclick="openPlan()">
-        <div class="nav-icon">Ã°ÂÂÂ</div>
+        <div class="nav-icon">ÃÂ°ÃÂÃÂÃÂ</div>
         <div class="nav-label">Plan</div>
     </div>
     <div class="nav-btn" onclick="openHelp()">
-        <div class="nav-icon">Ã¢ÂÂ</div>
+        <div class="nav-icon">ÃÂ¢ÃÂÃÂ</div>
         <div class="nav-label">Hilfe</div>
     </div>
     <div class="nav-btn" onclick="openSettings()">
-        <div class="nav-icon">Ã¢ÂÂÃ¯Â¸Â</div>
+        <div class="nav-icon">ÃÂ¢ÃÂÃÂÃÂ¯ÃÂ¸ÃÂ</div>
         <div class="nav-label">Style</div>
     </div>
 </div>
@@ -725,8 +725,8 @@
 <!-- Stundenplan Overlay -->
 <div id="plan-overlay">
     <div class="plan-header">
-        <button class="plan-close" onclick="closePlan()">Ã¢ÂÂ</button>
-        <div class="plan-title">Ã°ÂÂÂ Stundenplan</div>
+        <button class="plan-close" onclick="closePlan()">ÃÂ¢ÃÂÃÂ</button>
+        <div class="plan-title">ÃÂ°ÃÂÃÂÃÂ Stundenplan</div>
         <div style="width:32px;"></div>
     </div>
     <!-- Flip-Button Woche A/B -->
@@ -739,8 +739,8 @@
             display:flex; align-items:center; gap:8px;
             box-shadow:0 4px 15px rgba(37,99,235,0.4);
             transition:all 0.3s;">
-            <span id="week-flip-label">Ã°ÂÂÂ Woche A</span>
-            <span style="font-size:1.1rem;">Ã¢ÂÂ»</span>
+            <span id="week-flip-label">ÃÂ°ÃÂÃÂÃÂ Woche A</span>
+            <span style="font-size:1.1rem;">ÃÂ¢ÃÂÃÂ»</span>
         </button>
     </div>
     <div id="plan-grid-new" style="padding:0 12px 80px;"></div>
@@ -749,8 +749,8 @@
 <!-- Settings Overlay -->
 <div id="settings-overlay">
     <div class="settings-header">
-        <button style="background:none;border:none;color:var(--danger);font-size:1.5rem;cursor:pointer;font-weight:900;" onclick="closeSettings()">Ã¢ÂÂ</button>
-        <div style="font-size:1.1rem;font-weight:900;">Ã¢ÂÂÃ¯Â¸Â Dein Style</div>
+        <button style="background:none;border:none;color:var(--danger);font-size:1.5rem;cursor:pointer;font-weight:900;" onclick="closeSettings()">ÃÂ¢ÃÂÃÂ</button>
+        <div style="font-size:1.1rem;font-weight:900;">ÃÂ¢ÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Dein Style</div>
         <div style="width:32px;"></div>
     </div>
 
@@ -768,13 +768,13 @@
 
     <!-- Hintergrund -->
     <div class="settings-section">
-        <div class="settings-section-title">Ã°ÂÂÂ¼Ã¯Â¸Â Hintergrund wÃÂ¤hlen</div>
+        <div class="settings-section-title">ÃÂ°ÃÂÃÂÃÂ¼ÃÂ¯ÃÂ¸ÃÂ Hintergrund wÃÂÃÂ¤hlen</div>
         <div class="theme-bg-grid" id="bg-theme-grid"></div>
     </div>
 
     <!-- Theme -->
     <div class="settings-section">
-        <div class="settings-section-title">Ã°ÂÂÂ¨ Akzent-Farbe</div>
+        <div class="settings-section-title">ÃÂ°ÃÂÃÂÃÂ¨ Akzent-Farbe</div>
         <div class="theme-grid" id="theme-grid"></div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
             <span style="font-size:0.75rem;color:var(--sub);">Eigene Farbe:</span>
@@ -789,7 +789,7 @@
         <div class="toggle-row">
             <div>
                 <div class="toggle-label">Motivations-Spruch</div>
-                <div class="toggle-sub">TÃÂ¤glicher Spruch unterm News-Bereich</div>
+                <div class="toggle-sub">TÃÂÃÂ¤glicher Spruch unterm News-Bereich</div>
             </div>
             <button class="toggle on" id="toggle-motivation" onclick="toggleFeature('motivation')"></button>
         </div>
@@ -802,11 +802,11 @@
         </div>
     </div>
 
-    <button class="save-settings-btn" onclick="saveSettings()">Ã¢ÂÂ SPEICHERN</button>
+    <button class="save-settings-btn" onclick="saveSettings()">ÃÂ¢ÃÂÃÂ SPEICHERN</button>
 </div>
 
 <script>
-    // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ KONFIGURATION Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ KONFIGURATION ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
     const SUS_VERSION = "1.2";
     const urlParams  = new URLSearchParams(window.location.search);
     const CLASS_SLUG = urlParams.get('klasse') || localStorage.getItem('susClassSlug') || '';
@@ -819,20 +819,20 @@
     const GH_USER = localStorage.getItem('susGhUser') || '';
     const GH_REPO = localStorage.getItem('susGhRepo') || '';
 
-    // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ STATE Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ STATE ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
     let userName    = localStorage.getItem('susName')    || '';
-    let userAvatar  = localStorage.getItem('susAvatar')  || 'Ã°ÂÂÂ';
+    let userAvatar  = localStorage.getItem('susAvatar')  || 'ÃÂ°ÃÂÃÂÃÂ';
     let userAccent  = localStorage.getItem('susAccent')  || '#6366f1';
     let features    = JSON.parse(localStorage.getItem('susFeatures') || '{"countdown":true,"motivation":true,"vibration":true}');
     let schoolData  = {};
     let planWeek    = 'A';
-    // Aktive Woche - lokal gespeichert, ÃÂ¼berall synchronisiert
+    // Aktive Woche - lokal gespeichert, ÃÂÃÂ¼berall synchronisiert
     let activeWeek  = localStorage.getItem('susActiveWeek') || 'A';
     let lastNewsTs  = 0;
     let clockStyle  = localStorage.getItem('susClockStyle') || 'digital';
     let planViewMode = 'detail';
 
-    // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ STUNDENPLAN BLÃÂCKE Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ STUNDENPLAN BLÃÂÃÂCKE ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
     const BLOCKS = [
         { id:'b1', label:'1. Block',    start:'07:30', end:'09:00', isPause:false },
         { id:'p1', label:'1. Pause',    start:'09:00', end:'09:30', isPause:true  },
@@ -847,21 +847,21 @@
     const DAYS_SHORT = ['So','Mo','Di','Mi','Do','Fr','Sa'];
 
     const MOTIVATIONS = [
-        "Ã°ÂÂÂª Kurz durchhalten Ã¢ÂÂ Wochenende kommt!",
-        "Ã°ÂÂÂ® Nach der Schule gehÃÂ¶rt dir die Zeit. Erstmal durchziehen.",
-        "Ã°ÂÂÂ¥ Du schaffst das. Wird schon!",
-        "Ã°ÂÂÂ´ Schlafen ist die beste Vorbereitung fÃÂ¼r morgen.",
-        "Ã°ÂÂÂ Belohn dich nach dem letzten Block. Verdient!",
-        "Ã°ÂÂÂ± Noch ein paar Stunden, dann ist der Tag dein.",
-        "Ã°ÂÂÂµ KopfhÃÂ¶rer rein, Kopf frei. Los!",
-        "Ã¢ÂÂÃ¯Â¸Â Andere haben das auch geschafft. Du auch.",
-        "Ã¢ÂÂ¡ Energie sparen fÃÂ¼r nach der Schule.",
-        "Ã°ÂÂÂ Jede Note ist nur eine Zahl. Du bist mehr.",
-        "Ã°ÂÂÂ Stay cool. Das hier ist nur eine Phase.",
-        "Ã°ÂÂÂ Kleine Schritte zÃÂ¤hlen auch.",
+        "ÃÂ°ÃÂÃÂÃÂª Kurz durchhalten ÃÂ¢ÃÂÃÂ Wochenende kommt!",
+        "ÃÂ°ÃÂÃÂÃÂ® Nach der Schule gehÃÂÃÂ¶rt dir die Zeit. Erstmal durchziehen.",
+        "ÃÂ°ÃÂÃÂÃÂ¥ Du schaffst das. Wird schon!",
+        "ÃÂ°ÃÂÃÂÃÂ´ Schlafen ist die beste Vorbereitung fÃÂÃÂ¼r morgen.",
+        "ÃÂ°ÃÂÃÂÃÂ Belohn dich nach dem letzten Block. Verdient!",
+        "ÃÂ°ÃÂÃÂÃÂ± Noch ein paar Stunden, dann ist der Tag dein.",
+        "ÃÂ°ÃÂÃÂÃÂµ KopfhÃÂÃÂ¶rer rein, Kopf frei. Los!",
+        "ÃÂ¢ÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Andere haben das auch geschafft. Du auch.",
+        "ÃÂ¢ÃÂÃÂ¡ Energie sparen fÃÂÃÂ¼r nach der Schule.",
+        "ÃÂ°ÃÂÃÂÃÂ Jede Note ist nur eine Zahl. Du bist mehr.",
+        "ÃÂ°ÃÂÃÂÃÂ Stay cool. Das hier ist nur eine Phase.",
+        "ÃÂ°ÃÂÃÂÃÂ Kleine Schritte zÃÂÃÂ¤hlen auch.",
     ];
 
-    // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ INIT Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ INIT ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
     window.onload = function() {
         // Klassen-Slug aus URL speichern
         if (CLASS_SLUG) localStorage.setItem('susClassSlug', CLASS_SLUG);
@@ -911,15 +911,15 @@
         const btn = document.querySelector('.update-btn');
         if (btn) {
             btn.style.opacity = '0.7';
-            btn.innerHTML = '<span style="font-size:1rem;">Ã¢ÂÂ³</span><span>Wird geladen...</span>';
+            btn.innerHTML = '<span style="font-size:1rem;">ÃÂ¢ÃÂÃÂ³</span><span>Wird geladen...</span>';
         }
         await fetchData();
         updateDisplay();
         if (btn) {
             btn.style.opacity = '1';
-            btn.innerHTML = '<span style="font-size:1rem;">Ã¢ÂÂ</span><span>Alles aktuell!</span>';
+            btn.innerHTML = '<span style="font-size:1rem;">ÃÂ¢ÃÂÃÂ</span><span>Alles aktuell!</span>';
             setTimeout(() => {
-                btn.innerHTML = '<span style="font-size:1rem;">Ã°ÂÂÂ</span><span>Aktualisieren</span>';
+                btn.innerHTML = '<span style="font-size:1rem;">ÃÂ°ÃÂÃÂÃÂ</span><span>Aktualisieren</span>';
             }, 2500);
         }
     }
@@ -935,7 +935,7 @@
         setInterval(fetchData, 60000); // jede Minute aktualisieren
     }
 
-    // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ DATUM & UHR Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ DATUM & UHR ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
     function toLocalDateKey(d) {
         const date = d || new Date();
         return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
@@ -971,7 +971,7 @@
 
         // Greeting
         const hr = now.getHours();
-        const greet = hr < 10 ? 'Guten Morgen,' : hr < 14 ? 'Hallo,' : hr < 18 ? 'SchÃÂ¶nen Nachmittag,' : 'Guten Abend,';
+        const greet = hr < 10 ? 'Guten Morgen,' : hr < 14 ? 'Hallo,' : hr < 18 ? 'SchÃÂÃÂ¶nen Nachmittag,' : 'Guten Abend,';
         document.getElementById('greeting-text').innerText = greet;
         document.getElementById('user-name-display').innerText = userName;
         document.getElementById('avatar-display').innerText = userAvatar;
@@ -1021,20 +1021,20 @@
             const tileNext    = document.getElementById('tile-next');
             tileCurrent.className = 'status-tile tile-tomorrow';
             tileNext.className    = 'status-tile next tile-tomorrow';
-            document.getElementById('current-subject').innerText = tomorrow ? tomorrow.subj : 'Ã°ÂÂÂ Frei!';
-            document.getElementById('current-room').innerText    = tomorrow ? `Morgen ÃÂ· ${tomorrow.block.label}` : '';
-            document.getElementById('current-time').innerText    = tomorrow ? `${tomorrow.block.start} Ã¢ÂÂ ${tomorrow.block.end} Uhr` : '';
-            document.getElementById('tile-current').querySelector('.tile-label').innerText = 'Ã°ÂÂÂ Morgen frÃÂ¼h';
-            document.getElementById('next-subject').innerText   = tomorrow ? tomorrow.day : 'Ã¢ÂÂ';
+            document.getElementById('current-subject').innerText = tomorrow ? tomorrow.subj : 'ÃÂ°ÃÂÃÂÃÂ Frei!';
+            document.getElementById('current-room').innerText    = tomorrow ? `Morgen ÃÂÃÂ· ${tomorrow.block.label}` : '';
+            document.getElementById('current-time').innerText    = tomorrow ? `${tomorrow.block.start} ÃÂ¢ÃÂÃÂ ${tomorrow.block.end} Uhr` : '';
+            document.getElementById('tile-current').querySelector('.tile-label').innerText = 'ÃÂ°ÃÂÃÂÃÂ Morgen frÃÂÃÂ¼h';
+            document.getElementById('next-subject').innerText   = tomorrow ? tomorrow.day : 'ÃÂ¢ÃÂÃÂ';
             document.getElementById('next-room').innerText      = '1. Stunde';
             document.getElementById('next-time').innerText      = tomorrow ? `${tomorrow.block.start} Uhr` : '';
-            document.getElementById('tile-next').querySelector('.tile-label').innerText = 'Ã°ÂÂÂ Tag';
+            document.getElementById('tile-next').querySelector('.tile-label').innerText = 'ÃÂ°ÃÂÃÂÃÂ Tag';
             return;
         }
 
-        // Normal-Modus Labels zurÃÂ¼cksetzen
-        document.getElementById('tile-current').querySelector('.tile-label').innerText = 'Ã°ÂÂÂ¢ Aktuell';
-        document.getElementById('tile-next').querySelector('.tile-label').innerText    = 'Ã¢ÂÂ­ NÃÂ¤chstes';
+        // Normal-Modus Labels zurÃÂÃÂ¼cksetzen
+        document.getElementById('tile-current').querySelector('.tile-label').innerText = 'ÃÂ°ÃÂÃÂÃÂ¢ Aktuell';
+        document.getElementById('tile-next').querySelector('.tile-label').innerText    = 'ÃÂ¢ÃÂÃÂ­ NÃÂÃÂ¤chstes';
         document.getElementById('tile-current').className = 'status-tile';
         document.getElementById('tile-next').className    = 'status-tile next';
 
@@ -1042,32 +1042,32 @@
         if (current) {
             const b   = current.block;
             const idx = current.idx;
-            const subj = dayPlan?.[idx] || (b.isPause ? 'Ã¢ÂÂ Pause' : 'Freizeit');
+            const subj = dayPlan?.[idx] || (b.isPause ? 'ÃÂ¢ÃÂÃÂ Pause' : 'Freizeit');
             const s = toMin(b.start), e = toMin(b.end);
             const prog = Math.min(((nowMin - s) / (e - s)) * 100, 100);
 
             document.getElementById('current-subject').innerText = subj;
-            document.getElementById('current-room').innerText   = b.isPause ? '' : (subj !== 'Freizeit' ? 'Ã¢ÂÂ ' + b.label : '');
-            document.getElementById('current-time').innerText   = `${b.start} Ã¢ÂÂ ${b.end} Uhr`;
+            document.getElementById('current-room').innerText   = b.isPause ? '' : (subj !== 'Freizeit' ? 'ÃÂ¢ÃÂÃÂ ' + b.label : '');
+            document.getElementById('current-time').innerText   = `${b.start} ÃÂ¢ÃÂÃÂ ${b.end} Uhr`;
             document.getElementById('current-progress').style.width = prog + '%';
             document.getElementById('tile-current').className = b.isPause ? 'status-tile' : 'status-tile';
         } else {
-            document.getElementById('current-subject').innerText = nowMin < toMin('07:30') ? 'Ã¢ÂÂÃ¯Â¸Â Vor der Schule' : 'Ã°ÂÂÂ  Schulschluss';
+            document.getElementById('current-subject').innerText = nowMin < toMin('07:30') ? 'ÃÂ¢ÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Vor der Schule' : 'ÃÂ°ÃÂÃÂÃÂ  Schulschluss';
             document.getElementById('current-room').innerText   = '';
             document.getElementById('current-time').innerText   = '';
             document.getElementById('current-progress').style.width = '0%';
         }
 
-        // NÃÂ¤chstes
+        // NÃÂÃÂ¤chstes
         if (next) {
             const b    = next.block;
             const idx  = next.idx;
-            const subj = dayPlan?.[idx] || (b.isPause ? 'Ã¢ÂÂ Pause' : 'Ã¢ÂÂ');
+            const subj = dayPlan?.[idx] || (b.isPause ? 'ÃÂ¢ÃÂÃÂ Pause' : 'ÃÂ¢ÃÂÃÂ');
             const minLeft = toMin(b.start) - nowMin;
 
             document.getElementById('next-subject').innerText = subj;
             document.getElementById('next-room').innerText    = b.isPause ? '' : b.label;
-            document.getElementById('next-time').innerText    = `in ${minLeft} Min ÃÂ· ${b.start} Uhr`;
+            document.getElementById('next-time').innerText    = `in ${minLeft} Min ÃÂÃÂ· ${b.start} Uhr`;
 
             // Alert wenn < 5 Minuten
             const tile = document.getElementById('tile-next');
@@ -1077,7 +1077,7 @@
                 navigator.vibrate([200, 100, 200]);
             }
         } else {
-            document.getElementById('next-subject').innerText = 'Ã°ÂÂÂ Feierabend!';
+            document.getElementById('next-subject').innerText = 'ÃÂ°ÃÂÃÂÃÂ Feierabend!';
             document.getElementById('next-room').innerText    = '';
             document.getElementById('next-time').innerText    = '';
         }
@@ -1086,8 +1086,8 @@
     function getTomorrowPlan(week) {
         const now = new Date();
         let tomorrowIdx = now.getDay() + 1;
-        if (tomorrowIdx === 6) tomorrowIdx = 1; // Sa Ã¢ÂÂ Mo
-        if (tomorrowIdx === 7) tomorrowIdx = 1; // So Ã¢ÂÂ Mo
+        if (tomorrowIdx === 6) tomorrowIdx = 1; // Sa ÃÂ¢ÃÂÃÂ Mo
+        if (tomorrowIdx === 7) tomorrowIdx = 1; // So ÃÂ¢ÃÂÃÂ Mo
         const tomorrowShort = DAYS_SHORT[tomorrowIdx];
         const tomorrowPlan  = schoolData[`woche${week}`]?.[tomorrowShort];
         // Ersten Block mit Inhalt finden
@@ -1101,7 +1101,7 @@
 
     function updateCountdown(now) { /* entfernt */ }
 
-    // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ DATEN VON GITHUB LADEN Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ DATEN VON GITHUB LADEN ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
     async function fetchData() {
         const classSlug = localStorage.getItem('susClassSlug') || CLASS_SLUG;
         const ghUser    = localStorage.getItem('susGhUser') || GH_USER;
@@ -1147,7 +1147,7 @@
                 localStorage.setItem('susTeacherEmail', data.teacherEmail || '');
             }
 
-            // Woche aus Lehrer-Daten ÃÂ¼bernehmen (nur beim allerersten Start)
+            // Woche aus Lehrer-Daten ÃÂÃÂ¼bernehmen (nur beim allerersten Start)
             if (!localStorage.getItem('susActiveWeek')) {
                 activeWeek = data.currentWeek || 'A';
                 localStorage.setItem('susActiveWeek', activeWeek);
@@ -1162,16 +1162,16 @@
     function showDemoData() {
         schoolData = {
             currentWeek: 'A',
-            news: 'Verbinde dich mit deinem Lehrer Ã¢ÂÂ QR-Code scannen!',
+            news: 'Verbinde dich mit deinem Lehrer ÃÂ¢ÃÂÃÂ QR-Code scannen!',
             teacherName: 'deinen Lehrer',
             wocheA: { Mo:['Physik','','Mathe',''], Di:['Deutsch','','Englisch',''], Mi:['Sport','','Biologie',''], Do:['Kunst','','Geschichte',''], Fr:['Musik','','',''] },
             wocheB: { Mo:['Mathe','','Physik',''], Di:['Englisch','','Deutsch',''], Mi:['Biologie','','Sport',''], Do:['Geschichte','','Kunst',''], Fr:['','','Musik',''] }
         };
-        document.getElementById('news-text').innerText = 'Ã°ÂÂÂ¡ Noch keine Verbindung zum Lehrer. QR-Code scannen!';
+        document.getElementById('news-text').innerText = 'ÃÂ°ÃÂÃÂÃÂ¡ Noch keine Verbindung zum Lehrer. QR-Code scannen!';
         document.getElementById('mail-teacher-name').innerText = 'deinen Lehrer';
     }
 
-    // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ MAIL Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ MAIL ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
     function sendMail() {
         const msg   = document.getElementById('mail-text').value.trim();
         const email = localStorage.getItem('susTeacherEmail') || schoolData.teacherEmail || '';
@@ -1187,7 +1187,7 @@
         document.getElementById('mail-text').value = '';
     }
 
-    // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ STUNDENPLAN Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ STUNDENPLAN ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
     function openPlan() {
         document.getElementById('plan-overlay').style.display = 'block';
         // Aktive Woche verwenden (gespeichert)
@@ -1214,7 +1214,7 @@
         // Stundenplan Flip-Button updaten
         const lbl = document.getElementById('week-flip-label');
         const btn = document.getElementById('week-flip-btn');
-        if (lbl) lbl.innerText = 'Ã°ÂÂÂ Woche ' + w;
+        if (lbl) lbl.innerText = 'ÃÂ°ÃÂÃÂÃÂ Woche ' + w;
         if (btn) {
             btn.style.background = w === 'A'
                 ? 'linear-gradient(135deg,#2563eb,#3b82f6)'
@@ -1271,19 +1271,19 @@
         var hCol = isToday ? 'white' : 'var(--sub)';
         var label = ['Mo','Di','Mi','Do','Fr'][dIdx];
         var s = '<div style="flex:1;min-width:0;">';
-        s += '<div style="font-size:0.7rem;font-weight:900;text-align:center;padding:4px 2px;border-radius:8px;margin-bottom:6px;height:32px;display:flex;align-items:center;justify-content:center;background:' + hBg + ';color:' + hCol + ';">' + (isToday ? 'Ã°ÂÂÂ' : '') + label + '</div>';
+        s += '<div style="font-size:0.7rem;font-weight:900;text-align:center;padding:4px 2px;border-radius:8px;margin-bottom:6px;height:32px;display:flex;align-items:center;justify-content:center;background:' + hBg + ';color:' + hCol + ';">' + (isToday ? 'ÃÂ°ÃÂÃÂÃÂ' : '') + label + '</div>';
         for (var bi = 0; bi < BLOCKS.length; bi++) {
             var b    = BLOCKS[bi];
             var subj = (plan[d] && plan[d][bi]) ? plan[d][bi] : '';
             if (b.isPause) {
-                s += '<div style="height:18px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;font-size:0.5rem;color:var(--sub);opacity:0.4;">Ã¢ÂÂ</div>';
+                s += '<div style="height:18px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;font-size:0.5rem;color:var(--sub);opacity:0.4;">ÃÂ¢ÃÂÃÂ</div>';
             } else {
                 var bg  = subj ? (color + '28') : 'var(--card)';
                 var bdr = subj ? (color + '60') : 'rgba(255,255,255,0.04)';
                 var tc  = subj ? 'white' : 'var(--sub)';
                 var fw  = subj ? '800' : '400';
                 var op  = subj ? '1' : '0.35';
-                s += '<div style="background:' + bg + ';border:1px solid ' + bdr + ';border-radius:8px;padding:4px 3px;margin-bottom:4px;text-align:center;font-size:0.7rem;font-weight:' + fw + ';color:' + tc + ';height:36px;display:flex;align-items:center;justify-content:center;opacity:' + op + ';">' + (subj || 'Ã¢ÂÂ') + '</div>';
+                s += '<div style="background:' + bg + ';border:1px solid ' + bdr + ';border-radius:8px;padding:4px 3px;margin-bottom:4px;text-align:center;font-size:0.7rem;font-weight:' + fw + ';color:' + tc + ';height:36px;display:flex;align-items:center;justify-content:center;opacity:' + op + ';">' + (subj || 'ÃÂ¢ÃÂÃÂ') + '</div>';
             }
         }
         return s + '</div>';
@@ -1297,7 +1297,7 @@
         return '<div style="display:flex;justify-content:center;margin-bottom:10px;"><div style="display:flex;gap:5px;width:55%;">' + buildTimeCol() + buildDayCol(plan, color, todayIdx, d, dIdx) + '</div></div>';
     }
 
-    // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ SETTINGS Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ SETTINGS ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
     function openHelp() {
         document.getElementById("help-overlay").style.display = "block";
     }
@@ -1324,7 +1324,7 @@
     }
 
     // Avatar
-    const AVATARS = ['Ã°ÂÂÂ','Ã°ÂÂ¦Â','Ã°ÂÂÂ','Ã¢ÂÂ¡','Ã°ÂÂÂ®','Ã°ÂÂÂ','Ã°ÂÂÂ¥','Ã°ÂÂÂµ','Ã°ÂÂÂ','Ã°ÂÂÂ','Ã°ÂÂÂ','Ã°ÂÂÂ¯','Ã°ÂÂ¦Â','Ã°ÂÂÂº','Ã°ÂÂÂ¸'];
+    const AVATARS = ['ÃÂ°ÃÂÃÂÃÂ','ÃÂ°ÃÂÃÂ¦ÃÂ','ÃÂ°ÃÂÃÂÃÂ','ÃÂ¢ÃÂÃÂ¡','ÃÂ°ÃÂÃÂÃÂ®','ÃÂ°ÃÂÃÂÃÂ','ÃÂ°ÃÂÃÂÃÂ¥','ÃÂ°ÃÂÃÂÃÂµ','ÃÂ°ÃÂÃÂÃÂ','ÃÂ°ÃÂÃÂÃÂ','ÃÂ°ÃÂÃÂÃÂ','ÃÂ°ÃÂÃÂÃÂ¯','ÃÂ°ÃÂÃÂ¦ÃÂ','ÃÂ°ÃÂÃÂÃÂº','ÃÂ°ÃÂÃÂÃÂ¸'];
     function buildAvatarGrid() {
         const grid = document.getElementById('avatar-grid');
         grid.innerHTML = AVATARS.map(a =>
@@ -1342,17 +1342,17 @@
     // Hintergrund-Themes
     const BG_THEMES = [
         { id:'bg1',  label:'Lila Nacht',   class:'bg-theme-1',  preview:'linear-gradient(135deg,#0a0a0f,#1a0533)' },
-        { id:'bg2',  label:'GrÃÂ¼ner Wald',  class:'bg-theme-2',  preview:'linear-gradient(135deg,#0a0f0a,#003320)' },
+        { id:'bg2',  label:'GrÃÂÃÂ¼ner Wald',  class:'bg-theme-2',  preview:'linear-gradient(135deg,#0a0f0a,#003320)' },
         { id:'bg3',  label:'Rote Glut',    class:'bg-theme-3',  preview:'linear-gradient(135deg,#0a0a0f,#330015)' },
         { id:'bg4',  label:'Gold Dusk',    class:'bg-theme-4',  preview:'linear-gradient(135deg,#0f0a00,#332200)' },
         { id:'bg5',  label:'Deep Blue',    class:'bg-theme-5',  preview:'linear-gradient(135deg,#050510,#001033)' },
-        { id:'bg6',  label:'Ã°ÂÂÂ Live Lila', class:'bg-theme-6',  preview:'linear-gradient(45deg,#0a0a0f,#1a0533,#000d33)' },
-        { id:'bg7',  label:'Ã°ÂÂÂ Live GrÃÂ¼n', class:'bg-theme-7',  preview:'linear-gradient(45deg,#0a0f0a,#003320,#001a33)' },
-        { id:'bg8',  label:'Ã°ÂÂÂ Live Rot',  class:'bg-theme-8',  preview:'linear-gradient(45deg,#0f0000,#330015,#1a0000)' },
+        { id:'bg6',  label:'ÃÂ°ÃÂÃÂÃÂ Live Lila', class:'bg-theme-6',  preview:'linear-gradient(45deg,#0a0a0f,#1a0533,#000d33)' },
+        { id:'bg7',  label:'ÃÂ°ÃÂÃÂÃÂ Live GrÃÂÃÂ¼n', class:'bg-theme-7',  preview:'linear-gradient(45deg,#0a0f0a,#003320,#001a33)' },
+        { id:'bg8',  label:'ÃÂ°ÃÂÃÂÃÂ Live Rot',  class:'bg-theme-8',  preview:'linear-gradient(45deg,#0f0000,#330015,#1a0000)' },
         { id:'bg9',  label:'Nebel Lila',   class:'bg-theme-9',  preview:'radial-gradient(ellipse at top,#1a0533,#0a0a0f)' },
-        { id:'bg10', label:'Nebel GrÃÂ¼n',   class:'bg-theme-10', preview:'radial-gradient(ellipse at bottom,#003320,#0a0a0f)' },
-        { id:'bg11', label:'Ã¢ÂÂ Muster',     class:'bg-theme-11', preview:'linear-gradient(135deg,#1a0533 25%,#0a0a0f 75%)' },
-        { id:'bg12', label:'Ã¢ÂÂ¡ Stripes',    class:'bg-theme-12', preview:'repeating-linear-gradient(45deg,#0a0a0f,#0a0a0f 8px,#13131a 8px,#13131a 16px)' },
+        { id:'bg10', label:'Nebel GrÃÂÃÂ¼n',   class:'bg-theme-10', preview:'radial-gradient(ellipse at bottom,#003320,#0a0a0f)' },
+        { id:'bg11', label:'ÃÂ¢ÃÂÃÂ Muster',     class:'bg-theme-11', preview:'linear-gradient(135deg,#1a0533 25%,#0a0a0f 75%)' },
+        { id:'bg12', label:'ÃÂ¢ÃÂÃÂ¡ Stripes',    class:'bg-theme-12', preview:'repeating-linear-gradient(45deg,#0a0a0f,#0a0a0f 8px,#13131a 8px,#13131a 16px)' },
     ];
 
     let userBgTheme = localStorage.getItem('susBgTheme') || 'bg1';
@@ -1365,7 +1365,7 @@
             var t = BG_THEMES[i];
             var sel = t.id === userBgTheme ? ' selected' : '';
             var icon = '';
-            if (t.label.indexOf('Ã°ÂÂÂ') === 0 || t.label.indexOf('Ã¢ÂÂ') === 0 || t.label.indexOf('Ã¢ÂÂ¡') === 0) {
+            if (t.label.indexOf('ÃÂ°ÃÂÃÂÃÂ') === 0 || t.label.indexOf('ÃÂ¢ÃÂÃÂ') === 0 || t.label.indexOf('ÃÂ¢ÃÂÃÂ¡') === 0) {
                 icon = t.label.substring(0, 2);
             }
             out += '<div class="theme-bg-opt' + sel + '" style="background:' + t.preview + ';" onclick="applyBgTheme(\'' + t.id + '\')" title="' + t.label + '">' + icon + '</div>';
@@ -1390,7 +1390,7 @@
     const THEMES = [
         { color: '#6366f1', name: 'Lila' },
         { color: '#3b82f6', name: 'Blau' },
-        { color: '#10b981', name: 'GrÃÂ¼n' },
+        { color: '#10b981', name: 'GrÃÂÃÂ¼n' },
         { color: '#f59e0b', name: 'Gelb' },
         { color: '#ef4444', name: 'Rot' },
         { color: '#ec4899', name: 'Pink' },
@@ -1428,7 +1428,7 @@
         });
     }
 
-    // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ TAB NAVIGATION Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ TAB NAVIGATION ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
     function showTab(tab) {
         document.querySelectorAll('.nav-btn').forEach((b,i) => {
             b.classList.toggle('active', i === 0);
