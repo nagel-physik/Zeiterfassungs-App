@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Arbeitszeit-Assistent Pro v21.23</title>
     <style id="dynamic-theme-style"></style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
         :root { 
@@ -144,7 +143,6 @@
         .desktop-toggle-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         @keyframes pulse-help { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.8);transform:scale(1);} 50%{box-shadow:0 0 0 10px rgba(239,68,68,0);transform:scale(1.05);} }
-        .btn-sus { background: rgba(6,182,212,0.15); border: 2px solid var(--sus); color: var(--sus); animation: pulse-sus 3s ease-in-out infinite; }
         @keyframes pulse-sus { 0%,100%{box-shadow:0 4px 0 rgba(0,0,0,0.2),0 0 0 0 rgba(6,182,212,0.4);} 60%{box-shadow:0 4px 0 rgba(0,0,0,0.2),0 0 0 8px rgba(6,182,212,0);} }
         .today-dot { position:absolute; top:-6px; right:-6px; background:#ef4444; color:white; border-radius:10px; min-width:20px; height:20px; font-size:0.65rem; font-weight:900; border:2px solid var(--card); animation:pulse-dot 1.5s ease-in-out infinite; display:none; align-items:center; justify-content:center; padding:0 4px; line-height:1; }
         @keyframes pulse-schulrecht {
@@ -299,7 +297,6 @@
                 ⚖️ Schulrecht &amp; Dokumente
             </button>
         </a>
-        <button class="btn btn-sus" onclick="openSusManagement()">👥 Schüler-Management</button>
         <div class="progress-container" style="margin-top: 25px;">
             <div class="progress-label"><span>Tag Fortschritt</span><span id="day-percent">0%</span></div>
             <div class="progress-bar"><div id="day-progress" class="progress-fill" style="background: var(--primary);"></div></div>
@@ -413,7 +410,6 @@
     let weeklySollHours  = parseFloat(localStorage.getItem('weeklySollV13')) || 26;
     let userName         = localStorage.getItem('userNameV13')      || 'Lehrkraft';
     let ghToken          = localStorage.getItem('ghTokenV21')       || '';
-    let susAdminUnlocked = localStorage.getItem('susAdminUnlocked') || '';
     let ghUser           = localStorage.getItem('ghUserV21')        || '';
     let ghRepo           = localStorage.getItem('ghRepoV21')        || '';
     let class1Name       = localStorage.getItem('class1NameV21')    || 'Klasse 1';
@@ -1341,137 +1337,7 @@
     }
  
     // ─── SUS MANAGEMENT ───────────────────────────────────────────
-    function openSusManagement() {
-        // Prüfe ob GitHub-Token vorhanden (= freigeschaltet)
-        if (!ghToken && !susAdminUnlocked) {
-            var lockHTML = '<div class="modal-nav">';
-            lockHTML += '<button onclick="document.getElementById(\'modal\').style.display=\'none\'" style="background:none;border:none;color:var(--danger);font-weight:bold;cursor:pointer;">✕ SCHLIESSEN</button>';
-            lockHTML += '<b style="color:var(--sus)">👥 Schüler-Management</b><div></div></div>';
-            lockHTML += '<div style="padding:40px 20px; text-align:center;">';
-            lockHTML += '<div style="font-size:3rem; margin-bottom:16px;">🔒</div>';
-            lockHTML += '<div style="font-size:1.1rem; font-weight:900; color:var(--text); margin-bottom:12px;">Noch nicht freigeschaltet</div>';
-            lockHTML += '<div style="font-size:0.85rem; color:#94a3b8; line-height:1.6; margin-bottom:24px;">Das Schüler-Management ist nur für Klassenlehrer verfügbar und muss einmalig vom Administrator eingerichtet werden.<br><br>Bitte wenden Sie sich an den Administrator.</div>';
-            lockHTML += '<div style="background:rgba(6,182,212,0.08); border:1.5px solid var(--sus); border-radius:16px; padding:16px; font-size:0.8rem; color:var(--sus); font-weight:700; margin-bottom:24px;">';
-            lockHTML += 'ℹ️ Sobald der Administrator die GitHub-Verbindung eingerichtet hat, wird diese Funktion automatisch freigeschaltet.</div>';
-            lockHTML += '<div onclick="susLockToggle()" style="cursor:pointer; color:#334155; font-size:1.5rem; user-select:none; margin-bottom:10px;">🔒</div>';
-            lockHTML += '<div id="sus-lock-form" style="display:none;">';
-            lockHTML += '<input type="password" id="sus-lock-pw" placeholder="Passwort..." style="width:100%; background:#0f172a; border:1.5px solid #334155; color:white; padding:12px; border-radius:10px; font-size:1rem; margin-bottom:8px; text-align:center; box-sizing:border-box;">';
-            lockHTML += '<button onclick="susLockCheck()" style="width:100%; background:#334155; color:white; border:none; padding:12px; border-radius:10px; font-weight:800; cursor:pointer; font-size:0.9rem;">ENTSPERREN</button>';
-            lockHTML += '</div></div>';
-            document.getElementById('modal-body').innerHTML = lockHTML;
-            document.getElementById('modal').style.display = 'block';
-            return;
-        }
 
-                // Count pending sus entries
-        const pending = Object.values(calEntries).flat().filter(e => e.susShare).length;
-        const logHtml = sendLog.slice(-7).reverse().map(l =>
-            `<div class="send-log-entry"><span>${l.msg}</span><span class="ok">${l.time} ✅</span></div>`
-        ).join('') || '<div style="color:#475569; font-size:0.75rem;">Noch keine Sendungen.</div>';
- 
-        document.getElementById('modal-body').innerHTML = `
-            <div class="modal-nav">
-                <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;color:var(--danger);font-weight:bold;cursor:pointer;">✕ ZURÜCK</button>
-                <b style="color:var(--sus)">📡 SuS-MANAGEMENT</b>
-                <div></div>
-            </div>
- 
-            <div class="sus-panel" style="margin-top:20px;">
-                <div class="sus-panel-title">📱 QR-CODE FÜR SuS</div>
-
-                <select id="qr-class-select" style="width:100%;margin-bottom:12px;background:#0f172a;border:1.5px solid var(--sus);color:white;padding:10px;border-radius:10px;font-weight:800;font-size:0.9rem;">
-                    <option value="${class1Name}">${class1Name}</option>
-                    <option value="${class2Name}">${class2Name}</option>
-                </select>
-
-                <button onclick="generateQRCode()" style="width:100%;background:linear-gradient(135deg,var(--sus),#0e7490);color:white;border:none;padding:14px;border-radius:12px;font-weight:900;font-size:1rem;cursor:pointer;margin-bottom:12px;font-family:inherit;">
-                    📱 QR-Code generieren
-                </button>
-
-                <div id="qr-code-display" style="background:white;border-radius:16px;padding:16px;text-align:center;margin-bottom:10px;min-height:60px;display:none;">
-                    <div id="qr-img-wrap" style="display:flex;justify-content:center;margin-bottom:8px;"></div>
-                    <div id="qr-url-text" style="font-size:0.58rem;color:#64748b;word-break:break-all;margin-bottom:4px;"></div>
-                    <div style="font-size:0.65rem;font-weight:800;color:#0f172a;">👆 SuS einmal scannen – fertig!</div>
-                </div>
-
-                <div style="background:#0f172a;border-radius:10px;padding:10px;font-size:0.75rem;color:#94a3b8;text-align:center;">
-                    ${pending > 0 ? `<span style="color:var(--sus);font-weight:800;">${pending} Einträge</span> zur Übertragung bereit` : 'Keine freigegebenen Einträge'}
-                </div>
-            </div>
- 
-            <div class="admin-section">
-                <div class="admin-section-title">📢 TAGES-NEWS AN SuS</div>
-                <textarea id="sus-news-input" rows="3" placeholder="z.B. Morgen Test in Physik! Bitte Formelblatt mitbringen."></textarea>
-                <select id="sus-news-class" onchange="localStorage.setItem('susNewsClass', this.value)">
-                    <option value="both">Beide Klassen</option>
-                    <option value="class1">${class1Name}</option>
-                    <option value="class2">${class2Name}</option>
-                </select>
-            </div>
- 
-            <div class="admin-section">
-                <div class="admin-section-title">🏫 KLASSEN-STUNDENPLAN</div>
-                <p style="font-size:0.75rem; color:#94a3b8; margin:0 0 10px;">Tippe auf Woche A oder B um den Plan einzutragen.</p>
-                <!-- Woche A Akkordeon -->
-                <button onclick="susWeekAccordion('A')" id="sus-acc-a" style="width:100%; padding:14px; border-radius:12px; border:none; background:#2563eb; color:white; font-weight:800; cursor:pointer; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:1rem;">
-                    <span>📅 Woche A</span><span id="sus-acc-a-arrow">▼</span>
-                </button>
-                <div id="sus-acc-a-content" style="display:none; background:rgba(37,99,235,0.05); border-radius:12px; padding:10px; margin-bottom:8px;">
-                    <div id="sus-plan-fields-a"></div>
-                </div>
-                <!-- Woche B Akkordeon -->
-                <button onclick="susWeekAccordion('B')" id="sus-acc-b" style="width:100%; padding:14px; border-radius:12px; border:none; background:#9333ea; color:white; font-weight:800; cursor:pointer; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:1rem;">
-                    <span>📅 Woche B</span><span id="sus-acc-b-arrow">▼</span>
-                </button>
-                <div id="sus-acc-b-content" style="display:none; background:rgba(147,51,234,0.05); border-radius:12px; padding:10px; margin-bottom:8px;">
-                    <div id="sus-plan-fields-b"></div>
-                </div>
-            </div>
- 
-            <div class="admin-section" id="github-section" style="border-color:#334155; display:none;">
-                <div class="admin-section-title">🔐 GITHUB-VERBINDUNG</div>
-                <div id="admin-panel" style="display:block;">
-                    <p style="font-size:0.65rem; color:var(--success); font-weight:800;">✅ ADMIN-MODUS (MICHAEL NAGEL)</p>
-                    <label style="font-size:0.7rem; color:#94a3b8;">GitHub Token</label>
-                    <input type="password" id="gh-token-input" value="${ghToken}" placeholder="ghp_...">
-                    <label style="font-size:0.7rem; color:#94a3b8;">GitHub Username</label>
-                    <input type="text" id="gh-user-input" value="${ghUser}" placeholder="dein-github-name">
-                    <label style="font-size:0.7rem; color:#94a3b8;">Repository Name</label>
-                    <input type="text" id="gh-repo-input" value="${ghRepo}" placeholder="lehrer-app">
-                    <button onclick="saveGhCredentials()" style="width:100%; background:#334155; color:white; border:none; padding:10px; border-radius:10px; font-weight:800; cursor:pointer; margin-bottom:10px;">💾 Zugangsdaten speichern</button>
-                </div>
-            </div>
- 
-            <div class="admin-section">
-                <div class="admin-section-title">📋 SENDE-PROTOKOLL</div>
-                ${logHtml}
-            </div>
- 
-            <div id="admin-unlock-area" style="text-align:center; margin-top:5px;">
-                <div onclick="toggleAdminUnlock()" style="cursor:pointer; color:#334155; font-size:1.2rem; user-select:none;">🔒</div>
-                <div id="admin-unlock-form" style="display:none; margin-top:8px;">
-                    <input type="password" id="admin-pw-input" placeholder="Passwort..." style="margin-bottom:6px; text-align:center;">
-                    <button onclick="checkAdminPassword()" style="width:100%; background:#334155; color:white; border:none; padding:10px; border-radius:10px; font-weight:800; cursor:pointer;">ENTSPERREN</button>
-                </div>
-            </div>
-
-            <button onclick="pushToGitHub()" style="width:100%; background:linear-gradient(145deg,#0891b2,#0e7490); color:white; border:none; padding:18px; border-radius:16px; font-weight:900; font-size:1rem; cursor:pointer; margin-top:10px; box-shadow:0 4px 0 rgba(0,0,0,0.3);">
-                🚀 ALLES AN SuS SENDEN
-            </button>`;
- 
-        document.getElementById('modal').style.display = 'block';
-        renderSusPlanFields('A');
-        setTimeout(function() { generateQRCode(); }, 300);
-        // Klassen-Select Wert wiederherstellen
-        setTimeout(function() {
-            var newsSelEl = document.getElementById('sus-news-class');
-            var savedNews = localStorage.getItem('susNewsClass');
-            if (newsSelEl && savedNews) newsSelEl.value = savedNews;
-            var qrSelEl = document.getElementById('qr-class-select');
-            var savedQr = localStorage.getItem('activeClassV21');
-            if (qrSelEl && savedQr) qrSelEl.value = savedQr;
-        }, 200);
-    }
  
     let susPlanWeek = 'A';
 
@@ -1521,82 +1387,13 @@
     // ─── ADMIN PASSWORT ──────────────────────────────────────────
     const ADMIN_PW = "Lwlmn72Neo123"; // <-- Hier dein Passwort eintragen
 
-    function susLockToggle() {
-        var form = document.getElementById('sus-lock-form');
-        if (!form) return;
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        if (form.style.display === 'block') {
-            setTimeout(function() {
-                var inp = document.getElementById('sus-lock-pw');
-                if (inp) inp.focus();
-            }, 50);
-        }
-    }
 
-    function susLockCheck() {
-        var inp = document.getElementById('sus-lock-pw');
-        if (!inp) return;
-        if (inp.value === ADMIN_PW) {
-            // Admin-Flag dauerhaft setzen
-            susAdminUnlocked = 'yes';
-            localStorage.setItem('susAdminUnlocked', 'yes');
-            document.getElementById('modal').style.display = 'none';
-            // Management normal öffnen
-            setTimeout(function() {
-                openSusManagement();
-                // GitHub-Bereich direkt aufklappen
-                setTimeout(function() {
-                    var gs = document.getElementById('github-section');
-                    var ua = document.getElementById('admin-unlock-area');
-                    if (gs) gs.style.display = 'block';
-                    if (ua) ua.style.display = 'none';
-                }, 300);
-            }, 150);
-        } else {
-            inp.value = '';
-            inp.placeholder = 'Falsches Passwort...';
-            setTimeout(function() { inp.placeholder = 'Passwort...'; }, 2000);
-        }
-    }
 
-    function toggleAdminUnlockLocked() {
-        const form = document.getElementById('admin-unlock-form-locked');
-        if (!form) return;
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        if (form.style.display === 'block') {
-            setTimeout(function() {
-                var inp = document.getElementById('admin-pw-input-locked');
-                if (inp) inp.focus();
-            }, 100);
-        }
-    }
 
-    function checkAdminPasswordLocked() {
-        const input = document.getElementById('admin-pw-input-locked');
-        if (!input) return;
-        if (input.value === ADMIN_PW) {
-            // Passwort korrekt: Token-Bypass setzen und Management öffnen
-            var savedToken = ghToken;
-            ghToken = '__admin__';
-            document.getElementById('modal').style.display = 'none';
-            setTimeout(function() {
-                openSusManagement();
-                // GitHub-Bereich direkt öffnen nach kurzem Delay
-                setTimeout(function() {
-                    var gs = document.getElementById('github-section');
-                    var ua = document.getElementById('admin-unlock-area');
-                    if (gs) gs.style.display = 'block';
-                    if (ua) ua.style.display = 'none';
-                    // Token wieder zurücksetzen
-                    ghToken = savedToken;
-                }, 300);
-            }, 100);
-        } else {
-            input.value = '';
-            input.placeholder = 'Falsches Passwort...';
-            setTimeout(function() { input.placeholder = 'Passwort...'; }, 2000);
-        }
-    }
+
+
+
+
 
     function toggleAdminUnlock() {
         const form = document.getElementById('admin-unlock-form');
@@ -1630,86 +1427,6 @@
         alert("✅ Gespeichert!");
     }
  
-    function generateQRCode() {
-        var classSelect = document.getElementById('qr-class-select');
-        if (!classSelect) { alert('Fehler: Klassen-Select nicht gefunden'); return; }
-
-        var sel  = classSelect.value;
-        var slug = sel.toLowerCase().replace(/ /g, '_');
-        var base = 'https://zeiterfassungs-app-three.vercel.app';
-
-        // Basis-URL immer funktionierend
-        var susUrl = base + '/sus-app.html?klasse=' + encodeURIComponent(slug);
-        if (ghUser) susUrl += '&user=' + encodeURIComponent(ghUser);
-        if (ghRepo) susUrl += '&repo=' + encodeURIComponent(ghRepo);
-
-        var wrap    = document.getElementById('qr-img-wrap');
-        var urlText = document.getElementById('qr-url-text');
-        var display = document.getElementById('qr-code-display');
-        if (!wrap || !display) { alert('Fehler: Anzeige nicht gefunden'); return; }
-
-        window._lastQrUrl = susUrl;
-        display.style.display = 'block';
-        if (urlText) urlText.innerText = susUrl;
-
-        // Direkt den Link und Teilen-Button anzeigen (immer sichtbar)
-        wrap.innerHTML =
-            '<div style="background:#e0f2fe;border:1px solid #7dd3fc;padding:12px;border-radius:10px;margin-bottom:10px;text-align:left;">' +
-            '<div style="font-size:0.68rem;font-weight:900;color:#0369a1;margin-bottom:4px;">🔗 Link für SuS:</div>' +
-            '<div id="qr-link-text" style="font-size:0.58rem;color:#1e3a5f;word-break:break-all;margin-bottom:8px;">' + susUrl + '</div>' +
-            '<button onclick="teileLink()" style="width:100%;background:#0ea5e9;color:white;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:900;font-size:0.9rem;font-family:inherit;">📤 Link teilen / kopieren</button>' +
-            '</div>' +
-            '<div id="qr-img-inner" style="text-align:center;"></div>';
-
-        // Zusätzlich QR-Code laden
-        var imgWrap = document.getElementById('qr-img-inner');
-        if (imgWrap) {
-            var img = new Image();
-            img.style.cssText = 'width:180px;height:180px;border-radius:8px;margin:8px auto;display:block;';
-            img.onload = function() { imgWrap.appendChild(img); };
-            img.src = 'https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=' + encodeURIComponent(susUrl);
-        }
-
-        localStorage.setItem('activeClassV21', sel);
-    }
-
-    function teileLink() {
-        var url = window._lastQrUrl || '';
-        if (!url) return;
-        if (navigator.share) {
-            navigator.share({ title: 'SchulHub App', url: url });
-        } else if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).then(function() { alert('Link kopiert!'); });
-        } else {
-            prompt('Link:', url);
-        }
-    }
-
-    function teileLink() {
-        var url = window._lastQrUrl || '';
-        if (!url) return;
-        if (navigator.share) {
-            navigator.share({ title: 'SchulHub App', url: url });
-        } else if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).then(function() { alert('Link kopiert!'); });
-        } else {
-            prompt('Link kopieren:', url);
-        }
-    }
-
-    function teileLink(encodedUrl) {
-        var url = decodeURIComponent(encodedUrl);
-        if (navigator.share) {
-            navigator.share({ title: 'SchulHub App', url: url });
-        } else if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).then(function() { alert('✅ Link kopiert!'); });
-        } else {
-            prompt('Link kopieren:', url);
-        }
-    }
-
-    function updateQRCode() { /* manuell über Button */ }
-
     async function pushToGitHub() {
         if (!ghToken || !ghUser || !ghRepo) {
             alert("⚠️ Bitte zuerst GitHub-Zugangsdaten im Admin-Bereich eintragen!");
@@ -1717,7 +1434,7 @@
         }
  
         const newsText  = document.getElementById('sus-news-input')?.value  || '';
-        const newsClass = document.getElementById('sus-news-class')?.value || localStorage.getItem('susNewsClass') || 'both';
+        const newsClass = document.getElementById('sus-news-class')?.value || 'both';
  
         // Collect sus-shared calendar entries for today+future
         const todayKey = toLocalDateKey();
@@ -1743,53 +1460,30 @@
             sentAt: new Date().toLocaleString('de-DE')
         };
  
-        // Bestimme welche Dateien geschrieben werden sollen
-        const filesToWrite = [];
-        if (newsClass === 'both' || newsClass === class1Name) {
-            const slug1 = class1Name.toLowerCase().replace(/\s+/g, '_');
-            filesToWrite.push({ file: 'data_' + slug1 + '.json', className: class1Name });
-        }
-        if (newsClass === 'both' || newsClass === class2Name) {
-            const slug2 = class2Name.toLowerCase().replace(/\s+/g, '_');
-            filesToWrite.push({ file: 'data_' + slug2 + '.json', className: class2Name });
-        }
-        // Fallback: immer data.json schreiben
-        filesToWrite.push({ file: 'data.json', className: 'alle' });
-
+        const url = `https://api.github.com/repos/${ghUser}/${ghRepo}/contents/data.json`;
         try {
-            let allOk = true;
-            for (const f of filesToWrite) {
-                const filePayload = Object.assign({}, payload, { className: f.className });
-                const url = 'https://api.github.com/repos/' + ghUser + '/' + ghRepo + '/contents/' + f.file;
-                const getRes  = await fetch(url, { headers: { Authorization: 'token ' + ghToken } });
-                var sha = undefined;
-                if (getRes.ok) {
-                    var getFile = await getRes.json();
-                    sha = getFile.sha;
-                }
-                var body = {
-                    message: 'Update ' + new Date().toLocaleString('de-DE'),
-                    content: btoa(unescape(encodeURIComponent(JSON.stringify(filePayload, null, 2))))
-                };
-                if (sha) body.sha = sha;
-                const putRes  = await fetch(url, {
-                    method: 'PUT',
-                    headers: { Authorization: 'token ' + ghToken, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-                if (!putRes.ok) { allOk = false; }
-            }
-            if (allOk) {
-                const logEntry = { msg: newsText ? 'News: "' + newsText.substring(0,30) + '..."' : 'Plan-Update', time: new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) };
+            const getRes  = await fetch(url, { headers: { Authorization: `token ${ghToken}` } });
+            const getFile = await getRes.json();
+            const putRes  = await fetch(url, {
+                method: "PUT",
+                headers: { Authorization: `token ${ghToken}`, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: `Update ${new Date().toLocaleString('de-DE')}`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2)))),
+                    sha: getFile.sha
+                })
+            });
+            if (putRes.ok) {
+                const logEntry = { msg: newsText ? `News: "${newsText.substring(0,30)}..."` : "Plan-Update", time: new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) };
                 sendLog.push(logEntry);
                 if (sendLog.length > 20) sendLog.shift();
                 localStorage.setItem('sendLogV21', JSON.stringify(sendLog));
-                alert('✅ Erfolgreich an SuS gesendet!');
+                alert("✅ Erfolgreich an SuS gesendet!");
                 document.getElementById('modal').style.display = 'none';
             } else {
-                alert('❌ Fehler beim Senden. Token prüfen!');
+                alert("❌ Fehler beim Senden. Token prüfen!");
             }
-        } catch (e) { alert('❌ Verbindungsfehler: ' + e.message); }
+        } catch (e) { alert("❌ Verbindungsfehler: " + e.message); }
     }
  
     // ─── SETUP / SETTINGS ─────────────────────────────────────────
@@ -2003,9 +1697,6 @@
                 <p><b>Schritt 3 – Key eintragen:</b> Anbieter auswählen → Key ins Feld einfügen → 💾 Speichern. Der Key wird nur auf deinem Gerät gespeichert – kein anderer hat Zugriff.</p>
                 <p><b>Schritt 4 – Fragen stellen:</b> Frage eingeben oder Schnell-Button tippen → Antwort erscheint mit Paragraphenangabe.</p>
                 <p><b>Kosten:</b> Jeder Lehrer nutzt seinen eigenen Key. Bei normaler Nutzung (wenige Fragen täglich) entstehen nur minimale Kosten – oft gibt es kostenlose Kontingente.</p>
-
-                <h2>7. 👥 Schüler-Management</h2>
-                <p>News, Stundenplan und Infos an die Schüler-App senden. Benötigt GitHub-Token (einmalig vom Administrator einrichten). Ohne Token: Hinweis „Noch nicht freigeschaltet" → Schloss-Symbol tippen → Admin-Passwort eingeben.</p>
 
                 <h2>8. Kalender</h2>
                 <p>Kalender-Icon tippen (rote Zahl = heutige + zukünftige Termine). Navigation mit „Vorherige/Nächste Woche". Termine erscheinen automatisch unter Aktuell/Nächstes auf dem Dashboard.<br>
