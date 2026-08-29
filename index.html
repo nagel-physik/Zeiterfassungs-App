@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v21.23</title>
+    <title>Arbeitszeit-Assistent Pro v22.1</title>
     <style id="dynamic-theme-style"></style>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
@@ -46,9 +46,6 @@
         .task-label { font-size: 0.55rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 2px; }
         .task-val { font-size: 1.1rem; font-weight: 800; line-height: 1.1; min-height: 2.2em; display: flex; align-items: center; justify-content: center; color: #fff; }
         .task-sub { font-size: 0.65rem; color: #94a3b8; font-weight: 600; }
-        .task-val.alert-soon { color: var(--danger) !important; animation: blink-alert 1s infinite; }
-        @keyframes blink-alert { 0%,100%{opacity:1} 50%{opacity:0.4} }
- 
         /* TIMER */
         .timer-display { font-size: 2.8rem; font-weight: 800; margin: 5px 0; color: var(--text); font-variant-numeric: tabular-nums; }
         
@@ -64,8 +61,6 @@
         .btn-extra.active { background: #6366f1 !important; color: white; border: none; }
         .btn-vnb { background: rgba(16, 185, 129, 0.1); border: 1.5px solid var(--success); color: var(--success); }
         .btn-vnb.active { background: var(--success) !important; color: white; border: none; }
-        .btn-pulse { animation: pulse-btn 1.2s infinite; }
-        @keyframes pulse-btn { 0%,100%{box-shadow:0 4px 0 rgba(0,0,0,0.2)} 50%{box-shadow:0 0 20px rgba(56,189,248,0.8)} }
         @keyframes pulse-confirm { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
  
         /* PROGRESS */
@@ -117,6 +112,20 @@
         
         /* FORMS */
         .help-trigger { background: var(--primary); color: var(--bg); width: 32px; height: 32px; border-radius: 50%; font-weight: 900; border: none; cursor: pointer; animation: pulse-help 2.5s ease-in-out infinite; box-shadow: 0 0 0 0 rgba(239,68,68,0.8); }
+
+        /* NAECHSTER-TERMIN-LEISTE (Laufschrift unter Aktuell/Naechstes) */
+        .next-termin-bar { display: none; align-items: center; gap: 8px; margin-top: 8px; padding: 6px 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; }
+        .ntb-icon { flex-shrink: 0; font-size: 0.75rem; }
+        .ntb-viewport { flex: 1; overflow: hidden; white-space: nowrap; }
+        .ntb-text { display: inline-block; white-space: nowrap; padding-left: 100%; font-size: 0.7rem; font-weight: 700; color: var(--accent); animation: ntb-scroll 16s linear infinite; }
+        @keyframes ntb-scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+
+        /* WOCHE-WECHSEL-HINWEIS */
+        #week-switch-hint { display: none; margin-top: 2px; font-size: 0.56rem; font-weight: 800; color: #1e293b; background: var(--overtime); padding: 3px 9px; border-radius: 8px; text-align: center; white-space: nowrap; cursor: pointer; animation: hint-fade 2.4s ease-in-out infinite; }
+        @keyframes hint-fade { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+        /* AKTUALISIERUNG-BUTTON (auffaellig, damit er nicht vergessen wird) */
+        .btn-update-alert { background: var(--danger); color: white; border: none; animation: pulse-help 2.2s ease-in-out infinite; }
         /* ── DESKTOP MODUS ── */
         body.desktop-mode { max-width: 900px; margin: 0 auto; font-size: 110%; }
         body.desktop-mode .card { max-width: 860px; margin-left: auto; margin-right: auto; padding: 30px; }
@@ -145,10 +154,6 @@
         @keyframes pulse-help { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.8);transform:scale(1);} 50%{box-shadow:0 0 0 10px rgba(239,68,68,0);transform:scale(1.05);} }
         @keyframes pulse-sus { 0%,100%{box-shadow:0 4px 0 rgba(0,0,0,0.2),0 0 0 0 rgba(6,182,212,0.4);} 60%{box-shadow:0 4px 0 rgba(0,0,0,0.2),0 0 0 8px rgba(6,182,212,0);} }
         .today-dot { position:absolute; top:-6px; right:-6px; background:#ef4444; color:white; border-radius:10px; min-width:20px; height:20px; font-size:0.65rem; font-weight:900; border:2px solid var(--card); animation:pulse-dot 1.5s ease-in-out infinite; display:none; align-items:center; justify-content:center; padding:0 4px; line-height:1; }
-        @keyframes pulse-schulrecht {
-            0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.7); }
-            50%      { box-shadow: 0 0 0 8px rgba(99,102,241,0); }
-        }
         @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.3);opacity:0.7;} }
         .cal-icon-label { font-size:0.38rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; line-height:1; }
         .log-entry { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; display: flex; justify-content: space-between; color: #94a3b8; }
@@ -161,43 +166,53 @@
         textarea { resize: vertical; }
         .accordion-btn { background: #334155; color: white; padding: 15px; width: 100%; text-align: left; border: none; border-radius: 12px; margin-top: 10px; font-weight: bold; display: flex; justify-content: space-between; cursor: pointer; }
         .accordion-content { display: none; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 0 0 12px 12px; }
- 
+
+        /* STUNDENPLAN-GRID (kompakte Woche A/B Bearbeitung: Bloecke als Zeilen, Tage als Spalten) */
+        .stunden-table { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; }
+        .stunden-row { display: grid; grid-template-columns: 46px repeat(5, 1fr); gap: 3px; align-items: center; }
+        .stunden-row + .stunden-row { margin-top: 0; }
+        .stunden-header { margin-bottom: 3px; }
+        .stunden-header > div { font-size: 0.6rem; font-weight: 900; color: #94a3b8; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stunden-label { font-size: 0.56rem; font-weight: 800; color: var(--accent); line-height: 1.2; display: flex; flex-direction: column; }
+        .stunden-label .sl-time { font-size: 0.46rem; font-weight: 600; color: #64748b; }
+        .stunden-table input.stunden-input { width: 100%; padding: 7px 2px; margin: 0; font-size: 0.62rem; text-align: center; border-radius: 6px; }
+
         /* CALENDAR OVERLAY */
-        .cal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f1f5f9; z-index: 2000; overflow-y: auto; color: #1e293b; }
-        .cal-header-bar { position: sticky; top: 0; background: #ffffff; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); z-index: 1; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .cal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; overflow-y: auto; color: var(--text); }
+        .cal-header-bar { position: sticky; top: 0; background: var(--card); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); z-index: 1; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .cal-nav-btn { background: var(--primary); border: none; color: white; min-width: 80px; height: 44px; border-radius: 10px; font-size: 0.75rem; cursor: pointer; font-weight: 800; padding: 0 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }
-        .cal-week-title { font-weight: 900; font-size: 0.9rem; color: #0f172a; text-align: center; }
-        .cal-week-badge { font-size: 0.65rem; color: var(--accent); font-weight: 800; display: block; }
+        .cal-week-title { font-weight: 900; font-size: 0.9rem; color: var(--text); text-align: center; }
+        .cal-week-badge { font-size: 0.65rem; color: var(--bg); background: var(--primary); font-weight: 800; display: block; padding: 2px 8px; border-radius: 6px; margin-top: 2px; }
         .cal-body { padding: 15px; max-width: 420px; margin: 0 auto; }
         .cal-search { display: flex; gap: 8px; margin-bottom: 15px; }
         .cal-search input { margin: 0; flex: 1; }
         .cal-day-section { margin-bottom: 20px; }
-        .cal-day-header { font-size: 0.72rem; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; padding: 7px 12px; background: #e2e8f0; border-radius: 10px; }
-        .cal-day-header.today { background: var(--primary); color: white; box-shadow: 0 3px 10px rgba(56,189,248,0.3); }
-        .cal-day-header.holiday-header { background: #fef3c7; color: #92400e; }
+        .cal-day-header { font-size: 0.72rem; font-weight: 900; color: #cbd5e1; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; padding: 7px 12px; background: #334155; border-radius: 10px; }
+        .cal-day-header.today { background: var(--primary); color: var(--bg); box-shadow: 0 3px 10px rgba(56,189,248,0.3); }
+        .cal-day-header.holiday-header { background: rgba(251,191,36,0.18); color: var(--accent); }
         .cal-tile {
-            background: #ffffff; border-radius: 14px; padding: 12px 15px;
-            margin-bottom: 8px; border-left: 4px solid #94a3b8;
+            background: var(--card); border-radius: 14px; padding: 12px 15px;
+            margin-bottom: 8px; border-left: 4px solid #64748b;
             display: flex; align-items: center; justify-content: space-between;
             cursor: pointer; transition: all 0.15s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07); color: #1e293b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3); color: var(--text);
         }
         .cal-tile:active { transform: scale(0.98); }
         .cal-tile.has-entry { border-left-color: var(--success); }
-        .cal-tile.vertretung { border-left-color: var(--danger); background: #fff5f5; }
-        .cal-tile.konferenz { border-left-color: var(--accent); background: #fffbeb; }
-        .cal-tile.ferien { border-left-color: #d97706; background: #fefce8; }
+        .cal-tile.vertretung { border-left-color: var(--danger); background: rgba(239,68,68,0.08); }
+        .cal-tile.konferenz { border-left-color: var(--accent); background: rgba(251,191,36,0.08); }
+        .cal-tile.ferien { border-left-color: #d97706; background: rgba(217,119,6,0.1); }
         .cal-tile-left { text-align: left; }
         .cal-tile-time { font-size: 0.65rem; color: #94a3b8; font-weight: 700; }
-        .cal-tile-title { font-size: 0.95rem; font-weight: 800; color: #0f172a; }
+        .cal-tile-title { font-size: 0.95rem; font-weight: 800; color: var(--text); }
         .cal-tile-sub { font-size: 0.7rem; color: #94a3b8; margin-top: 2px; }
         .cal-tile-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
         .cal-tile-badge { font-size: 0.55rem; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
-        .badge-vz { background: rgba(239,68,68,0.2); color: var(--danger); }
+        .badge-vz { background: rgba(239,68,68,0.2); color: #fca5a5; }
         .badge-konf { background: rgba(251,191,36,0.2); color: var(--accent); }
         .badge-sus { background: rgba(6,182,212,0.2); color: var(--sus); }
         .anchor-icon { font-size: 0.8rem; }
- 
+
         /* ENTRY POPUP */
         /* VZ Klassen-Popup */
         .vz-popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2999; }
@@ -210,33 +225,52 @@
         .popup-title { font-size: 1rem; font-weight: 900; color: var(--primary); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         .popup-label { font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: block; }
  
-        /* SUS PANEL */
-        .sus-panel { background: rgba(6,182,212,0.1); border: 1px solid var(--sus); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
-        .sus-panel-title { color: var(--sus); font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
- 
-        /* ADMIN SECTION */
-        .admin-section { background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 15px; padding: 15px; margin-bottom: 15px; }
-        .admin-section-title { font-size: 0.7rem; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-        .send-log-entry { font-size: 0.7rem; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; color: #94a3b8; }
-        .send-log-entry .ok { color: var(--success); }
- 
         /* SEARCH RESULTS */
-        .search-result { background: white; color: #1e293b; box-shadow: 0 2px 6px rgba(0,0,0,0.07); border-radius: 10px; padding: 10px; margin-bottom: 8px; font-size: 0.8rem; }
+        .search-result { background: var(--card); color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.3); border-radius: 10px; padding: 10px; margin-bottom: 8px; font-size: 0.8rem; }
         .search-result-date { color: var(--primary); font-weight: 800; font-size: 0.65rem; }
         .search-result-title { font-weight: 700; }
         .search-result-note { color: #94a3b8; margin-top: 3px; font-style: italic; }
- 
+
         /* BOTTOM NAV AREA */
-        .bottom-actions { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 15px; }
+        .bottom-actions { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top: 15px; }
+
+        /* AUSFALL BUTTON */
+        .btn-ausfall { background: rgba(245, 158, 11, 0.1); border: 1.5px solid var(--overtime); color: var(--overtime); }
+        .btn-ausfall.active { background: var(--overtime) !important; color: white; border: none; }
+
+        /* TIME PICKER (eigener Zeit-Waehler statt input type=time) */
+        .time-select-row { display: flex; align-items: center; gap: 6px; margin: 5px 0 12px 0; }
+        .time-select { background: #0f172a; border: 1px solid #334155; color: white; padding: 12px 8px; border-radius: 10px; font-size: 1rem; font-family: inherit; margin: 0; flex: 1; }
+        .time-select-sep { font-weight: 900; color: #94a3b8; }
+
+        /* VERLAUF */
+        .verlauf-month { margin-bottom: 22px; }
+        .verlauf-month-header { display:flex; justify-content:space-between; align-items:baseline; padding:8px 4px; border-bottom: 2px solid var(--primary); margin-bottom: 8px; }
+        .verlauf-month-title { font-weight: 900; font-size: 0.95rem; color: var(--text); text-transform: capitalize; }
+        .verlauf-month-total { font-weight: 800; font-size: 0.8rem; color: var(--primary); }
+        .verlauf-month-sub { font-size: 0.68rem; color: #94a3b8; padding: 0 4px 8px; display:flex; gap:14px; flex-wrap:wrap; }
+        .verlauf-entry { background: var(--card); border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+        .verlauf-entry-left { text-align:left; }
+        .verlauf-entry-typ { font-size: 0.82rem; font-weight: 800; color: var(--text); }
+        .verlauf-entry-sub { font-size: 0.68rem; color: #94a3b8; margin-top: 2px; }
+        .verlauf-entry-right { display:flex; align-items:center; gap:8px; }
+        .verlauf-entry-dauer { font-size: 0.8rem; font-weight: 800; color: var(--primary); white-space: nowrap; }
+        .verlauf-empty { text-align:center; color:#94a3b8; padding:40px 10px; font-size:0.85rem; }
+
+        /* BACKUP */
+        .backup-btn-row { display:flex; gap:10px; }
+        .backup-btn-row .btn { margin-bottom: 0; }
     </style>
 </head>
 <body>
  
 <div id="update-toast">
-    <div class="toast-header"><span>✨ Update Info v21.23</span></div>
-    <div class="toast-body">v21.23: Nachtrag ersetzt alte Einträge · Desktop/Tablet-Modus.</div>
+    <div class="toast-header"><span>✨ Update Info v22.1</span></div>
+    <div class="toast-body">v22.1: Nächster-Termin-Leiste, auffälliger Aktualisierung-Button, Woche-Wechsel-Hinweis, fließende Farbe, kompaktes Stundenplan-Raster u.v.m. – alle Neuerungen stehen jetzt in der Hilfe (?) ganz oben.</div>
     <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
+ 
+<div class="container"></div>
  
 <div class="container">
     <div class="time-header">
@@ -259,7 +293,12 @@
             <div class="task-sub" id="task-next-sub">-</div>
         </div>
     </div>
- 
+
+    <div class="next-termin-bar" id="next-termin-bar">
+        <span class="ntb-icon">📅</span>
+        <div class="ntb-viewport"><span class="ntb-text" id="next-termin-text">–</span></div>
+    </div>
+
     <div class="card">
         <div id="display-name" style="font-size: 0.75rem; color: var(--accent); font-weight: 900; margin-bottom: 12px; letter-spacing: 2px;">LEHRKRAFT</div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; gap:10px;">
@@ -267,6 +306,7 @@
                 <span style="font-size:0.55rem; font-weight:900; color:var(--primary); text-transform:uppercase; letter-spacing:1px;">Wechseln</span>
                 <button id="week-btn" onclick="toggleWeekManual()" style="border:none; padding:10px 22px; border-radius:12px; color:white; font-weight:800; cursor:pointer;">Woche <span id="week-label">A</span></button>
                 <div style="font-size:0.72rem; font-weight:800; color:#94a3b8;">Ziel: <span id="soll-info" style="color:white;">26</span> Std</div>
+                <div id="week-switch-hint" onclick="ackWeekSwitch()" title="Woche fuer die naechste Woche pruefen. Antippen zum Bestaetigen, falls sie schon passt.">🔄 Woche prüfen!</div>
             </div>
             <div onclick="openCalendar()" style="cursor:pointer; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:4px;" ontouchstart="this.style.opacity='0.7'" ontouchend="this.style.opacity='1'">
                 <div style="position:relative; width:70px;">
@@ -292,33 +332,31 @@
         <button id="btn-vz" class="btn btn-vz" onclick="handleVZClick()">Vertretung</button>
         <button id="btn-extra" class="btn btn-extra" onclick="handleExtraClick()">Konferenz / Termin</button>
         <button id="btn-vnb" class="btn btn-vnb" onclick="handleVNBClick()">📚 Vor-/Nachbereitung</button>
-        <a href="schulrecht.html" style="display:block; text-decoration:none;">
-            <button class="btn" style="width:100%; background:linear-gradient(135deg,#4f46e5,#7c3aed); border:none; color:white; padding:12px; font-size:0.88rem; font-weight:900; animation:pulse-schulrecht 2.5s ease-in-out infinite;">
-                ⚖️ Schulrecht &amp; Dokumente
-            </button>
-        </a>
+        <button id="btn-ausfall" class="btn btn-ausfall" onclick="handleAusfallClick()">📉 Stunde ausgefallen</button>
         <div class="progress-container" style="margin-top: 25px;">
             <div class="progress-label"><span>Tag Fortschritt</span><span id="day-percent">0%</span></div>
             <div class="progress-bar"><div id="day-progress" class="progress-fill" style="background: var(--primary);"></div></div>
+            <div class="progress-label"><span>Wochenstunden</span><span id="week-percent">0%</span></div>
+            <div class="progress-bar"><div id="week-progress" class="progress-fill" style="background: var(--success);"></div></div>
             <div class="progress-label"><span>Vertretungen (Monat)</span><span id="vz-val">0</span></div>
             <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--danger);"></div></div>
-
-
+            <div id="balance-info" style="margin-top:10px; font-size:0.75rem; font-weight:800; text-align:center; padding:8px; border-radius:10px; background:rgba(255,255,255,0.03);">Ausgleichskonto: <span id="balance-val">±0,0 Std</span></div>
         </div>
     </div>
- 
+
     <div id="log-container"></div>
- 
+
     <div class="bottom-actions">
-        <button class="btn" style="background: #475569; padding: 12px;" onclick="openSetup()">⚙️ Einstellungen</button>
-        <button class="btn" style="border: 1px solid #475569; color: #94a3b8; background: transparent; padding: 12px;" onclick="forceUpdate()">🔄 Aktualisierung</button>
+        <button class="btn" style="background: #475569; padding: 12px; font-size:0.82rem;" onclick="openSetup()">⚙️ Einstellungen</button>
+        <button class="btn" style="background: #334155; padding: 12px; font-size:0.82rem;" onclick="openVerlauf()">📊 Verlauf</button>
+        <button class="btn btn-update-alert" style="padding: 12px; font-size:0.82rem;" onclick="forceUpdate()">🔄 Aktualisierung</button>
     </div>
- 
+
     <div class="desktop-toggle-wrap">
         <span class="desktop-toggle-label">Ansicht:</span>
         <button class="desktop-toggle-btn" id="desktop-toggle-btn" onclick="toggleDesktopMode()">📱 Mobil</button>
     </div>
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v21.23</footer>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v22.1</footer>
 </div>
  
 
@@ -380,8 +418,8 @@
     <input type="text" id="popup-entry-cat-custom" placeholder="z.B. Elternabend, Fortbildung, Prüfung..." style="display:none; margin-top:-8px;">
     <span class="popup-label">Uhrzeit (optional)</span>
     <div style="display:flex; gap:10px;">
-        <input type="time" id="popup-entry-start" style="flex:1; margin:0 0 12px 0;">
-        <input type="time" id="popup-entry-end" style="flex:1; margin:0 0 12px 0;">
+        <div id="popup-entry-start-wrap" style="flex:1;"></div>
+        <div id="popup-entry-end-wrap" style="flex:1;"></div>
     </div>
     <span class="popup-label">Notizen (SuS-Infos, Protokoll...)</span>
     <textarea id="popup-entry-note" rows="3" placeholder="Freies Notizfeld – z.B. Fehlzeiten klären, SuS hat oft Kopfschmerzen..."></textarea>
@@ -392,35 +430,83 @@
     </div>
 </div>
  
+<!-- AUSFALL POPUP -->
+<div class="vz-popup-overlay" id="ausfall-popup-overlay" onclick="closeAusfallPopup()"></div>
+<div class="vz-popup" id="ausfall-popup">
+    <div class="vz-popup-title">
+        <span style="color:var(--overtime);">📉 Stunde ausgefallen</span>
+        <button onclick="closeAusfallPopup()" style="background:var(--danger);color:white;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:900;">✕</button>
+    </div>
+    <span style="font-size:0.7rem;color:#94a3b8;font-weight:800;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Welcher Block ist ausgefallen?</span>
+    <select id="ausfall-block-select" style="margin-bottom:10px;"></select>
+    <div id="ausfall-hint" style="font-size:0.75rem;color:#94a3b8;margin-bottom:12px;"></div>
+    <input type="text" id="ausfall-note-input" placeholder="Notiz (optional, z.B. Grund)">
+    <button onclick="confirmAusfall()" style="width:100%;background:linear-gradient(145deg,#f59e0b,#d97706);color:white;border:none;padding:15px;border-radius:14px;font-weight:900;font-size:1rem;cursor:pointer;">📉 Als Minusstunde dokumentieren</button>
+    <button onclick="closeAusfallPopup()" style="width:100%;margin-top:8px;background:none;border:none;color:#475569;font-weight:700;padding:8px;cursor:pointer;">Abbrechen</button>
+</div>
+
+<!-- VERLAUF OVERLAY -->
+<div class="cal-overlay" id="verlauf-overlay">
+    <div class="cal-header-bar">
+        <div class="cal-week-title" style="text-align:left;">📊 Verlauf</div>
+        <button onclick="closeVerlauf()" style="background:none; border:none; color:var(--danger); font-weight:bold; font-size:1.3rem; cursor:pointer;">✕</button>
+    </div>
+    <div class="cal-body" id="verlauf-body"></div>
+</div>
+
+<!-- VERLAUF EDIT POPUP -->
+<div class="entry-popup-overlay" id="verlauf-edit-overlay" onclick="closeVerlaufEdit()"></div>
+<div class="entry-popup" id="verlauf-edit-popup">
+    <div class="popup-title">
+        <span id="verlauf-edit-title">Eintrag bearbeiten</span>
+        <button onclick="closeVerlaufEdit()" style="background:var(--danger); color:white; border:none; width:32px; height:32px; border-radius:50%; font-size:1rem; font-weight:900; cursor:pointer;">✕</button>
+    </div>
+    <span class="popup-label">Datum</span>
+    <input type="text" id="verlauf-edit-datum" disabled style="opacity:0.6;">
+    <span class="popup-label">Kategorie</span>
+    <input type="text" id="verlauf-edit-typ" disabled style="opacity:0.6;">
+    <span class="popup-label">Uhrzeit</span>
+    <div style="display:flex; gap:10px;">
+        <div id="verlauf-edit-start-wrap" style="flex:1;"></div>
+        <div id="verlauf-edit-end-wrap" style="flex:1;"></div>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+        <button onclick="saveVerlaufEdit()" style="flex:2; background:linear-gradient(145deg,#10b981,#059669); color:white; border:none; padding:14px; border-radius:14px; font-weight:800; cursor:pointer;">💾 SPEICHERN</button>
+        <button onclick="deleteVerlaufEntry()" style="flex:1; background:rgba(239,68,68,0.1); border:1.5px solid var(--danger); color:var(--danger); padding:14px; border-radius:14px; font-weight:800; cursor:pointer;">🗑️</button>
+    </div>
+</div>
+
+<!-- BACKUP FILE INPUT (hidden) -->
+<input type="file" id="backup-file-input" accept="application/json" style="display:none;" onchange="importBackup(event)">
+
 <script>
-    const APP_VERSION = "21.23";
+    const APP_VERSION = "22.1";
  
     // ─── STATE ────────────────────────────────────────────────────
     let db         = JSON.parse(localStorage.getItem('lehrerDB_Export'))    || [];
     let plan       = JSON.parse(localStorage.getItem('lehrerPlanV13'))      || {};
     let session    = JSON.parse(localStorage.getItem('activeSessionV13'))   || { active: false };
-    let vzSession  = JSON.parse(localStorage.getItem('vzSessionV13'))       || { active: false };
+    let vzMarker   = JSON.parse(localStorage.getItem('vzMarkerV22'))        || { active: false };
     let extraSession = JSON.parse(localStorage.getItem('extraSessionV13')) || { active: false };
     let vnbSession   = JSON.parse(localStorage.getItem('vnbSessionV13'))   || { active: false };
 
     let logs       = JSON.parse(localStorage.getItem('dailyLogsV13'))       || [];
     let calEntries = JSON.parse(localStorage.getItem('calEntriesV21'))      || {};   // key: "YYYY-MM-DD", value: [{...}]
-    let sendLog    = JSON.parse(localStorage.getItem('sendLogV21'))         || [];
     let currentWeek      = localStorage.getItem('manualWeekV13')   || 'A';
     let weeklySollHours  = parseFloat(localStorage.getItem('weeklySollV13')) || 26;
     let userName         = localStorage.getItem('userNameV13')      || 'Lehrkraft';
-    let ghToken          = localStorage.getItem('ghTokenV21')       || '';
-    let ghUser           = localStorage.getItem('ghUserV21')        || '';
-    let ghRepo           = localStorage.getItem('ghRepoV21')        || '';
-    let class1Name       = localStorage.getItem('class1NameV21')    || 'Klasse 1';
-    let class2Name       = localStorage.getItem('class2NameV21')    || 'Klasse 2';
-    let userEmail        = localStorage.getItem('userEmailV21')     || '';
     let userTheme        = localStorage.getItem('userThemeV21')     || '#38bdf8';
+    let themeCycleInterval = null;
     let confirmVZ = false, confirmExtra = false, confirmVNB = false;
- 
+    // Nur fuer die Balken-Skalierung (rein optisch) - bewusst KEINE feste Obergrenze mehr,
+    // da die genaue Regelung je nach Bundesland/Anstellung variiert und nicht fuer alle
+    // Nutzer:innen dieser App einheitlich gilt. Die Anzeige zeigt daher nur die Anzahl.
+    const VZ_BAR_SCALE = 6;
+
     let calOffset = 0;  // weeks from current
     let currentPopupDate = null;
     let currentPopupEntryIndex = null;
+    let verlaufEditIndex = null;
  
     // ─── SCHEDULE BLOCKS ─────────────────────────────────────────
     const blocks = [
@@ -436,6 +522,13 @@
     ];
  
     // ─── INIT ─────────────────────────────────────────────────────
+    // Veraltete Daten aus frueheren Versionen aufraeumen (SuS-Verwaltung, GitHub-Sync, alte Vertretungs-Session...)
+    ['ghTokenV21','ghUserV21','ghRepoV21','susPlanV21','class1NameV21','class2NameV21','userEmailV21','vzSessionV13','sendLogV21','fixedDatesV21'].forEach(function(k){ localStorage.removeItem(k); });
+    // Woche-Wechsel-Hinweis: beim allerersten Start (kein Marker vorhanden) NICHT sofort meckern, sondern als "passt schon" werten
+    if (localStorage.getItem('weekSwitchAckV22') === null) {
+        localStorage.setItem('weekSwitchAckV22', String(targetWeekMonday(new Date())));
+    }
+
     window.onload = function() {
         // Name sofort aus localStorage setzen
         const storedName = localStorage.getItem('userNameV13');
@@ -461,7 +554,8 @@
         updateCalFab();
         updateUI();
         updateAssistant();
-        checkAlarms();
+        updateWeekSwitchHint();
+        updateNextTerminTicker();
         // Woche-Button Farbe beim Start
         const wbInit = document.getElementById('week-btn');
         if (wbInit) {
@@ -469,7 +563,7 @@
             wbInit.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
         }
     };
- 
+
     // ─── CLOCK & TICKER ──────────────────────────────────────────
     setInterval(() => {
         const now = new Date();
@@ -488,7 +582,8 @@
         if (session.active) updateAssistant();
         updateUI();
         updateCalFab();
-        checkAlarms();
+        updateWeekSwitchHint();
+        updateNextTerminTicker();
     }, 1000);
  
     function updateCalFab() {
@@ -529,159 +624,6 @@
         }
     }
  
-    // ─── ALARM SYSTEM ─────────────────────────────────────────────
-    let lastAlarmFired = {};
-    let vzAutoLogoutWarned = false;
-
-    function checkAlarms() {
-        // ── AUTO-LOGOUT VERTRETUNG nach 90 Min ──
-        if (vzSession.active) {
-            const vzElapsed = Date.now() - vzSession.start;
-            const vzMin = Math.floor(vzElapsed / 60000);
-
-            // Warnung bei 85 Min
-            if (vzMin >= 85 && vzMin < 90 && !vzAutoLogoutWarned) {
-                vzAutoLogoutWarned = true;
-                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                playAlarmSound();
-                addLog('VZ endet in 5 Min');
-            }
-
-            // Auto-Logout bei 90 Min
-            if (vzMin >= 90) {
-                const vzTyp = vzSession.klasse ? 'Vertretung (VZ) – Klasse ' + vzSession.klasse : 'Vertretung (VZ)';
-                saveToDB(vzTyp, vzSession.start, Date.now());
-                vzSession = { active: false };
-                localStorage.removeItem('vzSessionV13');
-                vzAutoLogoutWarned = false;
-                addLog('VZ Auto-Ende (90 Min)');
-                if (navigator.vibrate) navigator.vibrate([400,100,400,100,400]);
-                playEndSound();
-                updateUI();
-            }
-        }
-
-        const now  = new Date();
-        const todayKey = toLocalDateKey(now);
-        const entries  = calEntries[todayKey] || [];
-        const nowMin   = now.getHours() * 60 + now.getMinutes();
- 
-        entries.forEach((entry, idx) => {
-            if (!entry.start) return;
-            const [h, m] = entry.start.split(':').map(Number);
-            const entryMin = h * 60 + m;
-            const diff = entryMin - nowMin;
-            const alarmKey = `${todayKey}-${idx}`;
- 
-            // Alert 5 min before
-            if (diff === 5 && !lastAlarmFired[alarmKey + '-5']) {
-                lastAlarmFired[alarmKey + '-5'] = true;
-                fireAlarm(entry, 5);
-            }
-            // Alert at exact time
-            if (diff === 0 && !lastAlarmFired[alarmKey + '-0']) {
-                lastAlarmFired[alarmKey + '-0'] = true;
-                fireAlarm(entry, 0);
-            }
- 
-            // Visual: blink task-next if < 5 min
-            if (diff > 0 && diff <= 5) {
-                document.getElementById('task-next').classList.add('alert-soon');
-                document.getElementById('btn-extra').classList.add('btn-pulse');
-            }
-        });
-
-        // ── SCHULENDE-ALARM aus Stundenplan ──
-        if (session.active) {
-            const now2  = new Date();
-            const tag   = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now2.getDay()];
-            const dayKey = currentWeek + '-' + tag;
-            const nowMin2 = now2.getHours()*60 + now2.getMinutes();
-
-            // Letzten Block mit Eintrag für heute finden
-            var lastEnd = -1;
-            var lastLabel = '';
-            blocks.forEach(function(b) {
-                if (plan[dayKey] && plan[dayKey][b.id] && plan[dayKey][b.id].trim() !== '') {
-                    const parts = b.end.split(':');
-                    const endMin = parseInt(parts[0])*60 + parseInt(parts[1]);
-                    if (endMin > lastEnd) {
-                        lastEnd = endMin;
-                        lastLabel = b.label;
-                    }
-                }
-            });
-
-            if (lastEnd > 0) {
-                const diff2 = lastEnd - nowMin2;
-                const endKey = todayKey + '-end-' + lastEnd;
-
-                // 5 Min vor Schulende
-                if (diff2 === 5 && !lastAlarmFired[endKey + '-5']) {
-                    lastAlarmFired[endKey + '-5'] = true;
-                    if (navigator.vibrate) navigator.vibrate([200,100,200,100,200]);
-                    playAlarmSound();
-                    document.getElementById('task-next').innerText = '⏰ In 5 Min Schulende!';
-                    addLog('Schulende in 5 Min (' + lastLabel + ')');
-                }
-
-                // Schulende - Zeit zum Ausloggen!
-                if (diff2 === 0 && !lastAlarmFired[endKey + '-0']) {
-                    lastAlarmFired[endKey + '-0'] = true;
-                    if (navigator.vibrate) navigator.vibrate([500,100,500,100,500,100,500]);
-                    playEndSound();
-                    document.getElementById('task-next').innerText = '🔔 DIENST BEENDEN!';
-                    addLog('Schulende! (' + lastLabel + ')');
-                }
-            }
-        }
-    }
- 
-    function fireAlarm(entry, minsBefore) {
-        // Vibration
-        if (navigator.vibrate) {
-            navigator.vibrate(minsBefore === 5 ? [200, 100, 200] : [400, 100, 400, 100, 400]);
-        }
-        // Sound
-        playAlarmSound();
-        // Notification-style update
-        const msg = minsBefore === 5
-            ? `⏰ In 5 Min: ${entry.title}`
-            : `🔔 JETZT: ${entry.title}`;
-        document.getElementById('task-next').innerText = msg.substring(0, 22);
-    }
- 
-    function playEndSound() {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const freqs = [523, 659, 784, 1047]; // C-E-G-C Akkord
-            freqs.forEach(function(freq, i) {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain); gain.connect(ctx.destination);
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.12);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.3);
-                osc.start(ctx.currentTime + i * 0.12);
-                osc.stop(ctx.currentTime + i * 0.12 + 0.3);
-            });
-        } catch(e) {}
-    }
-
-    function playAlarmSound() {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.frequency.setValueAtTime(880, ctx.currentTime);
-            osc.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.3, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-            osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
-        } catch(e) {}
-    }
- 
     // ─── MAIN TIMER ───────────────────────────────────────────────
     function formatTime(ms) { if (ms < 0) ms = 0; return new Date(ms).toISOString().substr(11, 8); }
  
@@ -698,12 +640,19 @@
                 return diff <= 10;
             });
             const autoTitle = entries.length > 0 ? entries[0].title : null;
- 
+
             session = { active: true, start: Date.now(), autoTitle };
             localStorage.setItem('activeSessionV13', JSON.stringify(session));
             addLog(autoTitle ? `Start: ${autoTitle}` : "Ankunft");
         } else {
             if (confirm("Dienst beenden?")) {
+                // Falls noch eine Vertretung dokumentiert wird, gleich mit abschliessen
+                if (vzMarker.active) {
+                    const vzTypEnd = vzMarker.klasse ? "Vertretung – Klasse " + vzMarker.klasse : "Vertretung";
+                    saveToDB(vzTypEnd, vzMarker.start, Date.now(), null, { isVZ: true, excludeFromWeek: true });
+                    vzMarker = { active: false };
+                    localStorage.removeItem('vzMarkerV22');
+                }
                 const start = session.start, end = Date.now();
                 const title = session.autoTitle || "Hauptdienst";
                 saveToDB(title, start, end);
@@ -715,13 +664,14 @@
             }
         }
     }
- 
+
     function handleVZClick() {
-        if (vzSession.active) {
+        if (vzMarker.active) {
             if (confirm("Vertretung beenden?")) {
-                const vzTyp = vzSession.klasse ? "Vertretung (VZ) – Klasse " + vzSession.klasse : "Vertretung (VZ)";
-                saveToDB(vzTyp, vzSession.start, Date.now());
-                vzSession = { active: false }; localStorage.removeItem('vzSessionV13'); addLog("VZ Ende");
+                const vzTyp = vzMarker.klasse ? "Vertretung – Klasse " + vzMarker.klasse : "Vertretung";
+                saveToDB(vzTyp, vzMarker.start, Date.now(), null, { isVZ: true, excludeFromWeek: true });
+                vzMarker = { active: false }; localStorage.removeItem('vzMarkerV22'); addLog("Vertretung Ende");
+                updateUI();
             }
         } else {
             // Popup öffnen für Klasseneingabe
@@ -739,17 +689,25 @@
 
     function startVZWithClass() {
         const klasse = document.getElementById('vz-class-input').value.trim();
-        vzSession = { active: true, start: Date.now(), klasse: klasse };
-        localStorage.setItem('vzSessionV13', JSON.stringify(vzSession));
-        addLog("VZ Start" + (klasse ? " – " + klasse : ""));
+        // Vertretung laeuft immer als Teil des Hauptdienstes - startet ihn ggf. automatisch mit
+        if (!session.active) {
+            session = { active: true, start: Date.now() };
+            localStorage.setItem('activeSessionV13', JSON.stringify(session));
+            addLog("Dienst automatisch gestartet (Vertretung)");
+        }
+        vzMarker = { active: true, start: Date.now(), klasse: klasse };
+        localStorage.setItem('vzMarkerV22', JSON.stringify(vzMarker));
+        addLog("Vertretung Start" + (klasse ? " – " + klasse : ""));
         closeVZPopup();
         updateUI();
     }
- 
+
     function handleExtraClick() {
         if (extraSession.active) {
             if (confirm("Termin beenden?")) {
-                saveToDB('Konferenz', extraSession.start, Date.now());
+                // Laeuft der Hauptdienst gerade noch, ist diese Zeit dort schon mit erfasst -
+                // nicht nochmal zu den Wochenstunden dazuzaehlen (sonst Doppelzaehlung).
+                saveToDB('Konferenz', extraSession.start, Date.now(), null, { excludeFromWeek: session.active });
                 extraSession = { active: false }; localStorage.removeItem('extraSessionV13'); addLog("Konf. Ende");
             }
         } else {
@@ -769,7 +727,8 @@
     function handleVNBClick() {
         if (vnbSession.active) {
             if (confirm("Vor-/Nachbereitung beenden?")) {
-                saveToDB('Vor-/Nachbereitung', vnbSession.start, Date.now());
+                // Falls doch mal parallel zum laufenden Hauptdienst gestartet: nicht doppelt zaehlen.
+                saveToDB('Vor-/Nachbereitung', vnbSession.start, Date.now(), null, { excludeFromWeek: session.active });
                 vnbSession = { active: false }; localStorage.removeItem('vnbSessionV13'); addLog("VNB Ende");
             }
         } else {
@@ -786,20 +745,110 @@
         }
     }
 
-    function saveToDB(typ, start, end, manualDatum = null) {
+    // ─── AUSFALL / MINUSSTUNDEN ─────────────────────────────────────
+    function getTodayPlanBlocks() {
+        const now = new Date();
+        const tag = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()];
+        const key = currentWeek + '-' + tag;
+        const nowMin = now.getHours()*60 + now.getMinutes();
+        const result = [];
+        blocks.forEach(function(b) {
+            const text = (plan[key] && plan[key][b.id]) ? plan[key][b.id].trim() : '';
+            if (!text) return;
+            const sp = b.start.split(':'), ep = b.end.split(':');
+            const sMin = parseInt(sp[0])*60+parseInt(sp[1]), eMin = parseInt(ep[0])*60+parseInt(ep[1]);
+            result.push({ id: b.id, label: b.label, text: text, start: b.start, end: b.end, startMin: sMin, endMin: eMin });
+        });
+        return { blocksToday: result, nowMin: nowMin };
+    }
+
+    function handleAusfallClick() {
+        const r = getTodayPlanBlocks();
+        const blocksToday = r.blocksToday, nowMin = r.nowMin;
+        const select = document.getElementById('ausfall-block-select');
+        const hint   = document.getElementById('ausfall-hint');
+        if (blocksToday.length === 0) {
+            select.innerHTML = '<option value="">Kein Stundenplan fuer heute hinterlegt</option>';
+            hint.innerText = 'Fuer heute ist in den Einstellungen kein Stundenplan eingetragen – bitte erst dort ergaenzen.';
+        } else {
+            let best = blocksToday.find(function(b){ return nowMin >= b.startMin && nowMin < b.endMin; });
+            if (!best) {
+                const past = blocksToday.filter(function(b){ return b.endMin <= nowMin; }).sort(function(a,b){ return b.endMin - a.endMin; });
+                best = past[0] || blocksToday[0];
+            }
+            select.innerHTML = blocksToday.map(function(b) {
+                const dauer = ((b.endMin - b.startMin) / 60).toFixed(2).replace('.', ',');
+                return `<option value="${b.id}"${b.id === best.id ? ' selected' : ''}>${b.label} (${b.start}–${b.end}, ${b.text}) · ${dauer} Std</option>`;
+            }).join('');
+            hint.innerText = 'Vorausgewaehlt: der aktuelle bzw. zuletzt beendete Block. Bei Bedarf oben aendern.';
+        }
+        document.getElementById('ausfall-note-input').value = '';
+        document.getElementById('ausfall-popup').style.display = 'block';
+        document.getElementById('ausfall-popup-overlay').style.display = 'block';
+    }
+
+    function closeAusfallPopup() {
+        document.getElementById('ausfall-popup').style.display = 'none';
+        document.getElementById('ausfall-popup-overlay').style.display = 'none';
+    }
+
+    function confirmAusfall() {
+        const r = getTodayPlanBlocks();
+        const blockId = document.getElementById('ausfall-block-select').value;
+        const block = r.blocksToday.find(function(b){ return b.id === blockId; });
+        if (!block) { alert('Bitte einen Block auswaehlen.'); return; }
+        const note = document.getElementById('ausfall-note-input').value.trim();
+        const now = new Date();
+        const startD = new Date(now); startD.setHours(Math.floor(block.startMin/60), block.startMin%60, 0, 0);
+        const endD   = new Date(now); endD.setHours(Math.floor(block.endMin/60), block.endMin%60, 0, 0);
+        const typ = 'Ausfall: ' + block.label + (note ? ' – ' + note : '');
+        saveToDB(typ, startD.getTime(), endD.getTime(), now.toLocaleDateString('de-DE'), { isAusfall: true });
+        addLog('Ausfall dokumentiert: ' + block.label);
+        closeAusfallPopup();
+        updateUI();
+        alert('Dokumentiert: ' + block.label + ' (' + block.start + '–' + block.end + ') als Minusstunde gespeichert.');
+    }
+
+    // ─── AUSGLEICHSKONTO (Minus/Plus uebers Schuljahr) ───────────────
+    function getSchoolYearRange(ref) {
+        ref = ref || new Date();
+        const y = ref.getMonth() >= 7 ? ref.getFullYear() : ref.getFullYear() - 1; // Schuljahr beginnt 1. August
+        return { start: new Date(y, 7, 1), end: new Date(y + 1, 6, 31, 23, 59, 59) };
+    }
+
+    function computeSchoolYearBalance() {
+        const range = getSchoolYearRange();
+        let plusMS = 0, minusMS = 0;
+        db.forEach(function(e) {
+            const parts = e.datum.split('.');
+            if (parts.length !== 3) return;
+            const d = new Date(parts[2], parts[1]-1, parts[0]);
+            if (d < range.start || d > range.end) return;
+            if (e.isVZ === 'JA') plusMS += (e.ms || 0);
+            if (e.isAusfall === 'JA') minusMS += (e.ms || 0);
+        });
+        return { plusMS: plusMS, minusMS: minusMS, saldoMS: plusMS - minusMS };
+    }
+
+    function saveToDB(typ, start, end, manualDatum, flags) {
+        manualDatum = manualDatum || null;
+        flags = flags || {};
         let datumStr = manualDatum || new Date(start).toLocaleDateString('de-DE');
         let diff = Math.abs(end - start);
         if (diff < 5000 && !manualDatum) return;
         db.push({
-            datum: datumStr, typ, 
+            id: Date.now() + '-' + Math.random().toString(36).substr(2, 6),
+            datum: datumStr, typ: typ,
             start: new Date(start).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
             ende: new Date(end).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}),
             dauer: new Date(diff).toISOString().substr(11, 8), ms: diff,
-            isVZ: (typ.includes('VZ') ? 'JA' : 'NEIN')
+            isVZ: flags.isVZ ? 'JA' : 'NEIN',
+            isAusfall: flags.isAusfall ? 'JA' : 'NEIN',
+            excludeFromWeek: flags.excludeFromWeek ? 'JA' : 'NEIN'
         });
         localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
     }
- 
+
     // ─── UI UPDATE ────────────────────────────────────────────────
     function updateUI() {
         const btnMain = document.getElementById('btn-main');
@@ -812,11 +861,11 @@
         }
  
         const vzBtn = document.getElementById('btn-vz');
-        if (vzSession.active) {
-            vzBtn.innerText = `VZ läuft (${formatTime(Date.now() - vzSession.start)})`;
+        if (vzMarker.active) {
+            vzBtn.innerText = `Vertretung läuft (${formatTime(Date.now() - vzMarker.start)})`;
             vzBtn.classList.add('active'); vzBtn.classList.remove('btn-confirm');
         } else if (!confirmVZ) { vzBtn.innerText = "Vertretung"; vzBtn.classList.remove('active', 'btn-confirm'); }
- 
+
         const exBtn = document.getElementById('btn-extra');
         if (extraSession.active) {
             exBtn.innerText = `LÄUFT (${formatTime(Date.now() - extraSession.start)})`;
@@ -833,39 +882,57 @@
                 vnbBtn.classList.remove('active', 'btn-confirm');
             }
         }
- 
+
         const now = new Date();
-        // VZ count
+        // VZ-Zaehler: nur die Anzahl der Vertretungsstunden diesen Monat, bewusst ohne "max."-Aussage
         const vzCount = db.filter(e => {
             const parts = e.datum.split('.');
             return parseInt(parts[1]) === (now.getMonth() + 1) && parseInt(parts[2]) === now.getFullYear() && e.isVZ === 'JA';
         }).length;
         document.getElementById('vz-val').innerText = vzCount;
-        document.getElementById('vz-progress').style.width = Math.min((vzCount / 4) * 100, 100) + "%";
- 
-        // Week total
+        document.getElementById('vz-progress').style.width = Math.min((vzCount / VZ_BAR_SCALE) * 100, 100) + "%";
+
+        // Week total (Vertretung laeuft mit Hauptdienst mit, Ausfall zaehlt nicht als geleistete Zeit)
         function getMonday(d) {
             d = new Date(d); var day = d.getDay(), diff = d.getDate() - day + (day === 0 ? -6 : 1);
             return new Date(d.setDate(diff)).setHours(0,0,0,0);
         }
         const monday = getMonday(now);
+        let weekAusfallMS = 0;
         let weekMS = db.filter(e => {
             const parts = e.datum.split('.');
-            return new Date(parts[2], parts[1]-1, parts[0]).getTime() >= monday;
+            const isThisWeek = new Date(parts[2], parts[1]-1, parts[0]).getTime() >= monday;
+            if (!isThisWeek) return false;
+            if (e.isAusfall === 'JA') { weekAusfallMS += (e.ms || 0); return false; }
+            if (e.excludeFromWeek === 'JA') return false; // war schon Teil eines anderen erfassten Zeitraums
+            return true;
         }).reduce((acc, curr) => acc + (curr.ms || 0), 0);
-        if (session.active)    weekMS += (Date.now() - session.start);
-        if (vzSession.active)  weekMS += (Date.now() - vzSession.start);
-        if (extraSession.active) weekMS += (Date.now() - extraSession.start);
-        if (vnbSession.active) weekMS += (Date.now() - vnbSession.start);
- 
-        const targetMS  = weeklySollHours * 3600000;
-        const weekPerc  = Math.round((weekMS / targetMS) * 100);
+        if (session.active) weekMS += (Date.now() - session.start);
+        // Konferenz/VNB nur zusaetzlich zaehlen, wenn der Hauptdienst NICHT parallel laeuft
+        // (sonst waere die ueberlappende Zeit doppelt erfasst)
+        if (extraSession.active && !session.active) weekMS += (Date.now() - extraSession.start);
+        if (vnbSession.active && !session.active)   weekMS += (Date.now() - vnbSession.start);
+
+        const targetMS  = Math.max(0, weeklySollHours * 3600000 - weekAusfallMS);
+        const weekPerc  = targetMS > 0 ? Math.round((weekMS / targetMS) * 100) : 100;
         const weekFill  = document.getElementById('week-progress');
         if (weekFill) {
+            const targetH = (targetMS / 3600000).toFixed(1).replace('.', ',');
+            const ausfallNote = weekAusfallMS > 0 ? ` (Soll um ${(weekAusfallMS/3600000).toFixed(1).replace('.', ',')} Std Ausfall reduziert)` : '';
+            document.getElementById('week-percent').innerText = weekPerc + '% (' + (weekMS/3600000).toFixed(1).replace('.', ',') + ' / ' + targetH + ' Std)' + ausfallNote;
             if (weekPerc >= 100) { weekFill.style.width = "100%"; weekFill.style.background = "var(--overtime)"; }
             else { weekFill.style.width = weekPerc + "%"; weekFill.style.background = "var(--success)"; }
         }
- 
+
+        // Ausgleichskonto (Minus/Plus uebers Schuljahr)
+        const balance = computeSchoolYearBalance();
+        const balEl = document.getElementById('balance-val');
+        if (balEl) {
+            const balH = (balance.saldoMS / 3600000);
+            balEl.innerText = (balH >= 0 ? '+' : '') + balH.toFixed(1).replace('.', ',') + ' Std';
+            balEl.style.color = balH > 0 ? 'var(--success)' : (balH < 0 ? 'var(--danger)' : '#94a3b8');
+        }
+
         // Day progress
         try {
             var dp_now    = new Date();
@@ -958,14 +1025,54 @@
 
         const nowEl  = document.getElementById('task-now');
         const nextEl = document.getElementById('task-next');
-        nowEl.classList.remove('alert-soon');
 
         nowEl.innerText  = activeTask ? activeTask.text : "Frei / Pause";
         document.getElementById('task-now-sub').innerText = activeTask ? activeTask.label : "-";
         nextEl.innerText = nextTask ? nextTask.text : "FEIERABEND!";
         document.getElementById('task-next-sub').innerText = nextTask ? nextTask.label : "Alles erledigt.";
     }
- 
+
+    // ─── NAECHSTER-TERMIN-LEISTE (unabhaengig vom Stundenplan-Abgleich oben: zeigt den
+    // naechsten selbst eingetragenen Kalender-Termin, egal wie weit er noch weg ist) ────
+    function getNextUpcomingTermin() {
+        const now = new Date();
+        const todayKey = toLocalDateKey(now);
+        const nowMin = now.getHours() * 60 + now.getMinutes();
+        let best = null, bestDateKey = null, bestMin = null;
+        Object.keys(calEntries).sort().forEach(function(dateKey) {
+            if (dateKey < todayKey) return;
+            const entries = calEntries[dateKey];
+            if (!Array.isArray(entries)) return;
+            entries.forEach(function(e) {
+                let eMin = 0;
+                if (e.start) { const p = e.start.split(':'); eMin = parseInt(p[0]) * 60 + parseInt(p[1]); }
+                if (dateKey === todayKey && e.start && eMin < nowMin) return; // heute, aber schon vorbei
+                if (best === null || dateKey < bestDateKey || (dateKey === bestDateKey && eMin < bestMin)) {
+                    best = e; bestDateKey = dateKey; bestMin = eMin;
+                }
+            });
+        });
+        return best ? { entry: best, dateKey: bestDateKey } : null;
+    }
+    function updateNextTerminTicker() {
+        const bar = document.getElementById('next-termin-bar');
+        const textEl = document.getElementById('next-termin-text');
+        if (!bar || !textEl) return;
+        const res = getNextUpcomingTermin();
+        if (!res) { bar.style.display = 'none'; return; }
+        const now = new Date();
+        const todayKey = toLocalDateKey(now);
+        const tomorrowKey = toLocalDateKey(new Date(now.getTime() + 86400000));
+        let dayLabel;
+        if (res.dateKey === todayKey) dayLabel = 'Heute';
+        else if (res.dateKey === tomorrowKey) dayLabel = 'Morgen';
+        else { const p = res.dateKey.split('-'); dayLabel = p[2] + '.' + p[1] + '.'; }
+        const e = res.entry;
+        const whenStr = e.start ? (dayLabel + ', ' + e.start + ' Uhr') : dayLabel;
+        textEl.innerText = 'Nächster Termin: ' + e.title + ' – ' + whenStr + (e.note ? ' (' + e.note + ')' : '');
+        bar.style.display = 'flex';
+    }
+
     // ─── CALENDAR ─────────────────────────────────────────────────
     function openCalendar() {
         document.getElementById('cal-overlay').style.display = 'block';
@@ -1009,6 +1116,33 @@
         const m = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
         return `${y}-${m}-${day}`;
+    }
+
+    // ─── ZEIT-WAEHLER (eigener Picker statt input type=time) ───────
+    function buildTimeSelectHTML(prefix, value) {
+        var parts = (value || '').split(':');
+        var h = parts[0] || '', m = parts[1] || '';
+        var hOpts = '<option value="">--</option>';
+        for (var i = 0; i < 24; i++) { var hs = String(i).padStart(2,'0'); hOpts += `<option value="${hs}"${hs===h?' selected':''}>${hs}</option>`; }
+        var mOpts = '<option value="">--</option>';
+        for (var j = 0; j < 60; j++) { var ms = String(j).padStart(2,'0'); mOpts += `<option value="${ms}"${ms===m?' selected':''}>${ms}</option>`; }
+        return `<div class="time-select-row">
+            <select id="${prefix}-h" class="time-select">${hOpts}</select>
+            <span class="time-select-sep">:</span>
+            <select id="${prefix}-m" class="time-select">${mOpts}</select>
+        </div>`;
+    }
+    function getTimeSelectValue(prefix) {
+        var hEl = document.getElementById(prefix + '-h'), mEl = document.getElementById(prefix + '-m');
+        var h = hEl ? hEl.value : '', m = mEl ? mEl.value : '';
+        if (!h || !m) return '';
+        return h + ':' + m;
+    }
+    function setTimeSelectValue(prefix, value) {
+        var parts = (value || '').split(':');
+        var hEl = document.getElementById(prefix + '-h'), mEl = document.getElementById(prefix + '-m');
+        if (hEl) hEl.value = parts[0] || '';
+        if (mEl) mEl.value = parts[1] || '';
     }
 
 
@@ -1181,7 +1315,6 @@
                     </div>
                     <div class="cal-tile-right">
                         <span class="cal-tile-badge ${badgeClass}">${entry.cat}</span>
-                        ${entry.susShare ? '<span class="anchor-icon">📡</span>' : ''}
                         ${entry.note    ? '<span class="anchor-icon">📎</span>' : ''}
                     </div>
                 </div>`;
@@ -1225,16 +1358,16 @@
                 document.getElementById('popup-entry-cat-custom').value = entryCat;
                 document.getElementById('popup-entry-cat-custom').style.display = 'block';
             }
-            document.getElementById('popup-entry-start').value = entry.start || '';
-            document.getElementById('popup-entry-end').value   = entry.end   || '';
+            document.getElementById('popup-entry-start-wrap').innerHTML = buildTimeSelectHTML('popup-entry-start', entry.start || '');
+            document.getElementById('popup-entry-end-wrap').innerHTML   = buildTimeSelectHTML('popup-entry-end', entry.end || '');
             document.getElementById('popup-entry-note').value  = entry.note  || '';
             delBtn.style.display = 'block';
         } else {
             document.getElementById('popup-entry-title').value = '';
             document.getElementById('popup-entry-cat').value = 'Termin';
             var customEl = document.getElementById('popup-entry-cat-custom'); if (customEl) { customEl.value = ''; customEl.style.display = 'none'; }
-            document.getElementById('popup-entry-start').value = '';
-            document.getElementById('popup-entry-end').value   = '';
+            document.getElementById('popup-entry-start-wrap').innerHTML = buildTimeSelectHTML('popup-entry-start', '');
+            document.getElementById('popup-entry-end-wrap').innerHTML   = buildTimeSelectHTML('popup-entry-end', '');
             document.getElementById('popup-entry-note').value  = '';
             delBtn.style.display = 'none';
         }
@@ -1273,8 +1406,8 @@
                 }
                 return sel;
             })(),
-            start:    document.getElementById('popup-entry-start').value,
-            end:      document.getElementById('popup-entry-end').value,
+            start:    getTimeSelectValue('popup-entry-start'),
+            end:      getTimeSelectValue('popup-entry-end'),
             note:     document.getElementById('popup-entry-note').value.trim(),
             created:  Date.now()
         };
@@ -1336,157 +1469,144 @@
         document.getElementById('cal-days-container').style.display = q ? 'none' : 'block';
     }
  
-    // ─── SUS MANAGEMENT ───────────────────────────────────────────
-
- 
-    let susPlanWeek = 'A';
-
-    function susWeekAccordion(w) {
-        const content = document.getElementById(`sus-acc-${w.toLowerCase()}-content`);
-        const arrow   = document.getElementById(`sus-acc-${w.toLowerCase()}-arrow`);
-        const isOpen  = content.style.display === 'block';
-        content.style.display = isOpen ? 'none' : 'block';
-        arrow.innerText = isOpen ? '▼' : '▲';
-        if (!isOpen) renderSusPlanFieldsFor(w);
+    // ─── VERLAUF-ANSICHT ─────────────────────────────────────────
+    function openVerlauf() {
+        renderVerlauf();
+        document.getElementById('verlauf-overlay').style.display = 'block';
+    }
+    function closeVerlauf() {
+        document.getElementById('verlauf-overlay').style.display = 'none';
     }
 
-    function renderSusPlanFieldsFor(w) {
-        const container = document.getElementById(`sus-plan-fields-${w.toLowerCase()}`);
-        if (!container) return;
-        const blockLabels = [
-            { label: '1. Block', time: '07:30 – 09:00' },
-            { label: '1. Pause', time: '09:00 – 09:30' },
-            { label: '2. Block', time: '09:30 – 11:00' },
-            { label: '2. Pause', time: '11:00 – 11:30' },
-            { label: '3. Block', time: '11:30 – 13:00' },
-            { label: '3. Pause', time: '13:00 – 13:45' },
-            { label: '4. Block', time: '13:45 – 15:15' },
-        ];
-        const days = ['Mo','Di','Mi','Do','Fr'];
+    function typLabel(e) {
+        if (e.isAusfall === 'JA') return '📉 ' + e.typ;
+        if (e.isVZ === 'JA') return '🔄 ' + e.typ;
+        if (e.typ === 'Konferenz') return '🔵 Konferenz';
+        if (e.typ === 'Vor-/Nachbereitung') return '📚 Vor-/Nachbereitung';
+        return '🟢 ' + e.typ;
+    }
+
+    function renderVerlauf() {
+        const body = document.getElementById('verlauf-body');
+        if (db.length === 0) { body.innerHTML = '<div class="verlauf-empty">Noch keine Einträge vorhanden.</div>'; return; }
+
+        // Nach Monat gruppieren (neuester Monat zuerst)
+        const groups = {};
+        db.forEach(function(e, idx) {
+            const parts = e.datum.split('.');
+            if (parts.length !== 3) return;
+            const mk = parts[2] + '-' + parts[1].padStart(2,'0');
+            if (!groups[mk]) groups[mk] = [];
+            const sp = (e.start || '0:0').split(':');
+            groups[mk].push(Object.assign({}, e, { _idx: idx, _sortDate: new Date(parts[2], parts[1]-1, parts[0], parseInt(sp[0])||0, parseInt(sp[1])||0) }));
+        });
+
+        const monthNames = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+        const sortedKeys = Object.keys(groups).sort().reverse();
         let html = '';
-        days.forEach(day => {
-            html += `<div style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
-                <b style="color:var(--accent); font-size:0.85rem; display:block; margin-bottom:6px;">${day}</b>`;
-            blockLabels.forEach((bl, i) => {
-                const val = (susPlan[w][day] && susPlan[w][day][i]) ? susPlan[w][day][i] : '';
-                html += `<div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
-                    <span style="font-size:0.6rem; color:#64748b; min-width:95px; font-weight:700;">${bl.time}</span>
-                    <input type="text" placeholder="${bl.label}" value="${val}"
-                        onchange="if(!susPlan['${w}']['${day}']) susPlan['${w}']['${day}']=[];susPlan['${w}']['${day}'][${i}]=this.value;localStorage.setItem('susPlanV21',JSON.stringify(susPlan));"
-                        style="flex:1; padding:8px; font-size:0.85rem; margin:0; border-radius:8px;">
+        sortedKeys.forEach(function(mk) {
+            const parts = mk.split('-'), y = parts[0], m = parts[1];
+            const entries = groups[mk].sort(function(a,b){ return b._sortDate - a._sortDate; });
+            let gearbeitetMS = 0, vzMS = 0, ausfallMS = 0;
+            entries.forEach(function(e) {
+                if (e.isAusfall === 'JA') ausfallMS += (e.ms||0);
+                else if (e.isVZ === 'JA') vzMS += (e.ms||0);
+                else if (e.excludeFromWeek !== 'JA') gearbeitetMS += (e.ms||0); // sonst mit Hauptdienst-Zeit doppelt gezaehlt
+            });
+            html += `<div class="verlauf-month">
+                <div class="verlauf-month-header">
+                    <span class="verlauf-month-title">${monthNames[parseInt(m)-1]} ${y}</span>
+                    <span class="verlauf-month-total">${(gearbeitetMS/3600000).toFixed(1)} Std</span>
+                </div>
+                <div class="verlauf-month-sub">
+                    <span>🔄 Vertretung: ${(vzMS/3600000).toFixed(1)} Std</span>
+                    <span>📉 Ausfall: ${(ausfallMS/3600000).toFixed(1)} Std</span>
+                </div>`;
+            entries.forEach(function(e) {
+                html += `<div class="verlauf-entry">
+                    <div class="verlauf-entry-left" onclick="openVerlaufEdit(${e._idx})" style="cursor:pointer; flex:1;">
+                        <div class="verlauf-entry-typ">${typLabel(e)}</div>
+                        <div class="verlauf-entry-sub">${e.datum} · ${e.start}–${e.ende}</div>
+                    </div>
+                    <div class="verlauf-entry-right">
+                        <span class="verlauf-entry-dauer">${(e.ms/3600000).toFixed(2)} Std</span>
+                    </div>
                 </div>`;
             });
             html += `</div>`;
         });
-        container.innerHTML = html;
-    }
-    let susPlan = JSON.parse(localStorage.getItem('susPlanV21')) || {
-        A: { Mo:['','','',''], Di:['','','',''], Mi:['','','',''], Do:['','','',''], Fr:['','','',''] },
-        B: { Mo:['','','',''], Di:['','','',''], Mi:['','','',''], Do:['','','',''], Fr:['','','',''] }
-    };
-    // ─── ADMIN PASSWORT ──────────────────────────────────────────
-    const ADMIN_PW = "Lwlmn72Neo123"; // <-- Hier dein Passwort eintragen
-
-
-
-
-
-
-
-
-
-    function toggleAdminUnlock() {
-        const form = document.getElementById('admin-unlock-form');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        if (form.style.display === 'block') {
-            document.getElementById('admin-pw-input').focus();
-        }
+        body.innerHTML = html;
     }
 
-    function checkAdminPassword() {
-        const input = document.getElementById('admin-pw-input').value;
-        if (input === ADMIN_PW) {
-            document.getElementById('github-section').style.display = 'block';
-            document.getElementById('admin-unlock-area').style.display = 'none';
-        } else {
-            document.getElementById('admin-pw-input').value = '';
-            document.getElementById('admin-pw-input').placeholder = 'Falsches Passwort...';
-            setTimeout(() => {
-                document.getElementById('admin-pw-input').placeholder = 'Passwort...';
-            }, 2000);
-        }
+    function openVerlaufEdit(idx) {
+        verlaufEditIndex = idx;
+        const e = db[idx];
+        document.getElementById('verlauf-edit-title').innerText = typLabel(e);
+        document.getElementById('verlauf-edit-datum').value = e.datum;
+        document.getElementById('verlauf-edit-typ').value = e.typ;
+        document.getElementById('verlauf-edit-start-wrap').innerHTML = buildTimeSelectHTML('verlauf-edit-start', e.start);
+        document.getElementById('verlauf-edit-end-wrap').innerHTML   = buildTimeSelectHTML('verlauf-edit-end', e.ende);
+        document.getElementById('verlauf-edit-popup').style.display = 'block';
+        document.getElementById('verlauf-edit-overlay').style.display = 'block';
+    }
+    function closeVerlaufEdit() {
+        document.getElementById('verlauf-edit-popup').style.display = 'none';
+        document.getElementById('verlauf-edit-overlay').style.display = 'none';
+        verlaufEditIndex = null;
+    }
+    function saveVerlaufEdit() {
+        if (verlaufEditIndex === null) return;
+        const start = getTimeSelectValue('verlauf-edit-start');
+        const end   = getTimeSelectValue('verlauf-edit-end');
+        if (!start || !end) { alert('Bitte Start- und Endzeit auswählen.'); return; }
+        const sp = start.split(':').map(Number), ep = end.split(':').map(Number);
+        let diffMin = (ep[0]*60+ep[1]) - (sp[0]*60+sp[1]);
+        if (diffMin <= 0) { alert('Endzeit muss nach der Startzeit liegen.'); return; }
+        const e = db[verlaufEditIndex];
+        e.start = start; e.ende = end;
+        e.ms = diffMin * 60000;
+        e.dauer = new Date(e.ms).toISOString().substr(11, 8);
+        localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
+        closeVerlaufEdit();
+        renderVerlauf();
+        updateUI();
+    }
+    function deleteVerlaufEntry() {
+        if (verlaufEditIndex === null) return;
+        if (!confirm('Diesen Eintrag wirklich löschen?')) return;
+        db.splice(verlaufEditIndex, 1);
+        localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
+        closeVerlaufEdit();
+        renderVerlauf();
+        updateUI();
     }
 
-    function saveGhCredentials() {
-        ghToken = document.getElementById('gh-token-input').value;
-        ghUser  = document.getElementById('gh-user-input').value;
-        ghRepo  = document.getElementById('gh-repo-input').value;
-        localStorage.setItem('ghTokenV21', ghToken);
-        localStorage.setItem('ghUserV21',  ghUser);
-        localStorage.setItem('ghRepoV21',  ghRepo);
-        alert("✅ Gespeichert!");
-    }
- 
-    async function pushToGitHub() {
-        if (!ghToken || !ghUser || !ghRepo) {
-            alert("⚠️ Bitte zuerst GitHub-Zugangsdaten im Admin-Bereich eintragen!");
-            return;
-        }
- 
-        const newsText  = document.getElementById('sus-news-input')?.value  || '';
-        const newsClass = document.getElementById('sus-news-class')?.value || 'both';
- 
-        // Collect sus-shared calendar entries for today+future
-        const todayKey = toLocalDateKey();
-        const sharedEntries = {};
-        Object.entries(calEntries).forEach(([dateKey, entries]) => {
-            if (dateKey >= todayKey) {
-                const shared = entries.filter(e => e.susShare);
-                if (shared.length > 0) sharedEntries[dateKey] = shared;
-            }
-        });
- 
-        const payload = {
-            currentWeek,
-            teacherName: userName,
-            teacherEmail: userEmail,
-            news: newsText,
-            newsClass,
-            newsTimestamp: Date.now(),
-            fixedDates: localStorage.getItem('fixedDatesV21') || '',
-            wocheA: susPlan.A,
-            wocheB: susPlan.B,
-            calendarEvents: sharedEntries,
-            sentAt: new Date().toLocaleString('de-DE')
-        };
- 
-        const url = `https://api.github.com/repos/${ghUser}/${ghRepo}/contents/data.json`;
-        try {
-            const getRes  = await fetch(url, { headers: { Authorization: `token ${ghToken}` } });
-            const getFile = await getRes.json();
-            const putRes  = await fetch(url, {
-                method: "PUT",
-                headers: { Authorization: `token ${ghToken}`, "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    message: `Update ${new Date().toLocaleString('de-DE')}`,
-                    content: btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2)))),
-                    sha: getFile.sha
-                })
-            });
-            if (putRes.ok) {
-                const logEntry = { msg: newsText ? `News: "${newsText.substring(0,30)}..."` : "Plan-Update", time: new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) };
-                sendLog.push(logEntry);
-                if (sendLog.length > 20) sendLog.shift();
-                localStorage.setItem('sendLogV21', JSON.stringify(sendLog));
-                alert("✅ Erfolgreich an SuS gesendet!");
-                document.getElementById('modal').style.display = 'none';
-            } else {
-                alert("❌ Fehler beim Senden. Token prüfen!");
-            }
-        } catch (e) { alert("❌ Verbindungsfehler: " + e.message); }
-    }
- 
     // ─── SETUP / SETTINGS ─────────────────────────────────────────
+    // Kurze Spaltenbeschriftung fuer das kompakte Stundenplan-Gitter (Bloecke bleiben unveraendert, nur die Anzeige ist kuerzer)
+    function shortBlockLabel(b) {
+        const map = { f1: 'Früh', b1: '1.', a1: 'P1', b2: '2.', a2: 'P2', b3: '3.', a3: 'P3', b4: '4.', s1: 'Spät' };
+        return map[b.id] || b.label;
+    }
+
+    // Kompaktes Stundenplan-Gitter fuer eine Woche (A oder B): Bloecke = Zeilen, Mo-Fr = Spalten, statt einer langen Liste
+    function renderPlanGrid(w) {
+        const days = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
+        const dayShort = { Montag: 'Mo', Dienstag: 'Di', Mittwoch: 'Mi', Donnerstag: 'Do', Freitag: 'Fr' };
+        let g = '<div class="stunden-table">';
+        g += '<div class="stunden-row stunden-header"><div></div>' + days.map(d => `<div>${dayShort[d]}</div>`).join('') + '</div>';
+        blocks.forEach(function(b) {
+            g += `<div class="stunden-row">
+                <div class="stunden-label" title="${b.label} (${b.start}–${b.end})"><span>${shortBlockLabel(b)}</span><span class="sl-time">${b.start}</span></div>
+                ${days.map(function(tag) {
+                    const val = (plan[`${w}-${tag}`] && plan[`${w}-${tag}`][b.id]) || '';
+                    return `<input type="text" class="stunden-input" id="${w}-${tag}-${b.id}" value="${val}">`;
+                }).join('')}
+            </div>`;
+        });
+        g += '</div>';
+        return g;
+    }
+
     function openSetup() {
         let dateOptions = "";
         let d = new Date();
@@ -1497,87 +1617,73 @@
             }
             d.setDate(d.getDate()-1);
         }
- 
+
         let html = `
             <div class="modal-nav">
                 <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;color:var(--danger);font-weight:bold;cursor:pointer;">✕ ABBRUCH</button>
                 <b style="color:var(--primary)">EINSTELLUNGEN</b>
                 <button onclick="saveSetup()" style="background:none;border:none;color:var(--success);font-weight:bold;">OK ✓</button>
             </div>
-            <div class="manual-box" style="border-color:var(--danger);background:rgba(239,68,68,0.05);margin-top:20px;">
-                <label style="color:var(--danger)">⚠️ RESET</label>
-                <button class="btn btn-stop" style="font-size:0.8rem;padding:8px;" onclick="resetToday()">HEUTE LÖSCHEN</button>
-            </div>
             <div class="manual-box" style="border-color:var(--success);">
-                <label style="color:var(--success)">📊 EXPORT</label>
+                <label style="color:var(--success)">📊 EXPORT (CSV)</label>
                 <button class="btn btn-start" style="font-size:0.8rem;padding:8px;background:var(--success);" onclick="exportData()">📥 EXPORT (CSV)</button>
+            </div>
+            <div class="manual-box">
+                <label style="color:var(--primary)">💾 BACKUP</label>
+                <div class="backup-btn-row">
+                    <button class="btn" style="font-size:0.8rem;padding:8px;background:var(--primary);color:var(--bg);" onclick="exportBackup()">💾 Sichern</button>
+                    <button class="btn" style="font-size:0.8rem;padding:8px;background:#334155;" onclick="triggerBackupImport()">📤 Wiederherstellen</button>
+                </div>
             </div>
             <div class="manual-box">
                 <label style="color:var(--accent)">🕒 NACHTRAG</label>
                 <select id="nachtrag-date">${dateOptions}</select>
                 <select id="nachtrag-cat">
                     <option value="Hauptdienst">🟢 Hauptdienst</option>
-                    <option value="Vertretung (VZ)">🔴 Vertretung (VZ)</option>
+                    <option value="Vertretung">🔄 Vertretung</option>
                     <option value="Konferenz">🔵 Konferenz</option>
                     <option value="Vor-/Nachbereitung">📚 Vor-/Nachbereitung</option>
+                    <option value="Ausfall">📉 Ausfall (Minus)</option>
                 </select>
-                <div style="display:flex;gap:10px;">
-                    <input type="time" id="nachtrag-start" value="08:00">
-                    <input type="time" id="nachtrag-end" value="13:00">
-                </div>
+                <div id="nachtrag-start-wrap"></div>
+                <div id="nachtrag-end-wrap"></div>
                 <button class="btn btn-start" style="padding:10px;font-size:0.85rem;" onclick="processManual()">SPEICHERN</button>
             </div>
 <!-- Theme Akkordeon -->
             <button class="accordion-btn" onclick="toggleAcc('accTheme')" style="margin-bottom:8px;">🎨 APP-FARBE ÄNDERN <span>▼</span></button>
             <div id="accTheme" class="accordion-content" style="padding:15px; border-radius:0 0 15px 15px;">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:12px;">
-                    <div onclick="applyTheme('#38bdf8')" title="Blau" style="width:44px;height:44px;border-radius:50%;background:#38bdf8;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🔵</div><div onclick="applyTheme('#8b5cf6')" title="Lila" style="width:44px;height:44px;border-radius:50%;background:#8b5cf6;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🟣</div><div onclick="applyTheme('#10b981')" title="Grün" style="width:44px;height:44px;border-radius:50%;background:#10b981;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🟢</div><div onclick="applyTheme('#f59e0b')" title="Gelb" style="width:44px;height:44px;border-radius:50%;background:#f59e0b;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🟡</div><div onclick="applyTheme('#ef4444')" title="Rot" style="width:44px;height:44px;border-radius:50%;background:#ef4444;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🔴</div><div onclick="applyTheme('#ec4899')" title="Pink" style="width:44px;height:44px;border-radius:50%;background:#ec4899;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🩷</div><div onclick="applyTheme('#06b6d4')" title="Türkis" style="width:44px;height:44px;border-radius:50%;background:#06b6d4;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🩵</div><div onclick="applyTheme('#64748b')" title="Grau" style="width:44px;height:44px;border-radius:50%;background:#64748b;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">⚫</div>
+                    <div onclick="applyTheme('#38bdf8')" title="Blau" style="width:44px;height:44px;border-radius:50%;background:#38bdf8;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🔵</div><div onclick="applyTheme('#8b5cf6')" title="Lila" style="width:44px;height:44px;border-radius:50%;background:#8b5cf6;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🟣</div><div onclick="applyTheme('#10b981')" title="Grün" style="width:44px;height:44px;border-radius:50%;background:#10b981;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🟢</div><div onclick="applyTheme('#f59e0b')" title="Gelb" style="width:44px;height:44px;border-radius:50%;background:#f59e0b;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🟡</div><div onclick="applyTheme('#ef4444')" title="Rot" style="width:44px;height:44px;border-radius:50%;background:#ef4444;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🔴</div><div onclick="applyTheme('#ec4899')" title="Pink" style="width:44px;height:44px;border-radius:50%;background:#ec4899;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🩷</div><div onclick="applyTheme('#06b6d4')" title="Türkis" style="width:44px;height:44px;border-radius:50%;background:#06b6d4;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🩵</div><div onclick="applyTheme('#64748b')" title="Grau" style="width:44px;height:44px;border-radius:50%;background:#64748b;cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">⚫</div><div onclick="applyTheme('auto-cycle')" title="Fließend (wechselt automatisch)" style="width:44px;height:44px;border-radius:50%;background:conic-gradient(from 0deg, #ef4444, #f59e0b, #10b981, #06b6d4, #38bdf8, #8b5cf6, #ec4899, #ef4444);cursor:pointer;border:3px solid transparent;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:900;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🌈</div>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;">
                     <label style="font-size:0.75rem;color:#94a3b8;white-space:nowrap;">Eigene Farbe:</label>
-                    <input type="color" id="custom-color-picker" value="${userTheme}" oninput="applyTheme(this.value)" style="width:100%;height:44px;border-radius:10px;border:1px solid #334155;background:#0f172a;cursor:pointer;padding:2px 4px;">
+                    <input type="color" id="custom-color-picker" value="${/^#[0-9a-fA-F]{6}$/.test(userTheme) ? userTheme : '#38bdf8'}" oninput="applyTheme(this.value)" style="width:100%;height:44px;border-radius:10px;border:1px solid #334155;background:#0f172a;cursor:pointer;padding:2px 4px;">
                 </div>
             </div>
             <label>NAME</label><input type="text" id="setup-name" value="${userName}">
-            <label>WOCHEN-SOLL</label><input type="number" id="setup-soll" value="${weeklySollHours}">
-            <label>E-MAIL (für SuS-Kontakt)</label><input type="email" id="setup-email" value="${userEmail}"><label>KLASSENNAME 1</label><input type="text" id="setup-class1" value="${class1Name}">
-            <label>KLASSENNAME 2</label><input type="text" id="setup-class2" value="${class2Name}">
+            <label>WOCHEN-SOLL (Std)</label><input type="number" id="setup-soll" value="${weeklySollHours}">
             <button class="accordion-btn" onclick="toggleAcc('accA')">WOCHE A BEARBEITEN <span>▼</span></button>
-            <div id="accA" class="accordion-content">`;
- 
-        ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
-            html += `<div style="margin-top:15px;border-bottom:1px solid #444;padding-bottom:10px;"><b style="color:var(--accent)">${tag}</b>`;
-            blocks.forEach(b => {
-                const val = plan[`A-${tag}`]?.[b.id] || '';
-                html += `<div style="margin-top:8px;"><label>${b.label}</label><input type="text" id="A-${tag}-${b.id}" value="${val}"></div>`;
-            });
-            html += `</div>`;
-        });
- 
-        html += `</div><button class="accordion-btn" onclick="toggleAcc('accB')">WOCHE B BEARBEITEN <span>▼</span></button><div id="accB" class="accordion-content">`;
- 
-        ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
-            html += `<div style="margin-top:15px;border-bottom:1px solid #444;padding-bottom:10px;"><b style="color:var(--accent)">${tag}</b>`;
-            blocks.forEach(b => {
-                const val = plan[`B-${tag}`]?.[b.id] || '';
-                html += `<div style="margin-top:8px;"><label>${b.label}</label><input type="text" id="B-${tag}-${b.id}" value="${val}"></div>`;
-            });
-            html += `</div>`;
-        });
- 
-        html += `</div>`;
+            <div id="accA" class="accordion-content">
+                <p style="font-size:0.68rem;color:#94a3b8;margin:4px 0 0;">Bloecke = Zeilen, Tage = Spalten. Antippen zum Eintragen (z.B. Klasse/Fach). Leer lassen = kein Unterricht.</p>
+                ${renderPlanGrid('A')}
+            </div>
+            <button class="accordion-btn" onclick="toggleAcc('accB')">WOCHE B BEARBEITEN <span>▼</span></button>
+            <div id="accB" class="accordion-content">
+                <p style="font-size:0.68rem;color:#94a3b8;margin:4px 0 0;">Bloecke = Zeilen, Tage = Spalten. Antippen zum Eintragen (z.B. Klasse/Fach). Leer lassen = kein Unterricht.</p>
+                ${renderPlanGrid('B')}
+            </div>`;
+
         document.getElementById('modal-body').innerHTML = html;
         document.getElementById('modal').style.display = 'block';
+        document.getElementById('nachtrag-start-wrap').innerHTML = buildTimeSelectHTML('nachtrag-start', '08:00');
+        document.getElementById('nachtrag-end-wrap').innerHTML   = buildTimeSelectHTML('nachtrag-end', '13:00');
     }
- 
+
     function saveSetup() {
         userName       = document.getElementById('setup-name').value;
         weeklySollHours = document.getElementById('setup-soll').value;
-        userEmail      = document.getElementById('setup-email').value;
         // Theme wird live gespeichert, hier nur sicherstellen
         localStorage.setItem('userThemeV21', userTheme);
-        class1Name     = document.getElementById('setup-class1').value;
-        class2Name     = document.getElementById('setup-class2').value;
         ['A','B'].forEach(w => {
             ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'].forEach(tag => {
                 if (!plan[`${w}-${tag}`]) plan[`${w}-${tag}`] = {};
@@ -1587,9 +1693,6 @@
         localStorage.setItem('userNameV13',    userName);
         localStorage.setItem('weeklySollV13',  weeklySollHours);
         localStorage.setItem('lehrerPlanV13',  JSON.stringify(plan));
-        localStorage.setItem('userEmailV21',   userEmail);
-        localStorage.setItem('class1NameV21',  class1Name);
-        localStorage.setItem('class2NameV21',  class2Name);
         // Sofort im UI aktualisieren ohne Reload
         document.getElementById('display-name').innerText = userName.toUpperCase();
         document.getElementById('soll-info').innerText = weeklySollHours;
@@ -1597,51 +1700,112 @@
         updateUI();
         updateAssistant();
     }
- 
+
+    // ─── BACKUP ───────────────────────────────────────────────────
+    function exportBackup() {
+        const backup = {
+            _type: 'ArbeitszeitAssistentBackup', version: APP_VERSION, exportedAt: new Date().toISOString(),
+            db: db, plan: plan, calEntries: calEntries, currentWeek: currentWeek, weeklySollHours: weeklySollHours,
+            userName: userName, userTheme: userTheme, desktopMode: desktopMode, logs: logs
+        };
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Backup_${userName}_${toLocalDateKey()}.json`;
+        link.click();
+    }
+
+    function triggerBackupImport() {
+        document.getElementById('backup-file-input').click();
+    }
+
+    function importBackup(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            let data;
+            try { data = JSON.parse(e.target.result); } catch (err) { alert('❌ Datei konnte nicht gelesen werden – ist es die richtige Backup-Datei?'); return; }
+            if (!data || data._type !== 'ArbeitszeitAssistentBackup') { alert('❌ Das ist keine gültige Backup-Datei dieser App.'); return; }
+            if (!confirm('Backup vom ' + new Date(data.exportedAt).toLocaleString('de-DE') + ' wiederherstellen?\nAlle aktuellen Daten auf diesem Gerät werden dabei überschrieben (' + (data.db ? data.db.length : 0) + ' Einträge im Backup).')) return;
+            if (data.db) localStorage.setItem('lehrerDB_Export', JSON.stringify(data.db));
+            if (data.plan) localStorage.setItem('lehrerPlanV13', JSON.stringify(data.plan));
+            if (data.calEntries) localStorage.setItem('calEntriesV21', JSON.stringify(data.calEntries));
+            if (data.currentWeek) localStorage.setItem('manualWeekV13', data.currentWeek);
+            if (data.weeklySollHours) localStorage.setItem('weeklySollV13', data.weeklySollHours);
+            if (data.userName) localStorage.setItem('userNameV13', data.userName);
+            if (data.userTheme) localStorage.setItem('userThemeV21', data.userTheme);
+            if (typeof data.desktopMode !== 'undefined') localStorage.setItem('desktopMode', data.desktopMode ? '1' : '0');
+            alert('✅ Backup wiederhergestellt. Die App wird neu geladen.');
+            location.reload();
+        };
+        reader.readAsText(file);
+    }
+
     function toggleAcc(id) { const el = document.getElementById(id); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
- 
+
     function processManual() {
         const d = document.getElementById('nachtrag-date').value;
         const c = document.getElementById('nachtrag-cat').value;
-        const s = document.getElementById('nachtrag-start').value;
-        const e = document.getElementById('nachtrag-end').value;
+        const s = getTimeSelectValue('nachtrag-start');
+        const e = getTimeSelectValue('nachtrag-end');
         if (!d || !s || !e) { alert('Bitte Datum und Uhrzeiten eintragen.'); return; }
         const d1 = new Date("2000-01-01T" + s), d2 = new Date("2000-01-01T" + e);
         if (d2 <= d1) { alert('Endzeit muss nach der Startzeit liegen!'); return; }
 
+        const catLabels = { 'Hauptdienst':'Hauptdienst', 'Vertretung':'Vertretung (Nachtrag)', 'Konferenz':'Konferenz', 'Vor-/Nachbereitung':'Vor-/Nachbereitung', 'Ausfall':'Ausfall (Nachtrag)' };
+        const typ = catLabels[c] || c;
+        const flags = { isVZ: c === 'Vertretung', isAusfall: c === 'Ausfall' };
+
         // Bestehenden Eintrag gleichen Datums + Kategorie ersetzen
-        const existing = db.findIndex(entry => entry.datum === d && entry.typ === c);
+        const existing = db.findIndex(entry => entry.datum === d && entry.typ === typ);
         if (existing >= 0) {
-            if (!confirm('Eintrag fuer ' + d + ' (' + c + ') ersetzen?')) return;
+            if (!confirm('Eintrag fuer ' + d + ' (' + typ + ') ersetzen?')) return;
             db.splice(existing, 1); // alten löschen
         }
 
-        saveToDB(c, d1.getTime(), d2.getTime(), d);
+        saveToDB(typ, d1.getTime(), d2.getTime(), d, flags);
         alert("Gespeichert!"); location.reload();
     }
- 
-    function resetToday() {
-        if (confirm("Heute löschen?")) {
-            const today = new Date().toLocaleDateString('de-DE');
-            db = db.filter(e => e.datum !== today);
-            localStorage.setItem('lehrerDB_Export', JSON.stringify(db));
-            localStorage.removeItem('activeSessionV13');
-            logs = []; localStorage.setItem('dailyLogsV13', JSON.stringify(logs));
-            location.reload();
-        }
-    }
- 
+
     // ─── HELP ─────────────────────────────────────────────────────
-                    function openHelp() {
+    function openHelp() {
         document.getElementById('modal-body').innerHTML = `
             <div class="modal-nav">
                 <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;color:var(--primary);font-weight:bold;cursor:pointer;">✕ SCHLIESSEN</button>
-                <b style="color:var(--primary)">BEDIENUNGSANLEITUNG v21.22</b>
+                <b style="color:var(--primary)">BEDIENUNGSANLEITUNG v22.1</b>
                 <div></div>
             </div>
             <div class="help-text" style="padding:10px 20px 60px;">
+                <div style="background:rgba(251,191,36,0.1);border-left:4px solid var(--accent);padding:14px;border-radius:8px;margin-bottom:20px;">
+                    <p style="margin:0 0 8px;"><b style="color:var(--accent);">🆕 Das ist neu</b> – für alle Kolleginnen und Kollegen, die diese Version zum ersten Mal sehen:</p>
+                    <p style="margin:0 0 6px;font-size:0.85rem;font-weight:700;color:var(--text);">Großer Umbau (v22.0):</p>
+                    <p style="margin:0 0 10px;font-size:0.82rem;line-height:1.5;">
+                        • <b>Vertretung</b> läuft jetzt zusammen mit dem Hauptdienst statt als eigener Timer – startet ihn bei Bedarf automatisch mit<br>
+                        • Neuer Button <b>📉 Stunde ausgefallen</b> – dokumentiert anhand deines Stundenplans automatisch eine ausgefallene Stunde als Minusstunde<br>
+                        • Neues <b>Ausgleichskonto</b> – verrechnet Vertretungs- und Ausfallstunden automatisch übers ganze Schuljahr<br>
+                        • Neue <b>📊 Verlaufs-Ansicht</b> – alle gespeicherten Zeiten nach Monat sortiert, einzelne Einträge direkt korrigierbar/löschbar (ersetzt „Heute löschen")<br>
+                        • Neue <b>Backup-Funktion</b> – eigene Daten als Datei sichern und bei Bedarf wiederherstellen (z.B. bei Handy-Wechsel)<br>
+                        • Neuer <b>Zeit-Wähler</b> (Dropdowns) bei Nachtrag/Kalender/Verlauf – funktioniert jetzt auf allen Handys zuverlässig (kein Problem mehr auf manchen Android-Geräten)<br>
+                        • <b>Kalender</b> komplett im dunklen Design überarbeitet – besser lesbar<br>
+                        • <b>Erinnerungen mit Ton/Vibration komplett entfernt</b> – die App piept/vibriert nicht mehr, bitte selbst regelmäßig reinschauen<br>
+                        • <b>Einstellungen</b> deutlich aufgeräumt (nur noch Name, Wochen-Soll, Stundenplan) – SuS-Verwaltung, GitHub-Sync und Schulrecht-Link entfernt
+                    </p>
+                    <p style="margin:0 0 6px;font-size:0.85rem;font-weight:700;color:var(--text);">Kleinere Verbesserungen seitdem (v22.1):</p>
+                    <p style="margin:0;font-size:0.82rem;line-height:1.5;">
+                        • <b>Stundenplan-Bearbeitung</b> (Woche A/B) jetzt als kompaktes Raster statt langer Liste<br>
+                        • <b>Wochen-Fortschritt</b> berücksichtigt jetzt automatisch ausgefallene Stunden (reduziertes Soll)<br>
+                        • Neue <b>Nächster-Termin-Leiste</b> unter Aktuell/Nächstes<br>
+                        • <b>Woche-Wechsel-Hinweis</b> neben dem Woche-Button – erinnert rechtzeitig ans Umschalten, ohne aus Versehen falsch zu wechseln<br>
+                        • <b>Fließende Farbe</b> als neue Design-Option<br>
+                        • <b>Aktualisierung-Button</b> jetzt auffällig hervorgehoben, damit Updates nicht verpasst werden<br>
+                        • Konferenz/Vor-Nachbereitung zählen nicht mehr doppelt, falls sie parallel zum laufenden Hauptdienst enden<br>
+                        • Anzeige bei Vertretungen zeigt nur noch die Anzahl (keine feste „max."-Zahl mehr, da je nach Bundesland unterschiedlich geregelt)
+                    </p>
+                </div>
+
                 <p style="background:rgba(56,189,248,0.1);border-left:4px solid var(--primary);padding:12px;border-radius:8px;margin-bottom:20px;">
-                    Diese App hilft dir dabei, deine <b>Arbeitszeit lückenlos zu dokumentieren</b>, Termine zu verwalten, Schüler zu informieren und Schulrecht nachzuschlagen. Alle Daten werden <b>nur auf deinem Gerät</b> gespeichert.
+                    Diese App hilft dir dabei, deine <b>Arbeitszeit lückenlos zu dokumentieren</b> und Termine zu verwalten. Alle Daten werden <b>nur auf deinem Gerät</b> gespeichert – es gibt keinen zentralen Server, der eure Zeiten sammelt.
                 </p>
 
                 <h2>1. Installation</h2>
@@ -1651,74 +1815,55 @@
                 <p>Tippe auf <b>⚙️ Einstellungen</b>:<br>
                 • <b>Name:</b> Erscheint oben auf dem Dashboard<br>
                 • <b>Wochen-Soll:</b> Deine Vertragsstunden (z.B. 26)<br>
-                • <b>E-Mail:</b> Für Schüler-Kontakt über die SuS-App<br>
-                • <b>Klassenname 1 &amp; 2:</b> z.B. 10b, 7a – für QR-Code und SuS-Management<br>
-                • <b>Woche A/B:</b> Stundenplan eintragen – steuert Schulende-Alarm und Dashboard</p>
+                • <b>Woche A/B:</b> Stundenplan eintragen – wird für Aktuell/Nächstes, den Tag-Fortschritt und den Ausfall-Button gebraucht</p>
 
                 <h2>3. Dashboard – Übersicht</h2>
-                <p><b>Uhr &amp; Datum</b> – Echtzeit. Daneben das Kalender-Icon mit roter Zahl (offene Termine).<br>
+                <p><b>Uhr</b> – Echtzeit. Daneben das Kalender-Icon mit roter Zahl (offene Termine).<br>
                 <b>Woche A/B Button</b> – Antippen zum Wechseln. Blau = A, Lila = B.<br>
-                <b>Aktuell/Nächstes</b> – Aus Stundenplan + Kalender. Ab 16:00 Uhr: morgiges erstes Fach.<br>
-                <b>Fortschrittsbalken</b> – Tag-Fortschritt und Vertretungen des Monats.</p>
+                <b>Aktuell/Nächstes</b> – Aus Stundenplan + Kalender.<br>
+                <b>Fortschrittsbalken</b> – Tag-Fortschritt, Wochenstunden im Vergleich zum Wochen-Soll, Vertretungen des Monats sowie dein Ausgleichskonto.</p>
 
                 <h2>4. Die Buttons</h2>
                 <h3>🟢 Dienst starten / beenden</h3>
                 <p>Tippen bei Ankunft → Timer läuft. Tippen bei Feierabend → Zeit gespeichert.</p>
-                <h3>🔴 Vertretung</h3>
-                <p>Öffnet Popup → Klasse eintragen (z.B. 8a) → Starten. <b>Auto-Logout nach 90 Min</b>, Vorwarnung bei 85 Min. Im CSV-Export mit Klasse.</p>
+                <h3>🔄 Vertretung</h3>
+                <p>Läuft nicht mehr als eigener Timer, sondern gemeinsam mit dem Hauptdienst – ist ja weiterhin Unterricht. Popup → Klasse eintragen (z.B. 8a) → Starten. Ist der Hauptdienst noch nicht gestartet, startet er automatisch mit. Zählt im Monatsbalken als Anzahl mit, ohne die Wochenstunden doppelt zu zählen. <i>Wie viele Vertretungsstunden erlaubt sind, regelt jedes Bundesland/jede Anstellung anders – bitte im Zweifel selbst bei Schulleitung/Personalrat nachfragen.</i></p>
                 <h3>🔵 Konferenz / Termin</h3>
-                <p><b>Zweimal tippen</b> (Sicherheit gegen versehentliches Klicken). Timer läuft separat.</p>
+                <p><b>Zweimal tippen</b> (Sicherheit gegen versehentliches Klicken). Läuft eigenständig, meist nach Feierabend. Findet die Konferenz während eines laufenden Hauptdienstes statt, zählt sie nicht extra zu den Wochenstunden dazu (die Zeit ist ja schon über den Hauptdienst erfasst) – nur wenn sie außerhalb (z.B. abends) läuft, kommt sie zusätzlich dazu.</p>
                 <h3>📚 Vor-/Nachbereitung</h3>
-                <p>Für Heimarbeit: Korrekturen, Unterrichtsvorbereitung, Zeugnisse etc. Zweimal tippen. Wird separat im CSV ausgewiesen – wichtig für Gewerkschaftsdokumentation.</p>
+                <p>Für Heimarbeit: Korrekturen, Unterrichtsvorbereitung, Zeugnisse etc. Zweimal tippen. Läuft eigenständig – wichtig für die Dokumentation.</p>
+                <p style="font-size:0.75rem;color:#94a3b8;">Ob und wie diese Zuhause-Zeit dienstrechtlich gesondert erfasst werden muss oder kann, regelt jedes Bundesland anders – im Zweifel bei Schulleitung/Personalrat nachfragen. Für die eigene Dokumentation zur Absicherung ist das Eintragen in jedem Fall sinnvoll.</p>
+                <h3>📉 Stunde ausgefallen</h3>
+                <p>Fällt eine laut Stundenplan geplante Stunde aus (z.B. keine Vertretung nötig), tippe hier. Die App schlägt anhand deines Stundenplans den passenden Block vor – bestätigen (oder anderen Block wählen) und die Zeit wird als Minusstunde dokumentiert. Gleicht sich übers Schuljahr mit Vertretungsstunden im Ausgleichskonto aus.</p>
 
-                <h2>5. ⚖️ Schulrecht &amp; Dokumente</h2>
-                <p>Der Button <b>„⚖️ Schulrecht &amp; Dokumente"</b> direkt unter Vor-/Nachbereitung öffnet eine eigene App mit 5 Bereichen:</p>
-                <p><b>📋 Ordnungsmaßnahmen</b> – §63/§64 BbgSchulG mit der vollständigen Stufenfolge (mündlicher Verweis → schriftlicher Verweis → Ausschluss → Schulwechsel), Praxisleitfaden und Warnhinweisen.</p>
-                <p><b>📚 Unterricht &amp; Bewertung</b> – Notenscala, VV Klassenarbeiten (Ankündigungspflicht 5 Tage, max. 2/Woche), Versetzungsregeln.</p>
-                <p><b>👨‍🏫 Lehrerpflichten</b> – Aufsichtspflicht, Arbeitszeitverordnung (26 Std/Woche Oberschule), Handyregeln, Kinderschutz-Meldepflicht.</p>
-                <p><b>👨‍👩‍👧 Eltern &amp; Schüler</b> – Elternrechte, Schülerpflichten, DSGVO-Regeln für die Schule.</p>
-                <p><b>📄 Dokumente erstellen</b> – Felder ausfüllen → Dokument mit offiziellem Briefkopf der Friedrich-Gedike-Oberschule erstellen → <b>Drucken oder per Mail senden</b>. Verfügbar:<br>
-                &nbsp;&nbsp;• Schriftlicher Verweis (mit Rückmeldebogen für Eltern)<br>
-                &nbsp;&nbsp;• Elternbrief (Einladung, Fehlzeiten, Leistung, Verhalten)<br>
-                &nbsp;&nbsp;• Gesprächsprotokoll (Elterngespräch, Schülergespräch, Konferenz)</p>
-                <p><b>Bei jedem Paragrafen</b> gibt es direkte Buttons zum passenden Dokument – kein Suchen nötig.</p>
-                <p><b>🔍 Suchfunktion</b> – Stichwort eingeben (z.B. „Verweis", „Aufsicht") → findet automatisch den richtigen Bereich.</p>
+                <h2>5. Ausgleichskonto</h2>
+                <p>Zeigt den laufenden Saldo aus Vertretungsstunden (Plus) und dokumentierten Ausfallstunden (Minus) für das aktuelle Schuljahr (1. August – 31. Juli) – so siehst du auf einen Blick, ob du noch etwas gutzumachen hast oder im Plus bist.</p>
 
-                <h2>6. 🤖 KI-Assistent</h2>
-                <p>In der Schulrecht-App unter Tab <b>„🤖 KI-Assistent"</b> kannst du Fragen direkt zum Brandenburger Schulrecht stellen.</p>
-                <p><b>Schritt 1 – KI-Anbieter wählen:</b><br>
-                🤖 <b>Claude (Anthropic)</b> – Empfehlung, sehr gute Rechtsantworten<br>
-                💬 <b>ChatGPT (OpenAI)</b> – Alternative<br>
-                🔷 <b>Gemini (Google)</b> – Kostenlose Option</p>
-                <p><b>Schritt 2 – API-Key beantragen (kostenlos registrieren):</b><br>
-                • <b>Claude:</b> console.anthropic.com → Registrieren → „API Keys" → „Create Key"<br>
-                • <b>ChatGPT:</b> platform.openai.com → Registrieren → „API Keys" → „Create new secret key"<br>
-                • <b>Gemini:</b> aistudio.google.com → Mit Google-Konto anmelden → „Get API Key"</p>
-                <p><b>Schritt 3 – Key eintragen:</b> Anbieter auswählen → Key ins Feld einfügen → 💾 Speichern. Der Key wird nur auf deinem Gerät gespeichert – kein anderer hat Zugriff.</p>
-                <p><b>Schritt 4 – Fragen stellen:</b> Frage eingeben oder Schnell-Button tippen → Antwort erscheint mit Paragraphenangabe.</p>
-                <p><b>Kosten:</b> Jeder Lehrer nutzt seinen eigenen Key. Bei normaler Nutzung (wenige Fragen täglich) entstehen nur minimale Kosten – oft gibt es kostenlose Kontingente.</p>
-
-                <h2>8. Kalender</h2>
+                <h2>6. Kalender</h2>
                 <p>Kalender-Icon tippen (rote Zahl = heutige + zukünftige Termine). Navigation mit „Vorherige/Nächste Woche". Termine erscheinen automatisch unter Aktuell/Nächstes auf dem Dashboard.<br>
                 <b>Kategorien:</b> Termin, Konferenz, Eigene Kategorie (freies Textfeld).<br>
-                <b>Brandenburger Ferien 2025–2027</b> und alle gesetzlichen Feiertage sind automatisch eingetragen.</p>
+                <b>Brandenburger Ferien 2025–2027</b> und alle gesetzlichen Feiertage sind automatisch eingetragen.<br>
+                <b>Hinweis:</b> Der Kalender erinnert dich aktuell nicht aktiv (kein Ton/Vibration) – schau bewusst regelmäßig rein.</p>
 
-                <h2>9. Export &amp; Nachtrag</h2>
-                <p><b>CSV-Export:</b> ⚙️ → 📥 EXPORT – alle Zeiten mit Datum, Kategorie, Dauer. Vertretungen mit Klasse. Monatliche Gesamtabrechnung.<br>
-                <b>Nachtrag:</b> ⚙️ → 🕒 NACHTRAG – vergessene Zeiten eintragen (Hauptdienst, Vertretung, Konferenz, Vor-/Nachbereitung).<br>
-                <b>Reset:</b> ⚙️ → Heute löschen (nicht rückgängig!).</p>
+                <h2>7. 📊 Verlauf</h2>
+                <p>Zeigt alle gespeicherten Zeiten übersichtlich nach Monat gruppiert, mit Zwischensummen für Gearbeitet/Vertretung/Ausfall. Tippe auf einen Eintrag, um Uhrzeiten zu korrigieren oder ihn zu löschen.</p>
 
-                <h2>10. App-Farbe &amp; Datenschutz</h2>
+                <h2>8. Export &amp; Nachtrag</h2>
+                <p><b>CSV-Export:</b> ⚙️ → 📥 EXPORT – alle Zeiten mit Datum, Kategorie, Dauer, plus monatliche Gesamtabrechnung.<br>
+                <b>Backup:</b> ⚙️ → 💾 BACKUP – sichert alle Daten als Datei (z.B. bei Handy-Wechsel) und kann sie bei Bedarf wiederherstellen.<br>
+                <b>Nachtrag:</b> ⚙️ → 🕒 NACHTRAG – vergessene Zeiten eintragen (Hauptdienst, Vertretung, Konferenz, Vor-/Nachbereitung, Ausfall).</p>
+
+                <h2>9. App-Farbe &amp; Datenschutz</h2>
                 <p><b>Farbe:</b> ⚙️ → 🎨 APP-FARBE ÄNDERN – 8 Themes + freier Farbwähler.<br>
-                <b>Datenschutz:</b> Alle Zeiterfassungsdaten werden nur lokal gespeichert. Keine externen Server außer beim GitHub-Sync (Admin) und KI-Anfragen (eigener API-Key).</p>
+                <b>Datenschutz:</b> Alle Daten werden ausschließlich lokal auf deinem Gerät gespeichert. Es gibt keinen externen Server.</p>
 
                 <p style="margin-top:30px;font-size:0.7rem;color:#475569;text-align:center;">
-                    Arbeitszeit-Assistent Pro v21.22 · © 2026 Michael Nagel · Alle Rechte vorbehalten
+                    Arbeitszeit-Assistent Pro v22.1 · © 2026 Michael Nagel · Alle Rechte vorbehalten
                 </p>
             </div>`;
         document.getElementById('modal').style.display = 'block';
     }
- 
+
     // ─── LOGS ─────────────────────────────────────────────────────
     function addLog(m) {
         logs.unshift({ t: new Date().toLocaleTimeString('de-DE').substr(0,5), m });
@@ -1742,8 +1887,33 @@
         wb.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
         updateUI();
         updateAssistant();
+        ackWeekSwitch(); // Wechsel-Hinweis verschwindet, da ja gerade aktiv gewechselt wurde
     }
- 
+
+    // ─── WOCHE-WECHSEL-HINWEIS (manuell, da nach Ferien nicht automatisch berechenbar) ──
+    // Liefert den Montag (ms) der Woche, fuer die der Nutzer die Woche A/B pruefen/setzen sollte:
+    // an Mo-Sa die laufende Woche, ab Sonntag schon die kommende Woche.
+    function targetWeekMonday(d) {
+        d = d || new Date();
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        const mon = new Date(d.getFullYear(), d.getMonth(), diff).setHours(0, 0, 0, 0);
+        return day === 0 ? mon + 7 * 86400000 : mon;
+    }
+    function updateWeekSwitchHint() {
+        const hintEl = document.getElementById('week-switch-hint');
+        if (!hintEl) return;
+        const target = targetWeekMonday(new Date());
+        const ack = parseInt(localStorage.getItem('weekSwitchAckV22') || '0', 10);
+        hintEl.style.display = (ack !== target) ? 'block' : 'none';
+    }
+    // Bestaetigt den Hinweis OHNE die Woche zu wechseln (z.B. nach den Ferien, wenn die
+    // gleiche Woche absichtlich bestehen bleibt) - antippen des Hinweis-Badges selbst macht das.
+    function ackWeekSwitch() {
+        localStorage.setItem('weekSwitchAckV22', String(targetWeekMonday(new Date())));
+        updateWeekSwitchHint();
+    }
+
     // ─── EXPORT ───────────────────────────────────────────────────
     function exportData() {
         let sorted = [...db].sort((a,b) => {
@@ -1791,13 +1961,38 @@
     }
 
     // ─── THEME ───────────────────────────────────────────────────
-    function applyTheme(color) {
-        userTheme = color;
+    // Setzt die tatsaechliche CSS-Farbe (ohne die Nutzer-Einstellung zu veraendern) - wird
+    // sowohl fuer feste Farben als auch von der fliessenden Farb-Rotation aufgerufen.
+    function setThemeColor(color) {
         document.documentElement.style.setProperty('--primary', color);
         // Kalender heute-Header Box-Shadow auch anpassen
         const style = document.getElementById('dynamic-theme-style');
         if (style) {
-            style.innerHTML = `.cal-day-header.today { background: ${color} !important; box-shadow: 0 3px 10px ${color}66 !important; } .cal-week-badge { background: ${color} !important; }`;
+            const shadowColor = color.charAt(0) === '#' ? color + '66' : color;
+            style.innerHTML = `.cal-day-header.today { background: ${color} !important; box-shadow: 0 3px 10px ${shadowColor} !important; } .cal-week-badge { background: ${color} !important; }`;
+        }
+    }
+    function stopThemeCycle() {
+        if (themeCycleInterval) { clearInterval(themeCycleInterval); themeCycleInterval = null; }
+    }
+    // Fliessende Farbe: dreht langsam u. dezent einmal durch den Farbkreis (kompletter
+    // Umlauf ca. 72 Sekunden), damit es erkennbar aber nicht ablenkend ist.
+    function startThemeCycle() {
+        stopThemeCycle();
+        let hue = Math.floor(Math.random() * 360);
+        setThemeColor(`hsl(${hue}, 75%, 60%)`);
+        themeCycleInterval = setInterval(function() {
+            hue = (hue + 1) % 360;
+            setThemeColor(`hsl(${hue}, 75%, 60%)`);
+        }, 200);
+    }
+    function applyTheme(color) {
+        userTheme = color;
+        if (color === 'auto-cycle') {
+            startThemeCycle();
+        } else {
+            stopThemeCycle();
+            setThemeColor(color);
         }
     }
 
