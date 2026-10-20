@@ -351,6 +351,21 @@
             .topbar #live-clock { font-size: 2.4rem; }
         }
         body.desktop-mode .container { max-width: 900px; }
+        /* Stundenplan: Mini-Felder antippbar, großes Eingabefenster */
+        .stunden-table input.stunden-input { cursor: pointer; caret-color: transparent; }
+        .stunden-table input.stunden-input.voll { border-color: var(--primary); background: rgba(56,189,248,0.10); font-weight: 700; }
+        #pe-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 3500; align-items: center; justify-content: center; padding: 16px; }
+        #pe-box { background: var(--card); border-radius: 20px; padding: 18px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,.7); border-top: 4px solid var(--primary); }
+        #pe-titel { font-size: 1.05rem; font-weight: 900; color: var(--primary); }
+        #pe-sub { font-size: .8rem; color: #94a3b8; font-weight: 700; margin: 2px 0 10px; }
+        #pe-input { font-size: 1.25rem !important; padding: 14px !important; margin: 0 0 10px; border: 2px solid var(--primary); }
+        #pe-vorschlag small { display: block; font-size: .68rem; color: #94a3b8; margin-bottom: 6px; }
+        .pe-chip { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; border-radius: 999px; padding: 7px 12px; margin: 0 6px 6px 0; font-size: .85rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+        .pe-btns { display: flex; gap: 8px; margin-top: 8px; }
+        .pe-btns button { border: none; border-radius: 12px; padding: 13px 10px; font-weight: 800; font-size: .9rem; cursor: pointer; font-family: inherit; }
+        .pe-ok { flex: 2; background: linear-gradient(145deg,#10b981,#059669); color: #fff; }
+        .pe-ab { flex: 1; background: #334155; color: #fff; }
+        .pe-leer { flex: 1; background: rgba(239,68,68,.12); color: var(--danger); border: 1.5px solid var(--danger) !important; }
     </style>
 </head>
 <body>
@@ -1623,6 +1638,44 @@
         updateAssistant();
     }
 
+    // ─── STUNDENPLAN: großes Eingabefeld statt Mini-Feld ────────────
+    let _peFeld = null;
+    function planFeldEdit(inp) {
+        _peFeld = inp;
+        const p = inp.id.split('-'); // A-Montag-b1
+        const b = blocks.find(function(x) { return x.id === p[2]; });
+        let ov = document.getElementById('pe-overlay');
+        if (!ov) {
+            ov = document.createElement('div'); ov.id = 'pe-overlay';
+            ov.innerHTML = '<div id="pe-box"><div id="pe-titel"></div><div id="pe-sub"></div>' +
+                '<input id="pe-input" type="text" autocomplete="off" placeholder="z. B. 7c Physik" onkeydown="if(event.key===\'Enter\')planFeldOk();if(event.key===\'Escape\')planFeldZu();">' +
+                '<div id="pe-vorschlag"></div>' +
+                '<div class="pe-btns"><button class="pe-leer" onclick="planFeldLeeren()">🗑 Leeren</button><button class="pe-ab" onclick="planFeldZu()">Abbrechen</button><button class="pe-ok" onclick="planFeldOk()">OK ✓</button></div></div>';
+            ov.addEventListener('click', function(e) { if (e.target === ov) planFeldZu(); });
+            document.body.appendChild(ov);
+        }
+        document.getElementById('pe-titel').textContent = 'Woche ' + p[0] + ' · ' + p[1];
+        document.getElementById('pe-sub').textContent = b ? b.label + ' (' + b.start + '–' + b.end + ')' : '';
+        // Vorschläge: Einträge, die schon im Plan stehen (ein Tipp genügt)
+        const set = {};
+        document.querySelectorAll('.stunden-input').forEach(function(x) { const v = (x.value || '').trim(); if (v) set[v] = (set[v] || 0) + 1; });
+        const vs = Object.keys(set).sort(function(a, b) { return set[b] - set[a] || a.localeCompare(b, 'de'); }).slice(0, 12);
+        document.getElementById('pe-vorschlag').innerHTML = vs.length
+            ? '<small>Schon im Plan – antippen zum Übernehmen:</small>' + vs.map(function(v) { return '<button class="pe-chip" onclick="planFeldNimm(this)">' + esc(v) + '</button>'; }).join('')
+            : '';
+        const i = document.getElementById('pe-input');
+        i.value = inp.value || '';
+        ov.style.display = 'flex';
+        setTimeout(function() { i.focus(); i.select(); }, 50);
+    }
+    function planFeldNimm(btn) { document.getElementById('pe-input').value = btn.textContent; planFeldOk(); }
+    function planFeldOk() {
+        if (_peFeld) { _peFeld.value = document.getElementById('pe-input').value.trim(); _peFeld.classList.toggle('voll', !!_peFeld.value); }
+        planFeldZu();
+    }
+    function planFeldLeeren() { document.getElementById('pe-input').value = ''; planFeldOk(); }
+    function planFeldZu() { const ov = document.getElementById('pe-overlay'); if (ov) ov.style.display = 'none'; _peFeld = null; }
+
     function renderCalendar() {
         const days = getWeekDates(calOffset);
         const kw   = getKW(days[0]);
@@ -1967,7 +2020,7 @@
                 <div class="stunden-label" title="${b.label} (${b.start}–${b.end})"><span>${shortBlockLabel(b)}</span><span class="sl-time">${b.start}</span></div>
                 ${days.map(function(tag) {
                     const val = (plan[`${w}-${tag}`] && plan[`${w}-${tag}`][b.id]) || '';
-                    return `<input type="text" class="stunden-input" id="${w}-${tag}-${b.id}" value="${val}">`;
+                    return `<input type="text" class="stunden-input${val ? ' voll' : ''}" readonly onclick="planFeldEdit(this)" id="${w}-${tag}-${b.id}" value="${esc(val)}" title="Antippen zum Eintragen">`;
                 }).join('')}
             </div>`;
         });
@@ -2045,12 +2098,12 @@
             <div style="font-size:0.68rem;color:#94a3b8;margin:-6px 0 10px;">Sobald unten ein Stundenplan steht, rechnet die App das Soll selbst: pro Schultag Anwesenheit 7:30–13:00 bzw. bis 15:15 mit 4. Block. Ferien &amp; Feiertage zählen nicht.</div>
             <button class="accordion-btn" onclick="toggleAcc('accA')">WOCHE A BEARBEITEN <span>▼</span></button>
             <div id="accA" class="accordion-content">
-                <p style="font-size:0.68rem;color:#94a3b8;margin:4px 0 0;">Bloecke = Zeilen, Tage = Spalten. Antippen zum Eintragen (z.B. Klasse/Fach). Leer lassen = kein Unterricht.</p>
+                <p style="font-size:0.68rem;color:#94a3b8;margin:4px 0 0;">Bloecke = Zeilen, Tage = Spalten. Feld antippen – es öffnet sich ein großes Eingabefenster (schon benutzte Einträge per Tipp übernehmen). Leer = kein Unterricht.</p>
                 ${renderPlanGrid('A')}
             </div>
             <button class="accordion-btn" onclick="toggleAcc('accB')">WOCHE B BEARBEITEN <span>▼</span></button>
             <div id="accB" class="accordion-content">
-                <p style="font-size:0.68rem;color:#94a3b8;margin:4px 0 0;">Bloecke = Zeilen, Tage = Spalten. Antippen zum Eintragen (z.B. Klasse/Fach). Leer lassen = kein Unterricht.</p>
+                <p style="font-size:0.68rem;color:#94a3b8;margin:4px 0 0;">Bloecke = Zeilen, Tage = Spalten. Feld antippen – es öffnet sich ein großes Eingabefenster (schon benutzte Einträge per Tipp übernehmen). Leer = kein Unterricht.</p>
                 ${renderPlanGrid('B')}
             </div>`;
 
@@ -2172,6 +2225,7 @@
                         • <b>Vertretung</b> zählt ab Blockbeginn und <b>stoppt nach 90 Min. automatisch</b> (Hinweis „gespeichert“ zum Wegklicken). Sie läuft innerhalb des Dienstes mit – nichts wird doppelt gezählt. Die Kachel zeigt die Vertretungsstunden im Monat (1 Block = 2 Std.); über 3 Std im Monat besteht nach VV-Arbeitszeit § 10 Anspruch auf Ausgleich – bitte mit der Schulleitung klären<br>
                         • <b>Termin-Kachel</b> mit Zähler der anstehenden Termine, <b>Termin-Vorwarnung</b> am Vortag (freitags schon fürs Wochenende/Montag) und <b>Wochenrückblick</b> freitags 12–19 Uhr<br>
                         • <b>Jahreszeiten-Effekt</b> (Blätter, Schnee, Blüten, Funkeln) – in den Einstellungen umschaltbar oder aus<br>
+                        • <b>Stundenplan eintragen:</b> Feld antippen – es öffnet sich ein großes Eingabefenster; schon benutzte Einträge übernimmst du mit einem Tipp<br>
                         • <b>Nachtrag</b> in den Einstellungen jetzt bis 4 Wochen zurück
                     </p>
                 </div>
