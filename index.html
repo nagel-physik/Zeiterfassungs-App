@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v22.1</title>
+    <title>Arbeitszeit-Assistent Pro v23.0</title>
     <style id="dynamic-theme-style"></style>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
@@ -260,104 +260,178 @@
         /* BACKUP */
         .backup-btn-row { display:flex; gap:10px; }
         .backup-btn-row .btn { margin-bottom: 0; }
+
+        /* ══════════ v23: KACHEL-LAYOUT ══════════ */
+        body { padding: 12px; }
+        .container { max-width: 440px; }
+        @media (min-width: 700px) { .container { max-width: 900px; } }
+        .topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .topbar .who { flex: 1; min-width: 0; }
+        .topbar #display-name { font-size: 0.7rem; color: var(--accent); font-weight: 900; letter-spacing: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .topbar .today-str { font-size: 0.72rem; color: #94a3b8; font-weight: 700; margin-top: 1px; }
+        .topbar #live-clock { font-size: 1.9rem; font-weight: 900; color: var(--primary); line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 3px 8px rgba(0,0,0,0.3); }
+        .week-pill { border: none; border-radius: 999px; padding: 7px 12px; color: #fff; font-weight: 800; font-size: 0.78rem; cursor: pointer; font-family: inherit; white-space: nowrap; background: var(--weekA); }
+        .week-pill small { display: block; font-weight: 700; opacity: .85; font-size: .58rem; line-height: 1; } .week-pill small:empty { display: none; }
+        #week-switch-hint { display: none; margin: -2px 0 10px; font-size: 0.72rem; font-weight: 800; color: #1e293b; background: var(--overtime); padding: 7px 12px; border-radius: 12px; text-align: center; white-space: normal; cursor: pointer; animation: hint-fade 2s ease-in-out infinite; }
+
+        .banner { display: flex; gap: 10px; align-items: center; border-radius: 14px; padding: 10px 12px; margin-bottom: 10px; color: #fff; box-shadow: 0 6px 16px rgba(0,0,0,.3); position: relative; }
+        .banner .b-ic { font-size: 1.6rem; flex-shrink: 0; }
+        .banner b { font-size: 0.88rem; display: block; }
+        .banner small { display: block; font-size: 0.72rem; opacity: .92; margin-top: 2px; line-height: 1.35; }
+        .banner .b-x { position: absolute; top: 6px; right: 8px; background: rgba(0,0,0,.25); border: none; color: #fff; width: 26px; height: 26px; border-radius: 50%; font-weight: 900; cursor: pointer; font-size: .8rem; }
+        .banner.has-x { padding-right: 40px; }
+        .bn-ferien   { background: linear-gradient(90deg,#7c2d12,#b45309); }
+        .bn-feiertag { background: linear-gradient(90deg,#7f1d1d,#b91c1c); }
+        .bn-vorb     { background: linear-gradient(90deg,#134e4a,#0f766e); }
+        .bn-vorwarn  { background: linear-gradient(90deg,#1e3a8a,#2563eb); }
+        .bn-rueck    { background: linear-gradient(90deg,#4c1d95,#7c3aed); }
+        .bn-ok       { background: linear-gradient(90deg,#065f46,#059669); }
+
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        @media (min-width: 700px) { .grid { grid-template-columns: repeat(4, 1fr); gap: 12px; grid-auto-flow: dense; } .h2 { grid-row: span 2; } }
+        .w2 { grid-column: span 2; }
+        @media (min-width: 700px) { .wfull { grid-column: 1 / -1; } }
+        .lab { font-size: 0.66rem; font-weight: 800; letter-spacing: .1em; color: #64748b; text-transform: uppercase; margin: 12px 2px 6px; }
+        .t { position: relative; border: none; border-radius: 16px; padding: 10px 12px; color: #fff; min-height: 76px; display: flex; flex-direction: column; align-items: stretch; text-align: left; box-shadow: 0 6px 16px rgba(0,0,0,.32); overflow: hidden; font-family: inherit; cursor: default; }
+        button.t { cursor: pointer; }
+        button.t:active { transform: scale(.97); }
+        .t .k { padding-right: 30px; font-size: 0.62rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .92; }
+        .t .v { font-size: 1.25rem; font-weight: 800; margin-top: 3px; letter-spacing: -.01em; line-height: 1.15; }
+        .t .s { font-size: 0.68rem; opacity: .92; margin-top: auto; padding-top: 4px; line-height: 1.3; }
+        .t .ic { position: absolute; right: 10px; top: 8px; font-size: 1.2rem; opacity: .9; }
+        .t.running { box-shadow: 0 0 0 3px rgba(255,255,255,.85), 0 6px 16px rgba(0,0,0,.32); animation: tile-pulse 2s ease-in-out infinite; }
+        .t.confirm { background: var(--accent) !important; color: #1e293b; }
+        @keyframes tile-pulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.15); } }
+        .t-dienst { background: linear-gradient(140deg,#0f766e,#047857); }
+        .t-dienst #main-timer { font-size: 2.3rem; font-weight: 800; font-variant-numeric: tabular-nums; margin: 2px 0 0; line-height: 1.1; }
+        .t-dienst .soll-line { font-size: 0.72rem; opacity: .95; margin: 2px 0 6px; }
+        .t-dienst #btn-main { margin: 8px 0 0; padding: 11px; font-size: 0.95rem; border-radius: 12px; background: #ecfdf5; color: #065f46; box-shadow: 0 3px 0 rgba(0,0,0,.18); }
+        .t-dienst #btn-main.btn-stop { color: #fff; }
+        .mini-bar { height: 7px; background: rgba(0,0,0,.28); border-radius: 6px; overflow: hidden; }
+        .mini-bar > div { height: 100%; width: 0%; background: #fde68a; border-radius: 6px; transition: width .8s ease; }
+        .mini-row { display: flex; justify-content: space-between; font-size: 0.64rem; font-weight: 700; opacity: .9; margin-bottom: 3px; }
+        .t-now { background: #1e293b; border: 1px solid #334155; box-shadow: 0 6px 16px rgba(0,0,0,.25); }
+        .t-now .row { display: flex; gap: 8px; margin-top: 6px; }
+        .t-now .row > div { flex: 1; background: #0f172a; border-radius: 10px; padding: 7px 9px; min-width: 0; }
+        .t-now .row small { font-size: 0.56rem; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; display: block; }
+        .t-now .row b { display: block; font-size: 0.92rem; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; }
+        .t-now .row span { display: block; font-size: 0.64rem; color: #94a3b8; font-weight: 600; }
+        .t-vz   { background: linear-gradient(140deg,#e11d48,#be123c); }
+        .t-kf   { background: linear-gradient(140deg,#2563eb,#1d4ed8); }
+        .t-vnb  { background: linear-gradient(140deg,#16a34a,#15803d); }
+        .t-aus  { background: linear-gradient(140deg,#64748b,#475569); }
+        .t-woche{ background: linear-gradient(140deg,#7c3aed,#6d28d9); flex-direction: row; align-items: center; gap: 12px; }
+        .t-konto{ background: linear-gradient(140deg,#0284c7,#0369a1); }
+        .t-vzm  { background: linear-gradient(140deg,#f97316,#ea580c); }
+        .t-term { background: linear-gradient(140deg,#0891b2,#0e7490); }
+        .ring { width: 64px; height: 64px; border-radius: 50%; background: conic-gradient(#fde68a 0 0%, rgba(255,255,255,.18) 0); display: grid; place-items: center; flex: 0 0 auto; }
+        .ring span { width: 48px; height: 48px; border-radius: 50%; background: #6d28d9; display: grid; place-items: center; font-weight: 800; font-size: 0.82rem; }
+        .count-badge { position: absolute; right: 8px; top: 8px; background: #fff; color: #1d4ed8; border-radius: 999px; min-width: 22px; height: 22px; padding: 0 6px; font-size: 0.7rem; font-weight: 900; display: none; align-items: center; justify-content: center; }
+        .vz-bar { position: relative; margin-top: 6px; }
+        .vz-bar .mark { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 2px; background: rgba(255,255,255,.8); }
+        .nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+        .nav button { position: relative; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; border-radius: 14px; padding: 9px 4px; font-size: 0.72rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+        .nav button .n-ic { display: block; font-size: 1.15rem; margin-bottom: 2px; }
+        .nav .mini-cal { display: inline-flex; flex-direction: column; align-items: center; border: 2px solid var(--primary); border-radius: 7px; width: 30px; overflow: hidden; margin-bottom: 2px; }
+        .nav .mini-cal i { display: block; width: 100%; height: 5px; background: var(--primary); }
+        .nav .mini-cal b { font-size: .8rem; line-height: 1.05; }
+        .nav .mini-cal em { font-style: normal; font-size: .42rem; font-weight: 800; color: var(--primary); }
+        .nav .btn-update-alert { background: var(--danger); border-color: var(--danger); color: #fff; }
+        .nav .today-dot { top: -6px; right: -4px; }
+        #log-container { margin-top: 8px; }
+        #fx-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; }
+        @media (min-width: 700px) {
+            .t { min-height: 108px; padding: 14px 16px; border-radius: 18px; }
+            .t .k { font-size: 0.7rem; }
+            .t .v { font-size: 1.6rem; }
+            .t .s { font-size: 0.78rem; }
+            .t .ic { font-size: 1.5rem; }
+            .t-dienst #main-timer { font-size: 3.2rem; }
+            .ring { width: 84px; height: 84px; } .ring span { width: 64px; height: 64px; font-size: 1rem; }
+            .topbar #live-clock { font-size: 2.4rem; }
+        }
+        body.desktop-mode .container { max-width: 900px; }
     </style>
 </head>
 <body>
  
 <div id="update-toast">
-    <div class="toast-header"><span>✨ Update Info v22.1</span></div>
-    <div class="toast-body">v22.1: Nächster-Termin-Leiste, auffälliger Aktualisierung-Button, Woche-Wechsel-Hinweis, fließende Farbe, kompaktes Stundenplan-Raster u.v.m. – alle Neuerungen stehen jetzt in der Hilfe (?) ganz oben.</div>
+    <div class="toast-header"><span>✨ Update Info v23.0</span></div>
+    <div class="toast-body">v23.0: Neues Kachel-Layout · Ferien &amp; Feiertage bis 2029 (kein Soll in den Ferien) · Soll nach Stundenplan · A/B-Woche wechselt automatisch · Vertretung stoppt nach 90 Min. von selbst · Termin-Vorwarnung &amp; Freitags-Rückblick · Jahreszeiten-Effekt. Details in der Hilfe (?).</div>
     <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
  
-<div class="container"></div>
- 
+<canvas id="fx-canvas" aria-hidden="true"></canvas>
 <div class="container">
-    <div class="time-header">
-        <span id="live-clock">--:--:--</span>
-        
-        <div style="position: absolute; right: 0; top: 5px; cursor: pointer;" onclick="openHelp()">
-            <button class="help-trigger">?</button>
+    <div class="topbar">
+        <div class="who">
+            <div id="display-name">LEHRKRAFT</div>
+            <div class="today-str" id="today-str">–</div>
         </div>
+        <span id="live-clock">--:--</span>
+        <button id="week-btn" class="week-pill" onclick="toggleWeekManual()" title="Woche A/B – wechselt automatisch (Ferienwochen werden übersprungen). Antippen = manuell umschalten."><small id="week-pre"></small>Woche <span id="week-label">A</span></button>
+        <button class="help-trigger" onclick="openHelp()">?</button>
     </div>
- 
-    <div class="next-info" id="task-card">
-        <div class="task-box">
-            <div class="task-label">Aktuell</div>
-            <div class="task-val" id="task-now">Bereit</div>
-            <div class="task-sub" id="task-now-sub">-</div>
-        </div>
-        <div class="task-box">
-            <div class="task-label">Nächstes</div>
-            <div class="task-val" id="task-next">Keine Termine</div>
-            <div class="task-sub" id="task-next-sub">-</div>
-        </div>
-    </div>
+    <div id="week-switch-hint" onclick="ackWeekSwitch()"></div>
+    <div id="banner-area"></div>
 
-    <div class="next-termin-bar" id="next-termin-bar">
-        <span class="ntb-icon">📅</span>
-        <div class="ntb-viewport"><span class="ntb-text" id="next-termin-text">–</span></div>
-    </div>
-
-    <div class="card">
-        <div id="display-name" style="font-size: 0.75rem; color: var(--accent); font-weight: 900; margin-bottom: 12px; letter-spacing: 2px;">LEHRKRAFT</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; gap:10px;">
-            <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
-                <span style="font-size:0.55rem; font-weight:900; color:var(--primary); text-transform:uppercase; letter-spacing:1px;">Wechseln</span>
-                <button id="week-btn" onclick="toggleWeekManual()" style="border:none; padding:10px 22px; border-radius:12px; color:white; font-weight:800; cursor:pointer;">Woche <span id="week-label">A</span></button>
-                <div style="font-size:0.72rem; font-weight:800; color:#94a3b8;">Ziel: <span id="soll-info" style="color:white;">26</span> Std</div>
-                <div id="week-switch-hint" onclick="ackWeekSwitch()" title="Woche fuer die naechste Woche pruefen. Antippen zum Bestaetigen, falls sie schon passt.">🔄 Woche prüfen!</div>
+    <div class="grid">
+        <div class="t t-dienst w2" id="dienst-tile">
+            <span class="k">Dienst</span><span class="ic">⏱</span>
+            <div id="main-timer">00:00:00</div>
+            <div class="soll-line" id="soll-line">–</div>
+            <div id="day-bar-wrap">
+                <div class="mini-row"><span id="day-ist">Heute 0:00 h</span><span id="day-percent">0%</span></div>
+                <div class="mini-bar"><div id="day-progress"></div></div>
             </div>
-            <div onclick="openCalendar()" style="cursor:pointer; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:4px;" ontouchstart="this.style.opacity='0.7'" ontouchend="this.style.opacity='1'">
-                <div style="position:relative; width:70px;">
-                    <div style="background:var(--card); border-radius:14px; border:2px solid var(--primary); overflow:hidden; box-shadow:0 4px 16px rgba(56,189,248,0.3);">
-                        <div style="background:var(--primary); padding:4px 0 3px; display:flex; justify-content:center; gap:5px;">
-                            <div style="width:6px;height:9px;border:2px solid #0f172a;border-radius:2px;background:#0f172a;"></div>
-                            <div style="width:6px;height:9px;border:2px solid #0f172a;border-radius:2px;background:#0f172a;"></div>
-                            <div style="width:6px;height:9px;border:2px solid #0f172a;border-radius:2px;background:#0f172a;"></div>
-                            <div style="width:6px;height:9px;border:2px solid #0f172a;border-radius:2px;background:#0f172a;"></div>
-                        </div>
-                        <div style="padding:4px 0 6px; text-align:center;">
-                            <div id="fab-day-num" style="font-size:1.5rem; font-weight:900; color:var(--text); line-height:1.1;">25</div>
-                            <div id="fab-day-name" style="font-size:0.42rem; font-weight:800; color:var(--primary); text-transform:uppercase; letter-spacing:1px;">MI</div>
-                        </div>
-                    </div>
-                    <div class="today-dot" id="today-dot"></div>
-                </div>
-                <div class="cal-icon-label">Termine</div>
+            <button id="btn-main" class="btn btn-start" onclick="toggleMain()">▶ Dienst starten</button>
+        </div>
+        <div class="t t-now w2" id="task-card">
+            <span class="k" style="color:#94a3b8">Heute laut Stundenplan</span>
+            <div class="row">
+                <div><small>Jetzt</small><b id="task-now">Bereit</b><span id="task-now-sub">-</span></div>
+                <div><small>Als Nächstes</small><b id="task-next">–</b><span id="task-next-sub">-</span></div>
             </div>
         </div>
-        <div id="main-timer" class="timer-display">00:00:00</div>
-        <button id="btn-main" class="btn btn-start" onclick="toggleMain()">Dienst starten</button>
-        <button id="btn-vz" class="btn btn-vz" onclick="handleVZClick()">Vertretung</button>
-        <button id="btn-extra" class="btn btn-extra" onclick="handleExtraClick()">Konferenz / Termin</button>
-        <button id="btn-vnb" class="btn btn-vnb" onclick="handleVNBClick()">📚 Vor-/Nachbereitung</button>
-        <button id="btn-ausfall" class="btn btn-ausfall" onclick="handleAusfallClick()">📉 Stunde ausgefallen</button>
-        <div class="progress-container" style="margin-top: 25px;">
-            <div class="progress-label"><span>Tag Fortschritt</span><span id="day-percent">0%</span></div>
-            <div class="progress-bar"><div id="day-progress" class="progress-fill" style="background: var(--primary);"></div></div>
-            <div class="progress-label"><span>Wochenstunden</span><span id="week-percent">0%</span></div>
-            <div class="progress-bar"><div id="week-progress" class="progress-fill" style="background: var(--success);"></div></div>
-            <div class="progress-label"><span>Vertretungen (Monat)</span><span id="vz-val">0</span></div>
-            <div class="progress-bar"><div id="vz-progress" class="progress-fill" style="background: var(--danger);"></div></div>
-            <div id="balance-info" style="margin-top:10px; font-size:0.75rem; font-weight:800; text-align:center; padding:8px; border-radius:10px; background:rgba(255,255,255,0.03);">Ausgleichskonto: <span id="balance-val">±0,0 Std</span></div>
+        <button class="t t-vz" id="btn-vz" onclick="handleVZClick()"><span class="k">Vertretung</span><span class="ic">🔄</span><span class="v" id="vz-tile-v"></span><span class="s" id="vz-tile-s">antippen zum Starten</span></button>
+        <button class="t t-kf" id="btn-extra" onclick="handleExtraClick()"><span class="k">Konferenz / Termin</span><span class="count-badge" id="termin-count"></span><span class="v" id="kf-tile-v"></span><span class="s" id="kf-tile-s">antippen zum Starten</span></button>
+        <button class="t t-vnb" id="btn-vnb" onclick="handleVNBClick()"><span class="k">Vor-/Nach&shy;bereitung</span><span class="ic">📚</span><span class="v" id="vnb-tile-v"></span><span class="s" id="vnb-tile-s">antippen zum Starten</span></button>
+        <button class="t t-aus" id="btn-ausfall" onclick="handleAusfallClick()"><span class="k">Ausfall</span><span class="ic">📉</span><span class="v"></span><span class="s">Stunde fällt aus</span></button>
+    </div>
+
+    <div class="lab">Überblick</div>
+    <div class="grid">
+        <div class="t t-woche w2" id="week-tile">
+            <div class="ring" id="week-ring"><span id="week-percent">0%</span></div>
+            <div style="min-width:0;">
+                <span class="k">Diese Woche</span>
+                <div class="v" id="week-val">0 / 0 Std</div>
+                <div class="s" id="week-sub">Soll nach Stundenplan</div>
+                <div id="week-progress" style="display:none;"></div>
+            </div>
         </div>
+        <div class="t t-konto"><span class="k">Ausgleichs&shy;konto</span><span class="ic">⚖️</span><div class="v" id="balance-val">±0,0 Std</div><div class="s" id="balance-sub">Schuljahr</div></div>
+        <div class="t t-vzm"><span class="k">Vertretung</span><span class="ic">🔄</span><div class="v" id="vz-val">0 Std</div><div class="s" id="vz-hint">diesen Monat</div><div class="mini-bar vz-bar"><div id="vz-progress"></div><span class="mark"></span></div></div>
+        <div class="t t-term w2 wfull" id="next-termin-bar" onclick="openCalendar()" style="cursor:pointer;"><span class="k">Nächster Termin</span><span class="ic">📅</span><div class="v" id="next-termin-text" style="font-size:1.05rem;">Keine Termine</div><div class="s" id="next-termin-sub">Kalender öffnen zum Eintragen</div></div>
     </div>
 
     <div id="log-container"></div>
 
-    <div class="bottom-actions">
-        <button class="btn" style="background: #475569; padding: 12px; font-size:0.82rem;" onclick="openSetup()">⚙️ Einstellungen</button>
-        <button class="btn" style="background: #334155; padding: 12px; font-size:0.82rem;" onclick="openVerlauf()">📊 Verlauf</button>
-        <button class="btn btn-update-alert" style="padding: 12px; font-size:0.82rem;" onclick="forceUpdate()">🔄 Aktualisierung</button>
+    <div class="nav">
+        <button onclick="openCalendar()"><span class="mini-cal"><i></i><b id="fab-day-num">1</b><em id="fab-day-name">MO</em></span><br>Kalender<span class="today-dot" id="today-dot" style="display:none;"></span></button>
+        <button onclick="openVerlauf()"><span class="n-ic">📊</span>Verlauf</button>
+        <button onclick="openSetup()"><span class="n-ic">⚙️</span>Einstellungen</button>
+        <button class="btn-update-alert" onclick="forceUpdate()"><span class="n-ic">🔄</span>Update</button>
     </div>
+    <span id="soll-info" style="display:none;"></span>
 
     <div class="desktop-toggle-wrap">
         <span class="desktop-toggle-label">Ansicht:</span>
         <button class="desktop-toggle-btn" id="desktop-toggle-btn" onclick="toggleDesktopMode()">📱 Mobil</button>
     </div>
-    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v22.1</footer>
+    <footer class="footer-info">&copy; 2026 Michael Nagel &bull; v23.0</footer>
 </div>
+
  
 
  
@@ -392,6 +466,7 @@
         <button onclick="closeVZPopup()" style="background:var(--danger);color:white;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:900;">✕</button>
     </div>
     <span style="font-size:0.7rem;color:#94a3b8;font-weight:800;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Welche Klasse vertreten Sie?</span>
+    <div id="vz-start-info" style="font-size:0.78rem;color:#cbd5e1;background:rgba(255,255,255,0.05);border-radius:10px;padding:9px 11px;margin-bottom:10px;line-height:1.4;"></div>
     <input type="text" id="vz-class-input" placeholder="z.B. 8a, 10b, 7c..." style="width:100%;background:#0f172a;border:1.5px solid var(--danger);color:white;padding:14px;border-radius:12px;font-size:1rem;margin-bottom:15px;">
     <button onclick="startVZWithClass()" style="width:100%;background:linear-gradient(145deg,#ef4444,#dc2626);color:white;border:none;padding:15px;border-radius:14px;font-weight:900;font-size:1rem;cursor:pointer;">🔄 Vertretung starten</button>
     <button onclick="closeVZPopup()" style="width:100%;margin-top:8px;background:none;border:none;color:#475569;font-weight:700;padding:8px;cursor:pointer;">Abbrechen</button>
@@ -480,7 +555,7 @@
 <input type="file" id="backup-file-input" accept="application/json" style="display:none;" onchange="importBackup(event)">
 
 <script>
-    const APP_VERSION = "22.1";
+    const APP_VERSION = "23.0";
  
     // ─── STATE ────────────────────────────────────────────────────
     let db         = JSON.parse(localStorage.getItem('lehrerDB_Export'))    || [];
@@ -524,10 +599,6 @@
     // ─── INIT ─────────────────────────────────────────────────────
     // Veraltete Daten aus frueheren Versionen aufraeumen (SuS-Verwaltung, GitHub-Sync, alte Vertretungs-Session...)
     ['ghTokenV21','ghUserV21','ghRepoV21','susPlanV21','class1NameV21','class2NameV21','userEmailV21','vzSessionV13','sendLogV21','fixedDatesV21'].forEach(function(k){ localStorage.removeItem(k); });
-    // Woche-Wechsel-Hinweis: beim allerersten Start (kein Marker vorhanden) NICHT sofort meckern, sondern als "passt schon" werten
-    if (localStorage.getItem('weekSwitchAckV22') === null) {
-        localStorage.setItem('weekSwitchAckV22', String(targetWeekMonday(new Date())));
-    }
 
     window.onload = function() {
         // Name sofort aus localStorage setzen
@@ -539,35 +610,27 @@
         // Theme + Desktop-Modus beim Start anwenden
         applyTheme(userTheme);
         applyDesktopMode();
-
-        // Woche-Button sofort korrekt einfärben
-        const wbStart = document.getElementById('week-btn');
-        if (wbStart) {
-            wbStart.style.background = currentWeek === 'A' ? '#2563eb' : '#9333ea';
-            wbStart.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
-            wbStart.style.color = 'white';
-        }
         
         if (localStorage.getItem('lastSeenV') !== APP_VERSION) {
             document.getElementById('update-toast').style.display = 'block';
         }
+        initABAnchor();
+        syncCurrentWeek();
+        checkVZAutoStop();
         updateCalFab();
         updateUI();
         updateAssistant();
         updateWeekSwitchHint();
         updateNextTerminTicker();
-        // Woche-Button Farbe beim Start
-        const wbInit = document.getElementById('week-btn');
-        if (wbInit) {
-            wbInit.style.background = currentWeek === 'A' ? '#2563eb' : '#9333ea';
-            wbInit.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
-        }
+        renderBanners(true);
+        fxStart();
     };
 
     // ─── CLOCK & TICKER ──────────────────────────────────────────
     setInterval(() => {
         const now = new Date();
-        document.getElementById('live-clock').innerText = now.toLocaleTimeString('de-DE');
+        document.getElementById('live-clock').innerText = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        v23Tick();
         // live-date entfernt
  
         // midnight reset
@@ -579,7 +642,6 @@
             renderLogs();
         }
  
-        if (session.active) updateAssistant();
         updateUI();
         updateCalFab();
         updateWeekSwitchHint();
@@ -614,6 +676,8 @@
                 });
             }
         });
+        var tc = document.getElementById('termin-count');
+        if (tc) { tc.style.display = total > 0 ? 'flex' : 'none'; tc.innerText = total > 99 ? '99+' : String(total); tc.title = total + ' anstehende Termine'; }
         if (total > 0) {
             dot.style.display        = 'flex';
             dot.style.alignItems     = 'center';
@@ -665,85 +729,14 @@
         }
     }
 
-    function handleVZClick() {
-        if (vzMarker.active) {
-            if (confirm("Vertretung beenden?")) {
-                const vzTyp = vzMarker.klasse ? "Vertretung – Klasse " + vzMarker.klasse : "Vertretung";
-                saveToDB(vzTyp, vzMarker.start, Date.now(), null, { isVZ: true, excludeFromWeek: true });
-                vzMarker = { active: false }; localStorage.removeItem('vzMarkerV22'); addLog("Vertretung Ende");
-                updateUI();
-            }
-        } else {
-            // Popup öffnen für Klasseneingabe
-            document.getElementById('vz-popup').style.display = 'block';
-            document.getElementById('vz-popup-overlay').style.display = 'block';
-            document.getElementById('vz-class-input').value = '';
-            setTimeout(() => document.getElementById('vz-class-input').focus(), 100);
-        }
-    }
 
     function closeVZPopup() {
         document.getElementById('vz-popup').style.display = 'none';
         document.getElementById('vz-popup-overlay').style.display = 'none';
     }
 
-    function startVZWithClass() {
-        const klasse = document.getElementById('vz-class-input').value.trim();
-        // Vertretung laeuft immer als Teil des Hauptdienstes - startet ihn ggf. automatisch mit
-        if (!session.active) {
-            session = { active: true, start: Date.now() };
-            localStorage.setItem('activeSessionV13', JSON.stringify(session));
-            addLog("Dienst automatisch gestartet (Vertretung)");
-        }
-        vzMarker = { active: true, start: Date.now(), klasse: klasse };
-        localStorage.setItem('vzMarkerV22', JSON.stringify(vzMarker));
-        addLog("Vertretung Start" + (klasse ? " – " + klasse : ""));
-        closeVZPopup();
-        updateUI();
-    }
 
-    function handleExtraClick() {
-        if (extraSession.active) {
-            if (confirm("Termin beenden?")) {
-                // Laeuft der Hauptdienst gerade noch, ist diese Zeit dort schon mit erfasst -
-                // nicht nochmal zu den Wochenstunden dazuzaehlen (sonst Doppelzaehlung).
-                saveToDB('Konferenz', extraSession.start, Date.now(), null, { excludeFromWeek: session.active });
-                extraSession = { active: false }; localStorage.removeItem('extraSessionV13'); addLog("Konf. Ende");
-            }
-        } else {
-            if (!confirmExtra) {
-                confirmExtra = true;
-                document.getElementById('btn-extra').innerText = "Sicher?";
-                document.getElementById('btn-extra').classList.add('btn-confirm');
-                setTimeout(() => { confirmExtra = false; updateUI(); }, 3000);
-            } else {
-                extraSession = { active: true, start: Date.now() };
-                localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
-                addLog("Konf. Start"); confirmExtra = false; updateUI();
-            }
-        }
-    }
  
-    function handleVNBClick() {
-        if (vnbSession.active) {
-            if (confirm("Vor-/Nachbereitung beenden?")) {
-                // Falls doch mal parallel zum laufenden Hauptdienst gestartet: nicht doppelt zaehlen.
-                saveToDB('Vor-/Nachbereitung', vnbSession.start, Date.now(), null, { excludeFromWeek: session.active });
-                vnbSession = { active: false }; localStorage.removeItem('vnbSessionV13'); addLog("VNB Ende");
-            }
-        } else {
-            if (!confirmVNB) {
-                confirmVNB = true;
-                document.getElementById('btn-vnb').innerText = "Sicher?";
-                document.getElementById('btn-vnb').classList.add('btn-confirm');
-                setTimeout(() => { confirmVNB = false; updateUI(); }, 3000);
-            } else {
-                vnbSession = { active: true, start: Date.now() };
-                localStorage.setItem('vnbSessionV13', JSON.stringify(vnbSession));
-                addLog("VNB Start"); confirmVNB = false; updateUI();
-            }
-        }
-    }
 
     // ─── AUSFALL / MINUSSTUNDEN ─────────────────────────────────────
     function getTodayPlanBlocks() {
@@ -850,187 +843,7 @@
     }
 
     // ─── UI UPDATE ────────────────────────────────────────────────
-    function updateUI() {
-        const btnMain = document.getElementById('btn-main');
-        if (session.active) {
-            document.getElementById('main-timer').innerText = formatTime(Date.now() - session.start);
-            btnMain.innerText = "Dienst beenden"; btnMain.className = "btn btn-stop";
-        } else {
-            document.getElementById('main-timer').innerText = "00:00:00";
-            btnMain.innerText = "Dienst starten"; btnMain.className = "btn btn-start";
-        }
  
-        const vzBtn = document.getElementById('btn-vz');
-        if (vzMarker.active) {
-            vzBtn.innerText = `Vertretung läuft (${formatTime(Date.now() - vzMarker.start)})`;
-            vzBtn.classList.add('active'); vzBtn.classList.remove('btn-confirm');
-        } else if (!confirmVZ) { vzBtn.innerText = "Vertretung"; vzBtn.classList.remove('active', 'btn-confirm'); }
-
-        const exBtn = document.getElementById('btn-extra');
-        if (extraSession.active) {
-            exBtn.innerText = `LÄUFT (${formatTime(Date.now() - extraSession.start)})`;
-            exBtn.classList.add('active'); exBtn.classList.remove('btn-confirm', 'btn-pulse');
-        } else if (!confirmExtra) { exBtn.innerText = "Konferenz / Termin"; exBtn.classList.remove('active', 'btn-confirm'); }
-
-        const vnbBtn = document.getElementById('btn-vnb');
-        if (vnbBtn) {
-            if (vnbSession.active) {
-                vnbBtn.innerText = `📚 LÄUFT (${formatTime(Date.now() - vnbSession.start)})`;
-                vnbBtn.classList.add('active'); vnbBtn.classList.remove('btn-confirm');
-            } else if (!confirmVNB) {
-                vnbBtn.innerText = "📚 Vor-/Nachbereitung";
-                vnbBtn.classList.remove('active', 'btn-confirm');
-            }
-        }
-
-        const now = new Date();
-        // VZ-Zaehler: nur die Anzahl der Vertretungsstunden diesen Monat, bewusst ohne "max."-Aussage
-        const vzCount = db.filter(e => {
-            const parts = e.datum.split('.');
-            return parseInt(parts[1]) === (now.getMonth() + 1) && parseInt(parts[2]) === now.getFullYear() && e.isVZ === 'JA';
-        }).length;
-        document.getElementById('vz-val').innerText = vzCount;
-        document.getElementById('vz-progress').style.width = Math.min((vzCount / VZ_BAR_SCALE) * 100, 100) + "%";
-
-        // Week total (Vertretung laeuft mit Hauptdienst mit, Ausfall zaehlt nicht als geleistete Zeit)
-        function getMonday(d) {
-            d = new Date(d); var day = d.getDay(), diff = d.getDate() - day + (day === 0 ? -6 : 1);
-            return new Date(d.setDate(diff)).setHours(0,0,0,0);
-        }
-        const monday = getMonday(now);
-        let weekAusfallMS = 0;
-        let weekMS = db.filter(e => {
-            const parts = e.datum.split('.');
-            const isThisWeek = new Date(parts[2], parts[1]-1, parts[0]).getTime() >= monday;
-            if (!isThisWeek) return false;
-            if (e.isAusfall === 'JA') { weekAusfallMS += (e.ms || 0); return false; }
-            if (e.excludeFromWeek === 'JA') return false; // war schon Teil eines anderen erfassten Zeitraums
-            return true;
-        }).reduce((acc, curr) => acc + (curr.ms || 0), 0);
-        if (session.active) weekMS += (Date.now() - session.start);
-        // Konferenz/VNB nur zusaetzlich zaehlen, wenn der Hauptdienst NICHT parallel laeuft
-        // (sonst waere die ueberlappende Zeit doppelt erfasst)
-        if (extraSession.active && !session.active) weekMS += (Date.now() - extraSession.start);
-        if (vnbSession.active && !session.active)   weekMS += (Date.now() - vnbSession.start);
-
-        const targetMS  = Math.max(0, weeklySollHours * 3600000 - weekAusfallMS);
-        const weekPerc  = targetMS > 0 ? Math.round((weekMS / targetMS) * 100) : 100;
-        const weekFill  = document.getElementById('week-progress');
-        if (weekFill) {
-            const targetH = (targetMS / 3600000).toFixed(1).replace('.', ',');
-            const ausfallNote = weekAusfallMS > 0 ? ` (Soll um ${(weekAusfallMS/3600000).toFixed(1).replace('.', ',')} Std Ausfall reduziert)` : '';
-            document.getElementById('week-percent').innerText = weekPerc + '% (' + (weekMS/3600000).toFixed(1).replace('.', ',') + ' / ' + targetH + ' Std)' + ausfallNote;
-            if (weekPerc >= 100) { weekFill.style.width = "100%"; weekFill.style.background = "var(--overtime)"; }
-            else { weekFill.style.width = weekPerc + "%"; weekFill.style.background = "var(--success)"; }
-        }
-
-        // Ausgleichskonto (Minus/Plus uebers Schuljahr)
-        const balance = computeSchoolYearBalance();
-        const balEl = document.getElementById('balance-val');
-        if (balEl) {
-            const balH = (balance.saldoMS / 3600000);
-            balEl.innerText = (balH >= 0 ? '+' : '') + balH.toFixed(1).replace('.', ',') + ' Std';
-            balEl.style.color = balH > 0 ? 'var(--success)' : (balH < 0 ? 'var(--danger)' : '#94a3b8');
-        }
-
-        // Day progress
-        try {
-            var dp_now    = new Date();
-            var dp_dow    = dp_now.getDay();
-            var dp_nowMin = dp_now.getHours()*60 + dp_now.getMinutes();
-            var dp_perc   = 0;
-
-            if (dp_dow >= 1 && dp_dow <= 5) {
-                // Stundenplan lesen
-                var dp_dayKey = currentWeek + '-' + ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][dp_dow];
-                var dp_first  = 999, dp_last = 0, dp_hasPlan = false;
-                for (var di = 0; di < blocks.length; di++) {
-                    var dpb = blocks[di];
-                    var dbVal = (plan[dp_dayKey] && plan[dp_dayKey][dpb.id]) ? plan[dp_dayKey][dpb.id].trim() : '';
-                    if (dbVal) {
-                        dp_hasPlan = true;
-                        var dsp = dpb.start.split(':');
-                        var dep = dpb.end.split(':');
-                        var dsMin = parseInt(dsp[0])*60 + parseInt(dsp[1]);
-                        var deMin = parseInt(dep[0])*60 + parseInt(dep[1]);
-                        if (dsMin < dp_first) dp_first = dsMin;
-                        if (deMin > dp_last)  dp_last  = deMin;
-                    }
-                }
-                // Fallback 07:30-13:00
-                if (!dp_hasPlan) { dp_first = 450; dp_last = 780; }
-                var dp_elapsed = dp_nowMin - dp_first;
-                if (dp_elapsed < 0) dp_elapsed = 0;
-                var dp_total = dp_last - dp_first;
-                if (dp_total < 1) dp_total = 1;
-                dp_perc = Math.round((dp_elapsed / dp_total) * 100);
-                if (dp_perc > 100) dp_perc = 100;
-            }
-            document.getElementById('day-percent').innerText = dp_perc + "%";
-            document.getElementById('day-progress').style.width = dp_perc + "%";
-        } catch(e) {
-            document.getElementById('day-percent').innerText = "–";
-        }
- 
-        if (document.getElementById('week-label')) document.getElementById('week-label').innerText = currentWeek;
-        const wBtn = document.getElementById('week-btn');
-        if (wBtn) {
-            wBtn.style.background = currentWeek === 'A' ? '#2563eb' : '#9333ea';
-            wBtn.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
-        }
-        document.getElementById('display-name').innerText = userName.toUpperCase();
-        document.getElementById('soll-info').innerText = weeklySollHours;
-        renderLogs();
-    }
- 
-    function updateAssistant() {
-        const now = new Date(), currentTime = now.getHours() * 60 + now.getMinutes();
-        const tag = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][now.getDay()];
-        const key = `${currentWeek}-${tag}`;
-        const todayKey = toLocalDateKey(now);
-
-        let activeTask = null, nextTask = null;
-
-        // SCHRITT 1: Stundenplan zuerst – aktiver Block + nächster Block
-        for (let i = 0; i < blocks.length; i++) {
-            const b = blocks[i];
-            const [sh, sm] = b.start.split(':').map(Number);
-            const [eh, em] = b.end.split(':').map(Number);
-            const sMin = sh*60+sm, eMin = eh*60+em;
-            const text = plan[key]?.[b.id];
-            if (!text?.trim()) continue;
-            if (currentTime >= sMin && currentTime < eMin) {
-                activeTask = { text, label: b.label };
-            } else if (currentTime < sMin && !nextTask) {
-                nextTask = { text, label: b.label };
-            }
-        }
-
-        // SCHRITT 2: Kalender-Termine
-        const todayEntries = (calEntries[todayKey] || []).filter(e => e.start);
-        todayEntries.forEach(e => {
-            const [sh, sm] = e.start.split(':').map(Number);
-            const sMin = sh * 60 + sm;
-            const eMin = e.end ? (() => { const [eh, em] = e.end.split(':').map(Number); return eh*60+em; })() : sMin + 60;
-
-            // Kalender überschreibt aktiven Block wenn Termin gerade läuft
-            if (currentTime >= sMin && currentTime < eMin) {
-                activeTask = { text: (e.cat === 'Vertretung' ? '🔄 ' : '') + e.title, label: e.cat, isCalendar: true };
-            }
-            // Kalender-Termin als Nächstes NUR wenn kein Stundenplan-Block mehr kommt
-            else if (currentTime < sMin && !nextTask) {
-                nextTask = { text: e.title, label: e.start + ' Uhr', isCalendar: true };
-            }
-        });
-
-        const nowEl  = document.getElementById('task-now');
-        const nextEl = document.getElementById('task-next');
-
-        nowEl.innerText  = activeTask ? activeTask.text : "Frei / Pause";
-        document.getElementById('task-now-sub').innerText = activeTask ? activeTask.label : "-";
-        nextEl.innerText = nextTask ? nextTask.text : "FEIERABEND!";
-        document.getElementById('task-next-sub').innerText = nextTask ? nextTask.label : "Alles erledigt.";
-    }
 
     // ─── NAECHSTER-TERMIN-LEISTE (unabhaengig vom Stundenplan-Abgleich oben: zeigt den
     // naechsten selbst eingetragenen Kalender-Termin, egal wie weit er noch weg ist) ────
@@ -1053,24 +866,6 @@
             });
         });
         return best ? { entry: best, dateKey: bestDateKey } : null;
-    }
-    function updateNextTerminTicker() {
-        const bar = document.getElementById('next-termin-bar');
-        const textEl = document.getElementById('next-termin-text');
-        if (!bar || !textEl) return;
-        const res = getNextUpcomingTermin();
-        if (!res) { bar.style.display = 'none'; return; }
-        const now = new Date();
-        const todayKey = toLocalDateKey(now);
-        const tomorrowKey = toLocalDateKey(new Date(now.getTime() + 86400000));
-        let dayLabel;
-        if (res.dateKey === todayKey) dayLabel = 'Heute';
-        else if (res.dateKey === tomorrowKey) dayLabel = 'Morgen';
-        else { const p = res.dateKey.split('-'); dayLabel = p[2] + '.' + p[1] + '.'; }
-        const e = res.entry;
-        const whenStr = e.start ? (dayLabel + ', ' + e.start + ' Uhr') : dayLabel;
-        textEl.innerText = 'Nächster Termin: ' + e.title + ' – ' + whenStr + (e.note ? ' (' + e.note + ')' : '');
-        bar.style.display = 'flex';
     }
 
     // ─── CALENDAR ─────────────────────────────────────────────────
@@ -1147,122 +942,695 @@
 
 
     // ─── BRANDENBURGER FERIEN & FEIERTAGE ────────────────────────
+
+
+ 
+
+    // ══════════════════════════════════════════════════════════════
+    // v23: SCHULKALENDER BRANDENBURG (Ferien + Feiertage)
+    // Quelle Ferien: VV-Schulbetrieb Anlage 1 (MBJS Brandenburg), Stand Okt. 2026.
+    // Bewegliche Ferientage: jeweils der landesweite Standardtermin – die Schulkonferenz
+    // kann abweichend festlegen.
+    // ══════════════════════════════════════════════════════════════
+    const FERIEN_BB = [
+        ['2025-07-24','2025-09-06','Sommerferien','☀️'],
+        ['2025-10-20','2025-11-01','Herbstferien','🍂'],
+        ['2025-12-22','2026-01-02','Weihnachtsferien','🎄'],
+        ['2026-02-02','2026-02-07','Winterferien','❄️'],
+        ['2026-03-30','2026-04-10','Osterferien','🐣'],
+        ['2026-05-15','2026-05-15','Beweglicher Ferientag','🌿'],
+        ['2026-05-26','2026-05-26','Pfingstferien','🕊️'],
+        ['2026-07-09','2026-08-22','Sommerferien','☀️'],
+        ['2026-10-19','2026-10-30','Herbstferien','🍂'],
+        ['2026-12-23','2027-01-02','Weihnachtsferien','🎄'],
+        ['2027-02-01','2027-02-06','Winterferien','❄️'],
+        ['2027-03-22','2027-04-03','Osterferien','🐣'],
+        ['2027-05-07','2027-05-07','Beweglicher Ferientag','🌿'],
+        ['2027-05-18','2027-05-18','Pfingstferien','🕊️'],
+        ['2027-07-01','2027-08-14','Sommerferien','☀️'],
+        ['2027-10-11','2027-10-23','Herbstferien','🍂'],
+        ['2027-12-23','2027-12-31','Weihnachtsferien','🎄'],
+        ['2028-01-31','2028-02-05','Winterferien','❄️'],
+        ['2028-04-10','2028-04-22','Osterferien','🐣'],
+        ['2028-05-26','2028-05-26','Beweglicher Ferientag','🌿'],
+        ['2028-06-29','2028-08-12','Sommerferien','☀️'],
+        ['2028-10-02','2028-10-14','Herbstferien','🍂'],
+        ['2028-10-30','2028-10-30','Beweglicher Ferientag','🌿'],
+        ['2028-12-22','2029-01-02','Weihnachtsferien','🎄'],
+        ['2029-01-29','2029-02-03','Winterferien','❄️'],
+        ['2029-03-26','2029-04-06','Osterferien','🐣'],
+        ['2029-04-30','2029-04-30','Beweglicher Ferientag','🌿'],
+        ['2029-05-11','2029-05-11','Beweglicher Ferientag','🌿'],
+        ['2029-05-22','2029-05-22','Pfingstferien','🕊️'],
+        ['2029-06-28','2029-08-11','Sommerferien','☀️']
+    ];
+    const DAY_NAMES = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    const DAY_SHORT = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+    const MONTH_NAMES = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    const VZ_AUTO_MS = 90 * 60000;           // Vertretung stoppt nach einem Block (90 Min.)
+    const UE_MS = 45 * 60000;                // 1 Unterrichtsstunde = 45 Min.
+
+    function toMin(hhmm) { const p = String(hhmm).split(':'); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); }
+    function parseKey(k) { const p = k.split('-'); return new Date(+p[0], +p[1] - 1, +p[2], 12); }
+    function addDays(d, n) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12); x.setDate(x.getDate() + n); return x; }
+    function mondayOf(d) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12); const wd = x.getDay() || 7; x.setDate(x.getDate() - wd + 1); return x; }
+    function fmtDM(d) { return DAY_SHORT[d.getDay()] + ' ' + String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.'; }
+    function fmtH(ms) { const neg = ms < 0; ms = Math.abs(ms); const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000); return (neg ? '-' : '') + h + ':' + String(m).padStart(2,'0') + ' h'; }
+    function fmtStd(ms) { return (ms / 3600000).toFixed(1).replace('.', ','); }
+    function minToStr(m) { return String(Math.floor(m/60)).padStart(2,'0') + ':' + String(m%60).padStart(2,'0'); }
+    function dbDate(e) { const p = (e.datum || '').split('.'); return p.length === 3 ? new Date(+p[2], +p[1] - 1, +p[0], 12) : null; }
+    function lsGet(k, def) { try { const v = localStorage.getItem(k); return v === null ? def : v; } catch (err) { return def; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (err) {} }
+
+    function osterSonntag(y) {
+        const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4,
+              f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,
+              i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+              month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+        return new Date(y, month - 1, day, 12);
+    }
+
+    const VORB_TAGE = {};   // dateKey -> true (letzte 3 Arbeitstage vor Schulbeginn nach den Sommerferien)
+
     function getBrandenburgHolidays() {
         const holidays = {};
-
-        // Gesetzliche Feiertage Brandenburg (jährlich wiederkehrend + fix)
-        const fixedHolidays = {
-            '01-01': 'Neujahr 🎆',
-            '05-01': 'Tag der Arbeit 🌱',
-            '10-03': 'Tag der Deutschen Einheit 🇩🇪',
-            '10-31': 'Reformationstag ⛪',
-            '12-25': '1. Weihnachtstag 🎄',
-            '12-26': '2. Weihnachtstag 🎄',
-        };
-
-        // Bewegliche Feiertage (Ostern-basiert) für 2025-2027
-        const movingHolidays = {
-            '2025': {
-                '04-18': 'Karfreitag ✝️',
-                '04-20': 'Ostersonntag 🐣',
-                '04-21': 'Ostermontag 🐣',
-                '05-29': 'Christi Himmelfahrt ✝️',
-                '06-08': 'Pfingstsonntag 🕊️',
-                '06-09': 'Pfingstmontag 🕊️',
-            },
-            '2026': {
-                '04-03': 'Karfreitag ✝️',
-                '04-05': 'Ostersonntag 🐣',
-                '04-06': 'Ostermontag 🐣',
-                '05-14': 'Christi Himmelfahrt ✝️',
-                '05-24': 'Pfingstsonntag 🕊️',
-                '05-25': 'Pfingstmontag 🕊️',
-            },
-            '2027': {
-                '03-26': 'Karfreitag ✝️',
-                '03-28': 'Ostersonntag 🐣',
-                '03-29': 'Ostermontag 🐣',
-                '05-06': 'Christi Himmelfahrt ✝️',
-                '05-16': 'Pfingstsonntag 🕊️',
-                '05-17': 'Pfingstmontag 🕊️',
-            }
-        };
-
-        // Schulferien Brandenburg 2025/2026
-        const schoolHolidays = [
-            // 2025
-            { start: '2025-01-01', end: '2025-01-03',  name: 'Winterferien 2025 ❄️' },
-            { start: '2025-03-03', end: '2025-03-14',  name: 'Frühjahrsferien 2025 🌸' },
-            { start: '2025-04-14', end: '2025-04-25',  name: 'Osterferien 2025 🐣' },
-            { start: '2025-05-30', end: '2025-05-30',  name: 'Brückentag 2025' },
-            { start: '2025-07-03', end: '2025-08-15',  name: 'Sommerferien 2025 ☀️' },
-            { start: '2025-10-06', end: '2025-10-17',  name: 'Herbstferien 2025 🍂' },
-            { start: '2025-12-22', end: '2026-01-02',  name: 'Weihnachtsferien 2025/26 🎄' },
-            // 2026
-            { start: '2026-02-02', end: '2026-02-06',  name: 'Winterferien 2026 ❄️' },
-            { start: '2026-03-23', end: '2026-04-10',  name: 'Osterferien 2026 🐣' },
-            { start: '2026-05-26', end: '2026-05-26',  name: 'Pfingstferien 2026 🌸' },
-            { start: '2026-07-09', end: '2026-08-22',  name: 'Sommerferien 2026 ☀️' },
-            { start: '2026-10-19', end: '2026-10-30',  name: 'Herbstferien 2026 🍂' },
-            { start: '2026-12-23', end: '2027-01-02',  name: 'Weihnachtsferien 2026/27 🎄' },
-            // 2027
-            { start: '2027-02-01', end: '2027-02-06',  name: 'Winterferien 2027 ❄️' },
-            { start: '2027-03-22', end: '2027-04-03',  name: 'Osterferien 2027 🐣' },
-            { start: '2027-05-07', end: '2027-05-07',  name: 'Brückentag 2027 🌸' },
-        ];
-
-        // Jahre 2025-2027 befüllen
-        [2025, 2026, 2027].forEach(year => {
-            // Feste Feiertage
-            Object.entries(fixedHolidays).forEach(([mmdd, name]) => {
-                holidays[`${year}-${mmdd}`] = { title: name, cat: 'Feiertag' };
-            });
-            // Bewegliche Feiertage
-            if (movingHolidays[year]) {
-                Object.entries(movingHolidays[year]).forEach(([mmdd, name]) => {
-                    holidays[`${year}-${mmdd}`] = { title: name, cat: 'Feiertag' };
-                });
-            }
-        });
-
-        // Schulferien – alle Tage eintragen
-        schoolHolidays.forEach(({ start, end, name }) => {
-            const s = new Date(start + 'T12:00:00');
-            const e = new Date(end + 'T12:00:00');
-            for (let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
+        for (let y = 2025; y <= 2030; y++) {
+            const fixed = { '01-01': 'Neujahr 🎆', '05-01': 'Tag der Arbeit 🌱', '10-03': 'Tag der Deutschen Einheit 🇩🇪',
+                            '10-31': 'Reformationstag ⛪', '12-25': '1. Weihnachtstag 🎄', '12-26': '2. Weihnachtstag 🎄' };
+            Object.keys(fixed).forEach(function(mmdd) { holidays[y + '-' + mmdd] = { title: fixed[mmdd], cat: 'Feiertag' }; });
+            const os = osterSonntag(y);
+            [[-2,'Karfreitag ✝️'],[0,'Ostersonntag 🐣'],[1,'Ostermontag 🐣'],[39,'Christi Himmelfahrt ✝️'],[49,'Pfingstsonntag 🕊️'],[50,'Pfingstmontag 🕊️']]
+                .forEach(function(p) { holidays[toLocalDateKey(addDays(os, p[0]))] = { title: p[1], cat: 'Feiertag' }; });
+        }
+        FERIEN_BB.forEach(function(f) {
+            const s = parseKey(f[0]), e = parseKey(f[1]);
+            for (let d = new Date(s); d <= e; d = addDays(d, 1)) {
                 const key = toLocalDateKey(d);
-                if (!holidays[key]) {
-                    holidays[key] = { title: name, cat: 'Ferien' };
-                }
+                if (!holidays[key]) holidays[key] = { title: f[2] + ' ' + f[3], cat: 'Ferien', name: f[2], emoji: f[3], start: f[0], end: f[1] };
             }
         });
-
         return holidays;
     }
-
     const BB_HOLIDAYS = getBrandenburgHolidays();
 
-    // Simple A/B week detection based on KW parity
-    function getABWeek(date) {
-        const kw = getKW(date);
-        // Use stored override if in current week
-        const now = new Date();
-        if (getKW(now) === kw) return currentWeek;
-        // Otherwise alternate from current
-        const diff = kw - getKW(now);
-        const flip = Math.abs(diff) % 2 !== 0;
-        if (flip) return currentWeek === 'A' ? 'B' : 'A';
-        return currentWeek;
+    function dayInfo(d) {
+        const h = BB_HOLIDAYS[toLocalDateKey(d)];
+        if (h && h.cat === 'Feiertag') return { type: 'feiertag', title: h.title };
+        if (h && h.cat === 'Ferien')   return { type: 'ferien', title: h.title, h: h };
+        const wd = d.getDay();
+        if (wd === 0 || wd === 6) return { type: 'wochenende' };
+        return { type: 'schule' };
     }
- 
+    function istSchultag(d) { return dayInfo(d).type === 'schule'; }
+    function istArbeitstag(d) { const wd = d.getDay(); return wd >= 1 && wd <= 5 && !(BB_HOLIDAYS[toLocalDateKey(d)] && BB_HOLIDAYS[toLocalDateKey(d)].cat === 'Feiertag'); }
+    function nextSchultag(d) { let x = addDays(d, 1); for (let i = 0; i < 160; i++) { if (istSchultag(x)) return x; x = addDays(x, 1); } return null; }
+    const _swCache = {};
+    function istSchulwoche(mon) {
+        const k = toLocalDateKey(mon);
+        if (_swCache[k] === undefined) { let r = false; for (let i = 0; i < 5; i++) if (istSchultag(addDays(mon, i))) r = true; _swCache[k] = r; }
+        return _swCache[k];
+    }
+    function naechsteSchulwoche(mon) { let m = new Date(mon); for (let i = 0; i < 30 && !istSchulwoche(m); i++) m = addDays(m, 7); return m; }
+
+    // Vorbereitungstage: die letzten 3 Arbeitstage vor dem ersten Schultag nach den Sommerferien
+    FERIEN_BB.filter(function(f) { return f[2] === 'Sommerferien'; }).forEach(function(f) {
+        const first = nextSchultag(parseKey(f[1]));
+        if (!first) return;
+        let d = addDays(first, -1), n = 0;
+        while (n < 3) { if (istArbeitstag(d)) { VORB_TAGE[toLocalDateKey(d)] = true; n++; } d = addDays(d, -1); }
+    });
+    Object.keys(VORB_TAGE).forEach(function(k) { if (BB_HOLIDAYS[k]) BB_HOLIDAYS[k].title += ' · 🧰 Vorbereitungstag'; });
+
+    // ─── A/B-WOCHE automatisch (Ferienwochen zaehlen nicht) ──────────
+    // Anker: eine Schulwoche (Montag) mit bekanntem Buchstaben. Jede weitere Woche mit
+    // mindestens einem Schultag wechselt A <-> B. Manuelles Umschalten setzt den Anker neu.
+    let abAnchor = null;
+    try { abAnchor = JSON.parse(lsGet('abAnchorV23', 'null')); } catch (err) { abAnchor = null; }
+    function initABAnchor() {
+        if (abAnchor && abAnchor.mon && (abAnchor.week === 'A' || abAnchor.week === 'B')) return;
+        // Erststart von v23: bisher eingestellte Woche gehoert zur letzten Schulwoche bis heute
+        let mon = mondayOf(new Date());
+        for (let i = 0; i < 30 && !istSchulwoche(mon); i++) mon = addDays(mon, -7);
+        abAnchor = { mon: toLocalDateKey(mon), week: currentWeek === 'B' ? 'B' : 'A' };
+        lsSet('abAnchorV23', JSON.stringify(abAnchor));
+    }
+    const _abCache = {};
+    function abWeekFor(d) {
+        initABAnchor();
+        const target = naechsteSchulwoche(mondayOf(d));
+        const tk = toLocalDateKey(target) + '|' + abAnchor.mon + abAnchor.week;
+        if (_abCache[tk]) return _abCache[tk];
+        const anc = naechsteSchulwoche(parseKey(abAnchor.mon));
+        let flips = 0, m;
+        if (target > anc) { for (m = addDays(anc, 7); m <= target; m = addDays(m, 7)) if (istSchulwoche(m)) flips++; }
+        else if (target < anc) { for (m = addDays(anc, -7); m >= target; m = addDays(m, -7)) if (istSchulwoche(m)) flips++; }
+        const w = (flips % 2 === 0) ? abAnchor.week : (abAnchor.week === 'A' ? 'B' : 'A');
+        _abCache[tk] = w;
+        return w;
+    }
+    // Woche, um die es fuer den Woche-Knopf gerade geht: Mo-Fr einer Schulwoche = diese Woche,
+    // am Wochenende / in den Ferien = die naechste Schulwoche.
+    function weekButtonTarget(now) {
+        const mon = mondayOf(now);
+        const wd = now.getDay();
+        if (istSchulwoche(mon) && wd >= 1 && wd <= 5) return mon;
+        return naechsteSchulwoche(addDays(mon, 7));
+    }
+    function getABWeek(date) {
+        const mon = mondayOf(date);
+        return istSchulwoche(mon) ? abWeekFor(mon) : 'FERIEN';
+    }
+
+    function toggleWeekManual() {
+        const target = weekButtonTarget(new Date());
+        const cur = abWeekFor(target);
+        abAnchor = { mon: toLocalDateKey(target), week: cur === 'A' ? 'B' : 'A' };
+        lsSet('abAnchorV23', JSON.stringify(abAnchor));
+        Object.keys(_abCache).forEach(function(k) { delete _abCache[k]; });
+        ackWeekSwitch();
+        syncCurrentWeek();
+        updateUI();
+        updateAssistant();
+    }
+    function weekAckKey() { const t = weekButtonTarget(new Date()); return toLocalDateKey(t) + '|' + abWeekFor(t); }
+    function ackWeekSwitch() { lsSet('abAckV23', weekAckKey()); updateWeekSwitchHint(); }
+    function updateWeekSwitchHint() {
+        const el = document.getElementById('week-switch-hint');
+        if (!el) return;
+        const key = weekAckKey();
+        if (lsGet('abAckV23', '') === key) { el.style.display = 'none'; return; }
+        const now = new Date(), t = weekButtonTarget(now), w = key.split('|')[1];
+        const thisWeek = toLocalDateKey(t) === toLocalDateKey(mondayOf(now));
+        el.innerHTML = '🔄 ' + (thisWeek ? 'Diese Woche ist automatisch <b>Woche ' + w + '</b>' : 'Ab ' + fmtDM(t) + ' automatisch <b>Woche ' + w + '</b>') +
+                       ' – antippen = passt · stimmt nicht? Oben auf „Woche“ tippen';
+        el.style.display = 'block';
+    }
+    function syncCurrentWeek() {
+        const w = abWeekFor(new Date());
+        if (w !== currentWeek) { currentWeek = w; lsSet('manualWeekV13', w); }
+    }
+
+    // ─── SOLL NACH STUNDENPLAN ──────────────────────────────────────
+    function planHasEntries() {
+        return Object.keys(plan).some(function(k) { return plan[k] && Object.keys(plan[k]).some(function(b) { return (plan[k][b] || '').trim(); }); });
+    }
+    function ausfallStartsFor(d) {
+        const k = toLocalDateKey(d);
+        return db.filter(function(e) { const dd = dbDate(e); return e.isAusfall === 'JA' && dd && toLocalDateKey(dd) === k; }).map(function(e) { return e.start; });
+    }
+    // Tages-Soll = Anwesenheit 7:30-13:00, mit 4. Block bis 15:15 (Frueh-/Spaetaufsicht verlaengern entsprechend).
+    // Ausgefallene Bloecke zaehlen nicht mit (faellt z.B. der 4. Block aus, endet der Tag um 13:00).
+    function tagesSoll(d) {
+        const info = dayInfo(d);
+        const res = { ms: 0, info: info, frei: false, start: null, end: null, blocks: 0, ausfall: 0 };
+        if (info.type !== 'schule') return res;
+        if (!planHasEntries()) { res.fallback = true; res.ms = (parseFloat(weeklySollHours) || 0) * 3600000 / 5; return res; }
+        const p = plan[abWeekFor(d) + '-' + DAY_NAMES[d.getDay()]] || {};
+        const aus = ausfallStartsFor(d);
+        let first = null, last = null;
+        blocks.forEach(function(b) {
+            if (!(p[b.id] || '').trim()) return;
+            if (aus.indexOf(b.start) >= 0) { res.ausfall++; return; }
+            if (b.id.charAt(0) === 'b') res.blocks++;
+            const s = toMin(b.start), e = toMin(b.end);
+            first = first === null ? s : Math.min(first, s);
+            last  = last  === null ? e : Math.max(last, e);
+        });
+        if (first === null) { res.frei = true; return res; }
+        res.start = Math.min(450, first); res.end = Math.max(780, last);
+        res.ms = (res.end - res.start) * 60000;
+        return res;
+    }
+    function wochenSoll(now) {
+        const mon = mondayOf(now);
+        let ms = 0, schultage = 0;
+        for (let i = 0; i < 5; i++) { const t = tagesSoll(addDays(mon, i)); ms += t.ms; if (t.info.type === 'schule') schultage++; }
+        return { ms: ms, schultage: schultage, mon: mon };
+    }
+    // Erfasste Arbeitszeit in einem Zeitraum (Vertretung/ueberlappende Zeiten nicht doppelt, Ausfall zaehlt nicht)
+    function istZeit(fromD, toD, includeRunning) {
+        const from = new Date(fromD.getFullYear(), fromD.getMonth(), fromD.getDate()).getTime();
+        const to   = new Date(toD.getFullYear(), toD.getMonth(), toD.getDate()).getTime() + 86400000;
+        let ms = 0;
+        db.forEach(function(e) {
+            const d = dbDate(e); if (!d) return;
+            const t = d.getTime(); if (t < from || t >= to) return;
+            if (e.isAusfall === 'JA' || e.excludeFromWeek === 'JA') return;
+            ms += (e.ms || 0);
+        });
+        if (includeRunning) {
+            const nowT = Date.now();
+            if (session.active && session.start >= from) ms += nowT - session.start;
+            if (extraSession.active && !session.active) ms += nowT - extraSession.start;
+            if (vnbSession.active && !session.active)   ms += nowT - vnbSession.start;
+        }
+        return ms;
+    }
+
+    // ─── VERTRETUNG ─────────────────────────────────────────────────
+    function vzStd(ms) { return Math.max(1, Math.round((ms || 0) / UE_MS)); }
+    function vertretungMonat(now) {
+        let std = 0, n = 0;
+        db.forEach(function(e) {
+            if (e.isVZ !== 'JA') return;
+            const d = dbDate(e); if (!d) return;
+            if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) { std += vzStd(e.ms); n++; }
+        });
+        return { std: std, n: n };
+    }
+    function laufenderBlock(now) {
+        const m = now.getHours() * 60 + now.getMinutes();
+        return blocks.find(function(b) { return b.id.charAt(0) === 'b' && m >= toMin(b.start) && m < toMin(b.end); }) || null;
+    }
+    function vzStartFuer(now) {
+        const b = laufenderBlock(now);
+        if (!b) return { ts: now.getTime(), block: null };
+        const s = toMin(b.start);
+        return { ts: new Date(now.getFullYear(), now.getMonth(), now.getDate(), Math.floor(s / 60), s % 60, 0, 0).getTime(), block: b };
+    }
+    function vzTyp() { return vzMarker.klasse ? 'Vertretung – Klasse ' + vzMarker.klasse : 'Vertretung'; }
+
+    function handleVZClick() {
+        if (vzMarker.active) {
+            if (confirm('Vertretung jetzt beenden? (Sie stoppt sonst automatisch nach 90 Min.)')) {
+                saveToDB(vzTyp(), vzMarker.start, Date.now(), null, { isVZ: true, excludeFromWeek: true });
+                vzMarker = { active: false }; localStorage.removeItem('vzMarkerV22'); addLog('Vertretung Ende');
+                updateUI();
+            }
+        } else {
+            const st = vzStartFuer(new Date());
+            const info = document.getElementById('vz-start-info');
+            if (info) info.innerHTML = st.block
+                ? '⏱ Zählt ab Blockbeginn <b>' + st.block.start + '</b> (' + st.block.label + ') und stoppt automatisch um <b>' + st.block.end + '</b>.'
+                : '⏱ Zählt ab jetzt und stoppt automatisch nach <b>90 Min.</b>';
+            document.getElementById('vz-popup').style.display = 'block';
+            document.getElementById('vz-popup-overlay').style.display = 'block';
+            document.getElementById('vz-class-input').value = '';
+            setTimeout(function() { document.getElementById('vz-class-input').focus(); }, 100);
+        }
+    }
+    function startVZWithClass() {
+        const klasse = document.getElementById('vz-class-input').value.trim();
+        const st = vzStartFuer(new Date());
+        // Vertretung laeuft immer als Teil des Hauptdienstes - startet ihn ggf. automatisch mit
+        if (!session.active) {
+            session = { active: true, start: st.ts };
+            localStorage.setItem('activeSessionV13', JSON.stringify(session));
+            addLog('Dienst automatisch gestartet (Vertretung)');
+        }
+        vzMarker = { active: true, start: st.ts, klasse: klasse };
+        localStorage.setItem('vzMarkerV22', JSON.stringify(vzMarker));
+        addLog('Vertretung Start' + (klasse ? ' – ' + klasse : ''));
+        closeVZPopup();
+        updateUI();
+    }
+    function checkVZAutoStop() {
+        if (!vzMarker.active || Date.now() < vzMarker.start + VZ_AUTO_MS) return;
+        const end = vzMarker.start + VZ_AUTO_MS;
+        const typ = vzTyp();
+        saveToDB(typ, vzMarker.start, end, null, { isVZ: true, excludeFromWeek: true });
+        const s = new Date(vzMarker.start).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        const e = new Date(end).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        lsSet('vzToastV23', typ + ' (' + s + '–' + e + ', 2 Std.) automatisch gespeichert.');
+        vzMarker = { active: false }; localStorage.removeItem('vzMarkerV22');
+        addLog('Vertretung automatisch gespeichert');
+    }
+    function dismissVZToast() { localStorage.removeItem('vzToastV23'); renderBanners(true); }
+
+    // ─── KONFERENZ / VNB (Kachel-Texte) ─────────────────────────────
+    function handleExtraClick() {
+        if (extraSession.active) {
+            if (confirm('Termin beenden?')) {
+                saveToDB('Konferenz', extraSession.start, Date.now(), null, { excludeFromWeek: session.active });
+                extraSession = { active: false }; localStorage.removeItem('extraSessionV13'); addLog('Konf. Ende');
+                updateUI();
+            }
+        } else if (!confirmExtra) {
+            confirmExtra = true; updateUI();
+            setTimeout(function() { confirmExtra = false; updateUI(); }, 3000);
+        } else {
+            extraSession = { active: true, start: Date.now() };
+            localStorage.setItem('extraSessionV13', JSON.stringify(extraSession));
+            addLog('Konf. Start'); confirmExtra = false; updateUI();
+        }
+    }
+    function handleVNBClick() {
+        if (vnbSession.active) {
+            if (confirm('Vor-/Nachbereitung beenden?')) {
+                saveToDB('Vor-/Nachbereitung', vnbSession.start, Date.now(), null, { excludeFromWeek: session.active });
+                vnbSession = { active: false }; localStorage.removeItem('vnbSessionV13'); addLog('VNB Ende');
+                updateUI();
+            }
+        } else if (!confirmVNB) {
+            confirmVNB = true; updateUI();
+            setTimeout(function() { confirmVNB = false; updateUI(); }, 3000);
+        } else {
+            vnbSession = { active: true, start: Date.now() };
+            localStorage.setItem('vnbSessionV13', JSON.stringify(vnbSession));
+            addLog('VNB Start'); confirmVNB = false; updateUI();
+        }
+    }
+    function setTile(id, state, v, s) {
+        const el = document.getElementById(id); if (!el) return;
+        el.classList.toggle('running', state === 'running');
+        el.classList.toggle('confirm', state === 'confirm');
+        const vEl = el.querySelector('.v'), sEl = el.querySelector('.s');
+        if (vEl && vEl.textContent !== v) vEl.textContent = v;
+        if (sEl && sEl.innerHTML !== s) sEl.innerHTML = s;
+    }
+    function setText(id, txt) { const el = document.getElementById(id); if (el && el.textContent !== txt) el.textContent = txt; }
+
+    // ─── UI UPDATE ──────────────────────────────────────────────────
+    function updateUI() {
+        const now = new Date();
+        syncCurrentWeek();
+        const today = dayInfo(now);
+        const btnMain = document.getElementById('btn-main');
+        if (session.active) {
+            document.getElementById('main-timer').innerText = formatTime(Date.now() - session.start);
+            btnMain.innerText = '■ Dienst beenden'; btnMain.className = 'btn btn-stop';
+        } else {
+            document.getElementById('main-timer').innerText = '00:00:00';
+            btnMain.innerText = '▶ Dienst starten'; btnMain.className = 'btn btn-start';
+        }
+
+        // Kacheln Vertretung / Konferenz / VNB
+        if (vzMarker.active) {
+            const left = vzMarker.start + VZ_AUTO_MS - Date.now();
+            setTile('btn-vz', 'running', formatTime(Date.now() - vzMarker.start),
+                (vzMarker.klasse ? 'Klasse ' + vzMarker.klasse + ' · ' : '') + 'stoppt in ' + Math.max(0, Math.ceil(left / 60000)) + ' Min.');
+        } else setTile('btn-vz', '', '', 'antippen zum Starten');
+        if (extraSession.active) setTile('btn-extra', 'running', formatTime(Date.now() - extraSession.start), 'läuft – antippen zum Beenden');
+        else if (confirmExtra)  setTile('btn-extra', 'confirm', 'Sicher?', 'nochmal tippen zum Starten');
+        else setTile('btn-extra', '', '', 'antippen zum Starten');
+        if (vnbSession.active) setTile('btn-vnb', 'running', formatTime(Date.now() - vnbSession.start), 'läuft – antippen zum Beenden');
+        else if (confirmVNB)  setTile('btn-vnb', 'confirm', 'Sicher?', 'nochmal tippen zum Starten');
+        else setTile('btn-vnb', '', '', 'antippen zum Starten');
+
+        // Tages-Soll + Tagesbalken
+        const ts = tagesSoll(now);
+        const dayIst = istZeit(now, now, true);
+        const barWrap = document.getElementById('day-bar-wrap');
+        let sollLine;
+        if (today.type === 'ferien')        sollLine = '🏖️ Ferien – kein Soll';
+        else if (today.type === 'feiertag') sollLine = '🎉 Feiertag – kein Soll';
+        else if (today.type === 'wochenende') sollLine = 'Wochenende – kein Soll';
+        else if (ts.fallback) sollLine = 'Soll heute ' + fmtH(ts.ms) + ' (noch kein Stundenplan eingetragen)';
+        else if (ts.frei) sollLine = ts.ausfall ? 'Heute fällt alles aus – kein Soll' : '🌿 Heute laut Stundenplan frei';
+        else sollLine = 'Soll heute ' + minToStr(ts.start) + '–' + minToStr(ts.end) + ' · ' + fmtH(ts.ms) + (ts.ausfall ? ' (' + ts.ausfall + '× Ausfall berücksichtigt)' : '');
+        setText('soll-line', sollLine);
+        if (ts.ms > 0) {
+            barWrap.style.display = '';
+            const perc = Math.round(dayIst / ts.ms * 100);
+            setText('day-ist', 'Heute ' + fmtH(dayIst) + ' von ' + fmtH(ts.ms));
+            setText('day-percent', perc + '%');
+            document.getElementById('day-progress').style.width = Math.min(perc, 100) + '%';
+        } else {
+            barWrap.style.display = dayIst > 0 ? '' : 'none';
+            setText('day-ist', 'Heute erfasst: ' + fmtH(dayIst));
+            setText('day-percent', '');
+            document.getElementById('day-progress').style.width = '0%';
+        }
+
+        // Woche: Soll = Summe der Tages-Soll (nur Schultage), Ist = erfasste Zeit
+        const ws = wochenSoll(now);
+        const weekIst = istZeit(ws.mon, addDays(ws.mon, 6), true);
+        const ring = document.getElementById('week-ring');
+        if (ws.schultage === 0) {
+            setText('week-percent', '–');
+            setText('week-val', fmtStd(weekIst) + ' Std erfasst');
+            setText('week-sub', 'Ferienwoche – kein Wochen-Soll');
+            ring.style.background = 'conic-gradient(#fde68a 0 0%, rgba(255,255,255,.18) 0)';
+        } else {
+            const perc = ws.ms > 0 ? Math.round(weekIst / ws.ms * 100) : 100;
+            setText('week-percent', perc + '%');
+            setText('week-val', fmtStd(weekIst) + ' / ' + fmtStd(ws.ms) + ' Std');
+            setText('week-sub', (perc >= 100 ? '✅ Soll erreicht · ' : '') + ws.schultage + ' Schultag' + (ws.schultage === 1 ? '' : 'e') + ' · Woche ' + abWeekFor(ws.mon));
+            ring.style.background = 'conic-gradient(' + (perc >= 100 ? '#86efac' : '#fde68a') + ' 0 ' + Math.min(perc, 100) + '%, rgba(255,255,255,.18) 0)';
+        }
+
+        // Vertretung im Monat (in Unterrichtsstunden, 1 Block = 2 Std.)
+        const vm = vertretungMonat(now);
+        setText('vz-val', vm.std + ' Std');
+        const vzHint = document.getElementById('vz-hint');
+        const hintTxt = vm.std <= 3
+            ? MONTH_NAMES[now.getMonth()] + ' · ' + vm.n + '× · bis 3 Std ohne Ausgleich'
+            : '⚠️ ' + MONTH_NAMES[now.getMonth()] + ': über 3 Std – Ausgleich prüfen';
+        if (vzHint.textContent !== hintTxt) vzHint.textContent = hintTxt;
+        const vzFill = document.getElementById('vz-progress');
+        vzFill.style.width = Math.min(vm.std / 6 * 100, 100) + '%';
+        vzFill.style.background = vm.std > 3 ? '#fecaca' : '#fde68a';
+
+        // Ausgleichskonto
+        const balance = computeSchoolYearBalance();
+        const balEl = document.getElementById('balance-val');
+        const balH = balance.saldoMS / 3600000;
+        setText('balance-val', (balH > 0 ? '+' : (balH < 0 ? '' : '±')) + balH.toFixed(1).replace('.', ',') + ' Std');
+        balEl.style.color = balH > 0 ? '#bbf7d0' : (balH < 0 ? '#fecaca' : '#fff');
+        const sy = getSchoolYearRange(now);
+        setText('balance-sub', 'Vertretung − Ausfall · ' + sy.start.getFullYear() + '/' + String(sy.end.getFullYear()).slice(2));
+
+        // Woche-Knopf
+        const t = weekButtonTarget(now);
+        const wl = abWeekFor(t);
+        const wb = document.getElementById('week-btn');
+        setText('week-label', wl);
+        const isThis = toLocalDateKey(t) === toLocalDateKey(mondayOf(now));
+        setText('week-pre', isThis ? '' : (!istSchulwoche(mondayOf(now)) && today.type !== 'wochenende' ? 'nach Ferien' : 'ab ' + DAY_SHORT[t.getDay()] + ' ' + t.getDate() + '.'));
+        wb.style.background = wl === 'A' ? 'var(--weekA)' : 'var(--weekB)';
+        setText('today-str', DAY_NAMES[now.getDay()] + ', ' + now.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+        setText('display-name', (userName || 'Lehrkraft').toUpperCase());
+        renderLogs();
+    }
+
+    // ─── HEUTE-KACHEL (Stundenplan) ─────────────────────────────────
+    function firstBlockText(d) {
+        const p = plan[abWeekFor(d) + '-' + DAY_NAMES[d.getDay()]] || {};
+        const b = blocks.find(function(b) { return (p[b.id] || '').trim(); });
+        return b ? { text: p[b.id].trim(), label: b.label + ' · ' + b.start } : null;
+    }
+    function updateAssistant() {
+        const now = new Date(), currentTime = now.getHours() * 60 + now.getMinutes();
+        const info = dayInfo(now);
+        const card = document.getElementById('task-card');
+        if (info.type === 'ferien' || info.type === 'feiertag') { card.style.display = 'none'; return; }
+        card.style.display = '';
+        let activeTask = null, nextTask = null;
+        if (info.type === 'wochenende') {
+            activeTask = { text: 'Wochenende', label: 'erhol dich gut' };
+            const ns = nextSchultag(now);
+            if (ns) { const fb = firstBlockText(ns); nextTask = { text: fb ? fb.text : 'laut Plan frei', label: fmtDM(ns) + (fb ? ' · ' + fb.label : '') }; }
+        } else {
+            const key = currentWeek + '-' + DAY_NAMES[now.getDay()];
+            for (let i = 0; i < blocks.length; i++) {
+                const b = blocks[i];
+                const sMin = toMin(b.start), eMin = toMin(b.end);
+                const text = plan[key] && plan[key][b.id];
+                if (!text || !text.trim()) continue;
+                if (currentTime >= sMin && currentTime < eMin) activeTask = { text: text, label: b.label + ' · bis ' + b.end };
+                else if (currentTime < sMin && !nextTask) nextTask = { text: text, label: b.label + ' · ' + b.start };
+            }
+            (calEntries[toLocalDateKey(now)] || []).filter(function(e) { return e.start; }).forEach(function(e) {
+                const sMin = toMin(e.start);
+                const eMin = e.end ? toMin(e.end) : sMin + 60;
+                if (currentTime >= sMin && currentTime < eMin) activeTask = { text: e.title, label: e.cat };
+                else if (currentTime < sMin && !nextTask) nextTask = { text: e.title, label: e.start + ' Uhr' };
+            });
+            if (!nextTask) {
+                const ns = nextSchultag(now);
+                if (ns) { const fb = firstBlockText(ns); nextTask = { text: 'Feierabend 🎉', label: 'dann ' + fmtDM(ns) + (fb ? ': ' + fb.text : '') }; }
+            }
+        }
+        setText('task-now', activeTask ? activeTask.text : 'Frei / Pause');
+        setText('task-now-sub', activeTask ? activeTask.label : '–');
+        setText('task-next', nextTask ? nextTask.text : 'Feierabend 🎉');
+        setText('task-next-sub', nextTask ? nextTask.label : '–');
+    }
+
+    // ─── NAECHSTER TERMIN (Kachel) ──────────────────────────────────
+    function updateNextTerminTicker() {
+        const res = getNextUpcomingTermin();
+        if (!res) { setText('next-termin-text', 'Keine Termine'); setText('next-termin-sub', 'Kalender öffnen zum Eintragen'); return; }
+        const now = new Date();
+        const todayKey = toLocalDateKey(now), tomorrowKey = toLocalDateKey(addDays(now, 1));
+        const d = parseKey(res.dateKey);
+        const dayLabel = res.dateKey === todayKey ? 'Heute' : res.dateKey === tomorrowKey ? 'Morgen' : fmtDM(d);
+        const e = res.entry;
+        setText('next-termin-text', dayLabel + (e.start ? ' · ' + e.start : ''));
+        setText('next-termin-sub', e.title + (e.cat ? ' (' + e.cat + ')' : ''));
+    }
+
+    // ─── BANNER: Ferien/Feiertag/Vorbereitung, Vorwarnung, Freitags-Rueckblick, VZ-Hinweis ──
+    let _bannerHTML = '';
+    function ferienPeriode(d) {
+        const k = toLocalDateKey(d);
+        return FERIEN_BB.find(function(f) { return k >= f[0] && k <= f[1]; }) || null;
+    }
+    function banner(cls, ic, title, sub, xFn) {
+        return '<div class="banner ' + cls + (xFn ? ' has-x' : '') + '"><span class="b-ic">' + ic + '</span><div><b>' + title + '</b>' +
+               (sub ? '<small>' + sub + '</small>' : '') + '</div>' + (xFn ? '<button class="b-x" onclick="' + xFn + '" aria-label="Schließen">✕</button>' : '') + '</div>';
+    }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    function renderBanners(force) {
+        const now = new Date(), todayKey = toLocalDateKey(now);
+        let h = '';
+        const toast = lsGet('vzToastV23', '');
+        if (toast) h += banner('bn-ok', '✅', 'Vertretung gespeichert', esc(toast), 'dismissVZToast()');
+
+        const info = dayInfo(now);
+        if (VORB_TAGE[todayKey]) {
+            const ns = nextSchultag(now);
+            h += banner('bn-vorb', '🧰', 'Vorbereitungstag – Präsenz in der Schule',
+                'Letzte Arbeitstage vor Schuljahresbeginn (VV-Arbeitszeit § 5). Kein Unterricht, kein Soll in der App' + (ns ? ' · erster Schultag ' + fmtDM(ns) : ''));
+        } else if (info.type === 'ferien' || (info.type === 'feiertag' && ferienPeriode(now))) {
+            const f = ferienPeriode(now), ns = nextSchultag(now);
+            const end = f ? parseKey(f[1]) : null;
+            h += banner('bn-ferien', f ? f[3] : '🏖️', (f ? f[2] : 'Ferien') + ' – kein Unterricht',
+                (end && toLocalDateKey(end) !== todayKey ? 'bis ' + fmtDM(end) + ' · ' : '') + (ns ? 'Schule wieder ab ' + fmtDM(ns) + ' (Woche ' + abWeekFor(ns) + ')' : '') + ' · kein Soll in den Ferien' + (info.type === 'feiertag' ? ' · heute: ' + info.title : ''));
+        } else if (info.type === 'feiertag') {
+            const ns = nextSchultag(now);
+            h += banner('bn-feiertag', '🎉', 'Feiertag: ' + info.title, 'Kein Unterricht, kein Soll' + (ns ? ' · nächster Schultag ' + fmtDM(ns) : ''));
+        } else if (info.type === 'wochenende') {
+            // Vorbereitungstage schon ankuendigen, wenn sie in der kommenden Woche liegen
+            const mon = addDays(mondayOf(now), 7);
+            for (let i = 0; i < 5; i++) { const d = addDays(mon, i); if (VORB_TAGE[toLocalDateKey(d)]) { h += banner('bn-vorb', '🧰', 'Nächste Woche: Vorbereitungstage', 'Ab ' + fmtDM(d) + ' Präsenz in der Schule (letzte 3 Arbeitstage vor Schuljahresbeginn).'); break; } }
+        }
+
+        // Termin-Vorwarnung (Tag vorher; freitags auch schon fuer Sa-Mo)
+        if (lsGet('vorwarnAckV23', '') !== todayKey) {
+            const span = now.getDay() === 5 ? 3 : 1;
+            const items = [];
+            for (let i = 1; i <= span; i++) {
+                const d = addDays(now, i), k = toLocalDateKey(d);
+                (calEntries[k] || []).forEach(function(e) { items.push((i === 1 ? 'Morgen' : fmtDM(d)) + (e.start ? ' ' + e.start : '') + ': ' + esc(e.title)); });
+            }
+            if (items.length) h += banner('bn-vorwarn', '📅', items.length === 1 ? 'Termin-Vorwarnung' : items.length + ' Termine stehen an', items.slice(0, 4).join('<br>') + (items.length > 4 ? '<br>…' : ''), 'ackVorwarnung()');
+        }
+
+        // Freitags-Wochenrueckblick: freitags 12-19 Uhr, wegklickbar
+        if (now.getDay() === 5 && now.getHours() >= 12 && now.getHours() < 19 && lsGet('rueckblickAckV23', '') !== todayKey) {
+            const ws = wochenSoll(now);
+            if (ws.schultage > 0) {
+                const ist = istZeit(ws.mon, addDays(ws.mon, 6), true);
+                let vzW = 0, ausW = 0;
+                db.forEach(function(e) { const d = dbDate(e); if (!d || d < ws.mon || d > addDays(ws.mon, 6)) return; if (e.isVZ === 'JA') vzW += vzStd(e.ms); if (e.isAusfall === 'JA') ausW++; });
+                const perc = ws.ms > 0 ? Math.round(ist / ws.ms * 100) : 100;
+                const nextMon = naechsteSchulwoche(addDays(ws.mon, 7));
+                const bal = computeSchoolYearBalance().saldoMS / 3600000;
+                h += banner('bn-rueck', '📊', 'Wochenrückblick KW ' + getKW(now) + (perc >= 100 ? ' – Soll erreicht 🎉' : ''),
+                    fmtStd(ist) + ' von ' + fmtStd(ws.ms) + ' Std (' + perc + ' %) · Vertretung ' + vzW + ' Std · Ausfall ' + ausW + '×<br>' +
+                    'Ausgleichskonto ' + (bal > 0 ? '+' : '') + bal.toFixed(1).replace('.', ',') + ' Std · ' + (toLocalDateKey(nextMon) === toLocalDateKey(addDays(ws.mon, 7)) ? 'nächste Woche' : 'nach den Ferien (' + fmtDM(nextMon) + ')') + ': ' + abWeekFor(nextMon) + ' · schönes Wochenende!',
+                    'ackRueckblick()');
+            }
+        }
+        if (force || h !== _bannerHTML) { _bannerHTML = h; document.getElementById('banner-area').innerHTML = h; }
+    }
+    function ackVorwarnung() { lsSet('vorwarnAckV23', toLocalDateKey(new Date())); renderBanners(true); }
+    function ackRueckblick() { lsSet('rueckblickAckV23', toLocalDateKey(new Date())); renderBanners(true); }
+
+    // ─── JAHRESZEITEN-EFFEKT (langsam, sparsam) ─────────────────────
+    const FX = { canvas: null, ctx: null, parts: [], mode: null, raf: null, last: 0, w: 0, h: 0, dpr: 1 };
+    function fxSeasonAuto() { const m = new Date().getMonth(); return (m >= 2 && m <= 4) ? 'fruehling' : (m >= 5 && m <= 7) ? 'sommer' : (m >= 8 && m <= 10) ? 'herbst' : 'winter'; }
+    function fxSetting() { return lsGet('seasonFxV23', 'auto'); }
+    function fxMode() {
+        const s = fxSetting();
+        if (s === 'aus') return null;
+        try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null; } catch (err) {}
+        return s === 'auto' ? fxSeasonAuto() : s;
+    }
+    function fxResize() {
+        if (!FX.canvas) return;
+        FX.dpr = Math.min(window.devicePixelRatio || 1, 2);
+        FX.w = window.innerWidth; FX.h = window.innerHeight;
+        FX.canvas.width = FX.w * FX.dpr; FX.canvas.height = FX.h * FX.dpr;
+        FX.ctx.setTransform(FX.dpr, 0, 0, FX.dpr, 0, 0);
+    }
+    function fxSpawn(p, initial) {
+        const m = FX.mode;
+        p.x = Math.random() * FX.w;
+        p.phase = Math.random() * Math.PI * 2;
+        p.rot = Math.random() * Math.PI * 2;
+        p.vr = (Math.random() - 0.5) * 0.03;
+        if (m === 'sommer') {
+            p.y = initial ? Math.random() * FX.h : FX.h + 10;
+            p.vy = -(0.15 + Math.random() * 0.25);
+            p.size = 1.5 + Math.random() * 2;
+            p.col = ['#fde68a', '#fef3c7', '#fcd34d'][Math.floor(Math.random() * 3)];
+        } else {
+            p.y = initial ? Math.random() * FX.h : -20;
+            p.vy = m === 'winter' ? 0.35 + Math.random() * 0.45 : 0.4 + Math.random() * 0.45;
+            p.size = m === 'winter' ? 1.5 + Math.random() * 2.5 : 6 + Math.random() * 5;
+            p.col = m === 'herbst' ? ['#d97706', '#b45309', '#dc2626', '#ca8a04', '#9a3412'][Math.floor(Math.random() * 5)]
+                  : m === 'fruehling' ? ['#fbcfe8', '#f9a8d4', '#fce7f3'][Math.floor(Math.random() * 3)] : '#ffffff';
+        }
+        p.sway = 0.3 + Math.random() * 0.6;
+        return p;
+    }
+    function fxDraw(p, t) {
+        const c = FX.ctx, m = FX.mode;
+        c.save(); c.translate(p.x, p.y); c.rotate(p.rot);
+        if (m === 'winter') {
+            c.globalAlpha = 0.75; c.fillStyle = '#fff'; c.beginPath(); c.arc(0, 0, p.size, 0, Math.PI * 2); c.fill();
+        } else if (m === 'herbst') {
+            c.globalAlpha = 0.8; c.fillStyle = p.col; c.beginPath();
+            c.moveTo(0, -p.size); c.quadraticCurveTo(p.size * 0.8, 0, 0, p.size); c.quadraticCurveTo(-p.size * 0.8, 0, 0, -p.size); c.fill();
+            c.strokeStyle = 'rgba(0,0,0,.25)'; c.lineWidth = 0.8; c.beginPath(); c.moveTo(0, -p.size); c.lineTo(0, p.size + 2); c.stroke();
+        } else if (m === 'fruehling') {
+            c.globalAlpha = 0.8; c.fillStyle = p.col; const r = p.size * 0.32;
+            for (let i = 0; i < 5; i++) { const a = i * Math.PI * 2 / 5; c.beginPath(); c.arc(Math.cos(a) * r, Math.sin(a) * r, r, 0, Math.PI * 2); c.fill(); }
+            c.fillStyle = '#fde047'; c.beginPath(); c.arc(0, 0, r * 0.55, 0, Math.PI * 2); c.fill();
+        } else {
+            c.globalAlpha = 0.35 + 0.45 * (0.5 + 0.5 * Math.sin(t / 600 + p.phase));
+            c.fillStyle = p.col; const s = p.size;
+            c.beginPath(); c.moveTo(0, -s * 2); c.lineTo(s * 0.45, 0); c.lineTo(0, s * 2); c.lineTo(-s * 0.45, 0); c.closePath(); c.fill();
+            c.beginPath(); c.moveTo(-s * 2, 0); c.lineTo(0, s * 0.45); c.lineTo(s * 2, 0); c.lineTo(0, -s * 0.45); c.closePath(); c.fill();
+        }
+        c.restore();
+    }
+    function fxLoop(t) {
+        FX.raf = requestAnimationFrame(fxLoop);
+        if (t - FX.last < 33) return;      // ~30 Bilder/s reichen und schonen den Akku
+        FX.last = t;
+        FX.ctx.clearRect(0, 0, FX.w, FX.h);
+        FX.parts.forEach(function(p) {
+            p.phase += 0.02;
+            p.y += p.vy;
+            p.x += Math.sin(p.phase) * p.sway;
+            p.rot += p.vr;
+            if (p.y > FX.h + 25 || p.y < -25 || p.x < -30 || p.x > FX.w + 30) fxSpawn(p, false);
+            fxDraw(p, t);
+        });
+    }
+    function fxStop() { if (FX.raf) cancelAnimationFrame(FX.raf); FX.raf = null; if (FX.ctx) FX.ctx.clearRect(0, 0, FX.w, FX.h); }
+    function fxStart() {
+        fxStop();
+        FX.mode = fxMode();
+        if (!FX.mode || document.hidden) return;
+        if (!FX.canvas) { FX.canvas = document.getElementById('fx-canvas'); if (!FX.canvas) return; FX.ctx = FX.canvas.getContext('2d'); }
+        fxResize();
+        const n = Math.round(Math.min(16, Math.max(7, FX.w * FX.h / 45000)));
+        FX.parts = []; for (let i = 0; i < n; i++) FX.parts.push(fxSpawn({}, true));
+        FX.raf = requestAnimationFrame(fxLoop);
+    }
+    function setSeasonFx(v) { lsSet('seasonFxV23', v); fxStart(); }
+    document.addEventListener('visibilitychange', function() { if (document.hidden) fxStop(); else fxStart(); });
+    window.addEventListener('resize', function() { if (FX.raf) fxResize(); });
+
+    // ─── v23 TICK (laeuft zusaetzlich zur Uhr) ──────────────────────
+    function v23Tick() {
+        checkVZAutoStop();
+        renderBanners(false);
+        updateAssistant();
+    }
+
     function renderCalendar() {
         const days = getWeekDates(calOffset);
         const kw   = getKW(days[0]);
         const ab   = getABWeek(days[0]);
  
         document.getElementById('cal-week-title').innerText  = `KW ${kw} · ${days[0].toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} – ${days[6].toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})}`;
-        document.getElementById('cal-week-badge').innerText = `WOCHE ${ab}`;
-        document.getElementById('cal-week-badge').style.background = ab === 'A' ? '#2563eb' : '#9333ea';
+        document.getElementById('cal-week-badge').innerText = ab === 'FERIEN' ? 'FERIENWOCHE' : `WOCHE ${ab}`;
+        document.getElementById('cal-week-badge').style.background = ab === 'FERIEN' ? '#d97706' : (ab === 'A' ? '#2563eb' : '#9333ea');
  
         const container = document.getElementById('cal-days-container');
         const dayNames  = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
@@ -1610,7 +1978,7 @@
     function openSetup() {
         let dateOptions = "";
         let d = new Date();
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 28; i++) {
             if (d.getDay() !== 0 && d.getDay() !== 6) {
                 let ds = d.toLocaleDateString('de-DE');
                 dateOptions += `<option value="${ds}">${i===0?'Heute':ds}</option>`;
@@ -1661,7 +2029,20 @@
                 </div>
             </div>
             <label>NAME</label><input type="text" id="setup-name" value="${userName}">
-            <label>WOCHEN-SOLL (Std)</label><input type="number" id="setup-soll" value="${weeklySollHours}">
+            <div class="manual-box" style="border-color:#f59e0b;">
+                <label style="color:#f59e0b">🍂 JAHRESZEITEN-EFFEKT</label>
+                <select id="setup-fx" onchange="setSeasonFx(this.value)">
+                    <option value="auto">Automatisch (nach Jahreszeit)</option>
+                    <option value="herbst">🍂 Herbst – Blätter</option>
+                    <option value="winter">❄️ Winter – Schnee</option>
+                    <option value="fruehling">🌸 Frühling – Blüten</option>
+                    <option value="sommer">✨ Sommer – Funkeln</option>
+                    <option value="aus">Aus</option>
+                </select>
+                <div style="font-size:0.68rem;color:#94a3b8;">Langsam und sparsam. Pausiert automatisch, wenn die App im Hintergrund ist.</div>
+            </div>
+            <label>WOCHEN-SOLL (Std) – nur solange kein Stundenplan eingetragen ist</label><input type="number" id="setup-soll" value="${weeklySollHours}">
+            <div style="font-size:0.68rem;color:#94a3b8;margin:-6px 0 10px;">Sobald unten ein Stundenplan steht, rechnet die App das Soll selbst: pro Schultag Anwesenheit 7:30–13:00 bzw. bis 15:15 mit 4. Block. Ferien &amp; Feiertage zählen nicht.</div>
             <button class="accordion-btn" onclick="toggleAcc('accA')">WOCHE A BEARBEITEN <span>▼</span></button>
             <div id="accA" class="accordion-content">
                 <p style="font-size:0.68rem;color:#94a3b8;margin:4px 0 0;">Bloecke = Zeilen, Tage = Spalten. Antippen zum Eintragen (z.B. Klasse/Fach). Leer lassen = kein Unterricht.</p>
@@ -1677,6 +2058,7 @@
         document.getElementById('modal').style.display = 'block';
         document.getElementById('nachtrag-start-wrap').innerHTML = buildTimeSelectHTML('nachtrag-start', '08:00');
         document.getElementById('nachtrag-end-wrap').innerHTML   = buildTimeSelectHTML('nachtrag-end', '13:00');
+        const fxSel = document.getElementById('setup-fx'); if (fxSel) fxSel.value = fxSetting();
     }
 
     function saveSetup() {
@@ -1773,10 +2155,26 @@
         document.getElementById('modal-body').innerHTML = `
             <div class="modal-nav">
                 <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;color:var(--primary);font-weight:bold;cursor:pointer;">✕ SCHLIESSEN</button>
-                <b style="color:var(--primary)">BEDIENUNGSANLEITUNG v22.1</b>
+                <b style="color:var(--primary)">BEDIENUNGSANLEITUNG v23.0</b>
                 <div></div>
             </div>
             <div class="help-text" style="padding:10px 20px 60px;">
+                <div style="background:rgba(56,189,248,0.1);border-left:4px solid var(--primary);padding:14px;border-radius:8px;margin-bottom:20px;">
+                    <p style="margin:0 0 8px;"><b style="color:var(--primary);">🆕 Neu in v23.0</b></p>
+                    <p style="margin:0;font-size:0.82rem;line-height:1.55;">
+                        • <b>Kachel-Layout</b> – alles auf einen Blick, auf dem Handy kompakt, auf Tablet/PC in 4 Spalten<br>
+                        • <b>Ferien &amp; Feiertage Brandenburg bis Sommer 2029</b> (amtlich, VV-Schulbetrieb). In Ferien und an Feiertagen gibt es <b>kein Soll</b>, keinen Tagesbalken und keinen Stundenplan – stattdessen ein Hinweis, wann die Schule wieder beginnt<br>
+                        • <b>Bewegliche Ferientage</b> sind mit dem landesweiten Standardtermin eingetragen – hat eure Schulkonferenz einen anderen Tag festgelegt, bitte den Tag per „Ausfall“ bzw. Nachtrag berücksichtigen<br>
+                        • <b>Vorbereitungstage</b> (letzte 3 Arbeitstage vor Schuljahresbeginn nach den Sommerferien, VV-Arbeitszeit § 5) werden als Hinweis angezeigt<br>
+                        • <b>Soll nach Stundenplan:</b> pro Schultag Anwesenheit 7:30–13:00, mit 4. Block bis 15:15 (Früh-/Spätaufsicht verlängert entsprechend). Tag ohne Eintrag = „frei“. Fällt der 4. Block aus, endet das Soll um 13:00<br>
+                        • <b>Wochenbalken</b> = Summe der Tages-Soll der Schultage dieser Woche – zeigt einfach, ob die Stunden erreicht sind<br>
+                        • <b>A/B-Woche wechselt automatisch</b>, Ferienwochen werden übersprungen. Nach einem Wechsel erscheint ein Hinweis (antippen = passt). Stimmt es nicht, oben auf „Woche“ tippen – ab dann rechnet die App von dort weiter<br>
+                        • <b>Vertretung</b> zählt ab Blockbeginn und <b>stoppt nach 90 Min. automatisch</b> (Hinweis „gespeichert“ zum Wegklicken). Sie läuft innerhalb des Dienstes mit – nichts wird doppelt gezählt. Die Kachel zeigt die Vertretungsstunden im Monat (1 Block = 2 Std.); über 3 Std im Monat besteht nach VV-Arbeitszeit § 10 Anspruch auf Ausgleich – bitte mit der Schulleitung klären<br>
+                        • <b>Termin-Kachel</b> mit Zähler der anstehenden Termine, <b>Termin-Vorwarnung</b> am Vortag (freitags schon fürs Wochenende/Montag) und <b>Wochenrückblick</b> freitags 12–19 Uhr<br>
+                        • <b>Jahreszeiten-Effekt</b> (Blätter, Schnee, Blüten, Funkeln) – in den Einstellungen umschaltbar oder aus<br>
+                        • <b>Nachtrag</b> in den Einstellungen jetzt bis 4 Wochen zurück
+                    </p>
+                </div>
                 <div style="background:rgba(251,191,36,0.1);border-left:4px solid var(--accent);padding:14px;border-radius:8px;margin-bottom:20px;">
                     <p style="margin:0 0 8px;"><b style="color:var(--accent);">🆕 Das ist neu</b> – für alle Kolleginnen und Kollegen, die diese Version zum ersten Mal sehen:</p>
                     <p style="margin:0 0 6px;font-size:0.85rem;font-weight:700;color:var(--text);">Großer Umbau (v22.0):</p>
@@ -1877,18 +2275,6 @@
         ).join('');
     }
  
-    function toggleWeekManual() {
-        currentWeek = currentWeek === 'A' ? 'B' : 'A';
-        localStorage.setItem('manualWeekV13', currentWeek);
-        // Sofort sichtbar - direkt DOM updaten
-        if (document.getElementById('week-label')) document.getElementById('week-label').innerText = currentWeek;
-        const wb = document.getElementById('week-btn');
-        wb.style.background = currentWeek === 'A' ? '#2563eb' : '#9333ea';
-        wb.style.boxShadow  = currentWeek === 'A' ? '0 4px 12px rgba(37,99,235,0.4)' : '0 4px 12px rgba(147,51,234,0.4)';
-        updateUI();
-        updateAssistant();
-        ackWeekSwitch(); // Wechsel-Hinweis verschwindet, da ja gerade aktiv gewechselt wurde
-    }
 
     // ─── WOCHE-WECHSEL-HINWEIS (manuell, da nach Ferien nicht automatisch berechenbar) ──
     // Liefert den Montag (ms) der Woche, fuer die der Nutzer die Woche A/B pruefen/setzen sollte:
@@ -1900,19 +2286,8 @@
         const mon = new Date(d.getFullYear(), d.getMonth(), diff).setHours(0, 0, 0, 0);
         return day === 0 ? mon + 7 * 86400000 : mon;
     }
-    function updateWeekSwitchHint() {
-        const hintEl = document.getElementById('week-switch-hint');
-        if (!hintEl) return;
-        const target = targetWeekMonday(new Date());
-        const ack = parseInt(localStorage.getItem('weekSwitchAckV22') || '0', 10);
-        hintEl.style.display = (ack !== target) ? 'block' : 'none';
-    }
     // Bestaetigt den Hinweis OHNE die Woche zu wechseln (z.B. nach den Ferien, wenn die
     // gleiche Woche absichtlich bestehen bleibt) - antippen des Hinweis-Badges selbst macht das.
-    function ackWeekSwitch() {
-        localStorage.setItem('weekSwitchAckV22', String(targetWeekMonday(new Date())));
-        updateWeekSwitchHint();
-    }
 
     // ─── EXPORT ───────────────────────────────────────────────────
     function exportData() {
