@@ -13,7 +13,7 @@
     <meta name="copyright" content="© 2026 M. Nagel – Weitergabe und Nachbau nur mit Zustimmung">
     <meta name="robots" content="noai, noimageai, noindex">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Arbeitszeit-Assistent Pro v24.0</title>
+    <title>Arbeitszeit-Assistent Pro v24.1</title>
     <style id="dynamic-theme-style"></style>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2693/2693507.png">
     <style>
@@ -413,8 +413,8 @@
 <body>
  
 <div id="update-toast">
-    <div class="toast-header"><span>✨ Update Info v24.0</span></div>
-    <div class="toast-body"><b>v24.0:</b> Unterrichtszeiten frei einstellbar (beliebig viele Stunden &amp; Pausen), A/B-Wochen abschaltbar, Nutzungsbedingungen.<br><b>v23.2:</b> Das Tages-Soll endet jetzt mit deiner letzten Stunde (nicht mehr pauschal um 13:00). Wer nach Plan bis 11:00 Unterricht hat und dann geht, erreicht 100 %.<br><b>v23.1:</b> Das Tages-Soll beginnt jetzt mit deiner ersten Stunde laut Stundenplan. Hast du den 1. Block frei und bist trotzdem früher da, zählt diese Zeit als Plus.<br>v23.0: Neues Kachel-Layout · Ferien &amp; Feiertage bis 2029 (kein Soll in den Ferien) · Soll nach Stundenplan · A/B-Woche wechselt automatisch · Vertretung stoppt nach 90 Min. von selbst · Termin-Vorwarnung &amp; Freitags-Rückblick · Jahreszeiten-Effekt. Details in der Hilfe (?).</div>
+    <div class="toast-header"><span>✨ Update Info v24.1</span></div>
+    <div class="toast-body"><b>v24.1:</b> Unterrichtszeiten: Das Uhrzeit-Rad bleibt offen, bis du bestätigst.<br><b>v24.0:</b> Unterrichtszeiten frei einstellbar (beliebig viele Stunden &amp; Pausen), A/B-Wochen abschaltbar, Nutzungsbedingungen.<br><b>v23.2:</b> Das Tages-Soll endet jetzt mit deiner letzten Stunde (nicht mehr pauschal um 13:00). Wer nach Plan bis 11:00 Unterricht hat und dann geht, erreicht 100 %.<br><b>v23.1:</b> Das Tages-Soll beginnt jetzt mit deiner ersten Stunde laut Stundenplan. Hast du den 1. Block frei und bist trotzdem früher da, zählt diese Zeit als Plus.<br>v23.0: Neues Kachel-Layout · Ferien &amp; Feiertage bis 2029 (kein Soll in den Ferien) · Soll nach Stundenplan · A/B-Woche wechselt automatisch · Vertretung stoppt nach 90 Min. von selbst · Termin-Vorwarnung &amp; Freitags-Rückblick · Jahreszeiten-Effekt. Details in der Hilfe (?).</div>
     <button class="toast-btn" onclick="closeToast()">OK, danke!</button>
 </div>
  
@@ -486,7 +486,7 @@
         <span class="desktop-toggle-label">Ansicht:</span>
         <button class="desktop-toggle-btn" id="desktop-toggle-btn" onclick="toggleDesktopMode()">📱 Mobil</button>
     </div>
-    <footer class="footer-info">&copy; 2026 M. Nagel &bull; v24.0 &bull; <a href="#" onclick="nutzungZeigen(true);return false;" style="color:inherit">Nutzungsbedingungen</a></footer>
+    <footer class="footer-info">&copy; 2026 M. Nagel &bull; v24.1 &bull; <a href="#" onclick="nutzungZeigen(true);return false;" style="color:inherit">Nutzungsbedingungen</a></footer>
 </div>
 
  
@@ -612,7 +612,7 @@
 <input type="file" id="backup-file-input" accept="application/json" style="display:none;" onchange="importBackup(event)">
 
 <script>
-    const APP_VERSION = "24.0";
+    const APP_VERSION = "24.1";
  
     // ─── STATE ────────────────────────────────────────────────────
     let db         = JSON.parse(localStorage.getItem('lehrerDB_Export'))    || [];
@@ -2256,7 +2256,7 @@
         document.getElementById('modal-body').innerHTML = `
             <div class="modal-nav">
                 <button onclick="document.getElementById('modal').style.display='none'" style="background:none;border:none;color:var(--primary);font-weight:bold;cursor:pointer;">✕ SCHLIESSEN</button>
-                <b style="color:var(--primary)">BEDIENUNGSANLEITUNG v24.0</b>
+                <b style="color:var(--primary)">BEDIENUNGSANLEITUNG v24.1</b>
                 <div></div>
             </div>
             <div class="help-text" style="padding:10px 20px 60px;">
@@ -2510,10 +2510,10 @@
             const u = rasterIstUnterricht(b);
             return '<div class="raster-row' + (u ? '' : ' pause') + '">' +
                 '<span class="raster-typ" title="' + (u ? 'Unterricht' : 'Pause / Aufsicht') + '">' + (u ? '📘' : '☕') + '</span>' +
-                '<input class="raster-lab" value="' + esc(b.label) + '" onchange="rasterAendern(' + i + ',\'label\',this.value)">' +
-                '<input type="time" value="' + b.start + '" onchange="rasterAendern(' + i + ',\'start\',this.value)">' +
+                '<input class="raster-lab" value="' + esc(b.label) + '" onchange="rasterWert(' + i + ',\'label\',this.value)">' +
+                '<input type="time" value="' + b.start + '" onchange="rasterWert(' + i + ',\'start\',this.value)">' +
                 '<span class="raster-bis">–</span>' +
-                '<input type="time" value="' + b.end + '" onchange="rasterAendern(' + i + ',\'end\',this.value)">' +
+                '<input type="time" value="' + b.end + '" onchange="rasterWert(' + i + ',\'end\',this.value)">' +
                 '<button class="raster-del" title="Zeile löschen" onclick="rasterLoeschen(' + i + ')">✕</button></div>';
         }).join('') + '</div>' +
         '<div class="raster-add"><button onclick="rasterNeu(\'u\')">+ Stunde / Block</button><button onclick="rasterNeu(\'p\')">+ Pause / Aufsicht</button></div>' +
@@ -2531,7 +2531,26 @@
         '</details>' +
         '<button class="raster-reset" onclick="rasterStandard()">↺ Auf Standard zurücksetzen (4 Blöcke à 90 Min.)</button>';
     }
-    function rasterZeichnen() { const el = document.getElementById('raster-box'); if (el) el.innerHTML = rasterHtml(); }
+    // Werte beim Drehen nur merken – neu sortiert/gezeichnet wird erst, wenn das Feld verlassen wird (sonst schließt sich das Uhrzeit-Rad)
+    let rasterGeaendert = false;
+    function rasterWert(i, feld, wert) {
+        const b = blocks[i]; if (!b) return;
+        if (feld === 'label') { wert = String(wert).trim(); if (!wert) return; }
+        else if (!/^\d\d:\d\d$/.test(wert)) return;
+        b[feld] = wert; rasterGeaendert = true;
+        try { localStorage.setItem('zeitrasterV24', JSON.stringify(blocks)); } catch (e) {}
+    }
+    function rasterFokusWeg() {
+        setTimeout(function() {
+            const box = document.getElementById('raster-box');
+            if (!rasterGeaendert || (box && box.contains(document.activeElement))) return;
+            rasterGeaendert = false;
+            const falsch = blocks.find(function(b) { return toMin(b.end) <= toMin(b.start); });
+            if (falsch) alert('Bei „' + falsch.label + '“ liegt das Ende vor dem Beginn – bitte prüfen.');
+            rasterNachAenderung();
+        }, 150);
+    }
+    function rasterZeichnen() { const el = document.getElementById('raster-box'); if (el) { el.innerHTML = rasterHtml(); } }
     function rasterNachAenderung() { planAusFeldern(); rasterSpeichern(); rasterZeichnen(); planGitterNeu(); try { updateUI(); updateAssistant(); } catch (e) {} }
     function rasterAendern(i, feld, wert) {
         const b = blocks[i]; if (!b) return;
@@ -2597,7 +2616,7 @@
             '<label class="ab-schalter"><input type="checkbox" ' + (abAktiv() ? 'checked' : '') + ' onchange="abUmschalten(this.checked)"> Meine Schule hat A- und B-Wochen</label>' +
             '<div style="font-size:0.68rem;color:#94a3b8;">Aus = ein Stundenplan für jede Woche, kein Wochen-Knopf, keine Umschalt-Hinweise.</div></div>' +
             '<button class="accordion-btn" onclick="toggleAcc(\'accZeit\')">🕐 UNTERRICHTSZEITEN <span>▼</span></button>' +
-            '<div id="accZeit" class="accordion-content"><p style="font-size:0.68rem;color:#94a3b8;margin:4px 0 8px;">Zeiten deiner Schule: 📘 Unterricht, ☕ Pause/Aufsicht (trägst du dort im Stundenplan eine Aufsicht ein, zählt sie zum Soll). Änderungen gelten sofort.</p><div id="raster-box">' + rasterHtml() + '</div></div>';
+            '<div id="accZeit" class="accordion-content"><p style="font-size:0.68rem;color:#94a3b8;margin:4px 0 8px;">Zeiten deiner Schule: 📘 Unterricht, ☕ Pause/Aufsicht (trägst du dort im Stundenplan eine Aufsicht ein, zählt sie zum Soll). Änderungen gelten sofort.</p><div id="raster-box" onfocusout="rasterFokusWeg()">' + rasterHtml() + '</div></div>';
     }
     (function() {
         // Wochen A/B abschalten: immer Woche A, keine Hinweise
